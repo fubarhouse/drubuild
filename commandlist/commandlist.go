@@ -2,8 +2,8 @@ package commandlist
 
 import (
 	"fmt"
-	"github.com/fubarhouse/golang_drush/command"
 	"os/exec"
+	"github.com/fubarhouse/golang-drush/command"
 )
 
 // Multiple Command objects as []Command, known as lists here.
