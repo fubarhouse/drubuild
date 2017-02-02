@@ -8,23 +8,23 @@ Intended for scripting purposes for Drupal developers who're using go.
 
 ****Running a single command****
 ```
-drush := NewDrush(alias, command)
-output, error := drush.Output()
+drush := NewDrushCommand()
+drush.Set("myalias", "cc all", false)
+_, cmdErr := drush.Output()
 ```
 ****Running an infinite amount of commands****
 ````
-drushList := NewDrushList()
-command1 := NewDrush("none", "", false)
-command2 := NewDrush("none", "", false)
-drushList.Add(command1, command2)
-drushList.RemoveIndex(1)
-outputArray, errorArray := drushList.Output()
+commands := NewDrushCommandList()
+command1 := NewDrushCommand()
+command1.Set("", "cc drush", false)
+commands.Add(command1)
+_, drushError := commands.Output()
 ````
 
 ## Install
 
 ```console
-$ go get github.com/fubarhouse/golang-drush/
+$ go get github.com/fubarhouse/golang-drush
 ```
 
 ## License
