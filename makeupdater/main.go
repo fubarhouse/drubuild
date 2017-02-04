@@ -22,7 +22,7 @@ func replaceTextInFile(fullPath string, oldString string, newString string) {
 }
 
 func UpdateMake(fullpath string) []string {
-	fmt.Println("Processing...")
+	fmt.Println("Processing " + fullpath + "...")
 	affectedProjects := []string{}
 	catCmd := "cat " + fullpath + " | grep projects | cut -d'[' -f2 | cut -d']' -f1 | uniq | sort"
 	y, _ := exec.Command("sh", "-c", catCmd).Output()
