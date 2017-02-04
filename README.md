@@ -4,7 +4,7 @@ A wide array of tools designed for system and drush specific use during scriptin
 
 **Package rundown**:
 
-* aliase
+* alias
     ````
     Provides the ability to create an alias object and provides a range of alias specific methods including installation and uninstallation.
     ````
