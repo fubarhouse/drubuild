@@ -50,8 +50,22 @@ This repository does not include the packages associated to my Drush Version Man
 ## Install
 
 ```console
-$ go get github.com/fubarhouse/golang-drush
+$ go get github.com/fubarhouse/golang-drush/...
 ```
+
+## Included binaries on build
+
+* update-make
+    ````
+    This package comes with the update-make binary which accepts a single string for the value of flag 'make'.
+    
+    It will accept a valid absolute path of a Drupal 7 make file and execute the make file updater on that makefile.
+      
+    It is assumed that any git-related activity is to not be handled by git, and that action is executed manually after the script has finished.
+    
+    Example usage:
+        update-make -make="/path/to/make.make"
+    ````
 
 ## License
 
