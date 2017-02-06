@@ -54,6 +54,15 @@ func (list *AliasList) GetNames() []string {
 	return returnVals
 }
 
+func (list *AliasList) GetAliasNames() []string {
+	// Return values from the Alias List object
+	returnVals := []string{}
+	for _, val := range list.value {
+		returnVals = append(returnVals, val.GetUri())
+	}
+	return returnVals
+}
+
 func (list *AliasList) GetAliases() *AliasList {
 	// Return values from the Alias List object
 	returnVals := NewAliasList()
