@@ -66,6 +66,19 @@ $ go get github.com/fubarhouse/golang-drush/...
     Example usage:
         update-make -make="/path/to/make.make"
     ````
+* module-scanner
+    ````
+    For cases where you need to find the 'enabled' status for multiple modules in multiple sites and store the output, this module fits the bill.
+    
+    Capable of loading up projects from a D7 make file with the -make flag, all you need to do is input installed aliases in the -aliases flag.
+    
+    Optionally you can input the specific modules with the -modules flag.
+    
+    Modules and aliases need to be inputted in a comma separated format.
+    
+    Example usage:
+        module-scanner -aliases="alias1, alias2, alias3" -make="/path/to/make.make"
+    ````
 
 ## License
 
