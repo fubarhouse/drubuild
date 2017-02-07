@@ -11,27 +11,46 @@ import (
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/command"
+	"os/exec"
 	"strings"
 )
 
 func main() {
 	var strAliases = flag.String("aliases", "", "alias1,alias2,alias3")
 	var strModules = flag.String("modules", "", "views,features,admin_menu")
+	var strMakefile = flag.String("make", "", "/path/to/make.make")
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
-	if *strAliases != "" && *strModules != "" {
+
+	getModulesFromMake := false
+	projects := []string{}
+
+	if *strMakefile != "" {
+		catCmd := "cat " + *strMakefile + " | grep projects | cut -d'[' -f2 | cut -d']' -f1 | uniq | sort"
+		y, _ := exec.Command("sh", "-c", catCmd).Output()
+		projects = strings.Split(string(y), "\n")
+		if len(projects) != 0 {
+			getModulesFromMake = true
+		}
+	}
+
+	if (*strAliases != "" && *strModules != "") || (*strAliases != "" && getModulesFromMake == true) {
 		aliasList := aliases.NewAliasList()
 		aliases := strings.Split(*strAliases, ",")
 		modules := strings.Split(*strModules, ",")
+		if len(projects) != 0 {
+			modules = projects
+		}
 		for _, value := range aliases {
 			thisAliasA := strings.Replace(value, "@", "", -1)
+			thisAliasA = strings.Replace(value, " ", "", -1)
 			thisAliasA = fmt.Sprintf("@%v", thisAliasA)
 			thisAlias := alias.NewAlias("", "", thisAliasA)
 			aliasList.Add(thisAlias)
 		}
 		for _, module := range modules {
 			count := 0
-			thisModule := module
+			thisModule := strings.Replace(module, " ", "", -1)
 			for _, value := range aliasList.GetAliasNames() {
 				cmd := command.NewDrushCommand()
 				cmd.SetAlias(value)
