@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/golang-drush/vhost"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,7 +20,7 @@ type makeDB struct {
 	dbPort int
 }
 
-func newmakeDB(dbHost, dbUser, dbPass string, dbPort int) *makeDB {
+func NewmakeDB(dbHost, dbUser, dbPass string, dbPort int) *makeDB {
 	newDB := &makeDB{}
 	newDB.setHost(dbHost)
 	newDB.setUser(dbUser)
@@ -77,30 +78,21 @@ func replaceTextInFile(fullPath string, oldString string, newString string) {
 }
 
 type Site struct {
-	timestamp     string
-	site_name     string
-	site_path     string
-	make_path     string
-	make_dir      string
-	codebase_name string
-	codebase_path string
-	branch        string
-	alias         string
-	drushVersion  int
+	timestamp string
+	path      string
+	make      string
+	name      string
+	alias     string
+	database  *makeDB
 }
 
-func newSite(codebase_name, codebase_path, make_dir, make_path, branch, site_name, site_path, alias string, drushVersion int) *Site {
+func NewSite(make, name, path, alias string) *Site {
 	Site := &Site{}
 	Site.SetTimeStamp()
-	Site.codebase_name = codebase_name
-	Site.codebase_path = codebase_path
-	Site.make_dir = make_dir
-	Site.make_path = make_path
-	Site.branch = branch
+	Site.make = make
+	Site.name = name
 	Site.alias = alias
-	Site.drushVersion = drushVersion
-	Site.site_name = site_name
-	Site.site_path = site_path
+	Site.path = path
 	return Site
 }
 
@@ -108,7 +100,7 @@ func (Site *Site) AliasExists(filter string) bool {
 	y := aliases.NewAliasList()
 	y.Generate(filter)
 	for _, z := range y.GetNames() {
-		if strings.Contains(z, Site.site_name) {
+		if strings.Contains(z, Site.alias) {
 			return true
 		}
 	}
@@ -126,13 +118,13 @@ func (Site *Site) GetTimeStamp() string {
 
 func (Site *Site) ProcessCoreMake() {
 	// Function to build core.make
-	_, err := os.Stat(Site.site_path)
+	_, err := os.Stat(Site.path)
 	if err == nil {
 		log.Println("Creating new directory for site")
-		os.MkdirAll(Site.site_path, 0755)
+		os.MkdirAll(Site.path, 0755)
 	}
 	for _, makefile := range []string{"core.make"} {
-		fullPath := fmt.Sprintf("%v/%v/%v", Site.make_path, Site.make_dir, makefile)
+		fullPath := Site.make
 		_, err := os.Stat(fullPath)
 		if err != nil {
 			log.Println("Error! File not found:", err)
@@ -140,7 +132,7 @@ func (Site *Site) ProcessCoreMake() {
 		}
 		log.Println("Building from", makefile)
 		// TODO: Consider copying from codebase here...
-		drushCommand := fmt.Sprintf("make %v %v -y --working-copy", fullPath, Site.site_path)
+		drushCommand := fmt.Sprintf("make %v %v_%v -y --working-copy", fullPath, Site.path, Site.timestamp)
 		drushMake := command.NewDrushCommand()
 		drushMake.Set("", drushCommand, true)
 		cmd, err := drushMake.Output()
@@ -157,7 +149,7 @@ func (Site *Site) ProcessMakes(makeFiles []string) {
 	// TODO: Consider doing away with makes and/or copying the data from the codebase folder.
 
 	for _, makefile := range makeFiles {
-		fullPath := fmt.Sprintf("%v/%v/%v", Site.make_path, Site.make_dir, makefile)
+		fullPath := fmt.Sprintf("%v/%v/%v", Site.path, makefile)
 		_, err := os.Stat(fullPath)
 		if err != nil {
 			log.Println("Error! File not found:", err)
@@ -169,11 +161,9 @@ func (Site *Site) ProcessMakes(makeFiles []string) {
 		} else {
 			log.Println("Building from", makefile)
 			// So this works - even on the host.
-			replaceTextInFile(fullPath, "rewriteme", Site.branch)
-			replaceTextInFile(fullPath, "master", Site.branch)
-			replaceTextInFile(fullPath, "production", Site.branch)
 			// TODO: Consider copying from codebase instead of drush making...
-			drushCommand := fmt.Sprintf("-y --no-core --working-copy make %v %v", fullPath, Site.site_path)
+			// TODO: Rewrite files separately elsewhere...
+			drushCommand := fmt.Sprintf("-y --no-core --working-copy make %v %v", fullPath, Site.path)
 			drushMake := command.NewDrushCommand()
 			drushMake.Set("", drushCommand, true)
 			cmd, err := drushMake.Output()
@@ -186,54 +176,69 @@ func (Site *Site) ProcessMakes(makeFiles []string) {
 			} else {
 				fmt.Sprintln(cmd)
 			}
-			replaceTextInFile(fullPath, "rewriteme", "rewriteme")
-			replaceTextInFile(fullPath, "master", "rewriteme")
-			replaceTextInFile(fullPath, "production", "rewriteme")
 		}
 	}
 }
 
-func (Site *Site) Install(database *makeDB) {
-	sqlQuery := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %v_%v;", Site.site_name, Site.timestamp)
-	sqlArgs := fmt.Sprintf("--user=`%v` --password=`%v` -e", database.getUser(), database.getPass())
-	_, err := exec.Command("sh", "-c", "mysql", sqlArgs, sqlQuery).Output()
+func (Site *Site) Install() {
+	sqlQuery := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %v_%v;", Site.name, Site.timestamp)
+	sqlUser := fmt.Sprintf("--user=%v", Site.database.getUser())
+	sqlPass := fmt.Sprintf("--password=%v", Site.database.getPass())
+	_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
 	if err != nil {
 		log.Println("MySQL Error:", err)
-		os.Exit(1)
 	}
-	x := command.NewDrushCommand()
-	x.SetAlias(Site.alias)
-	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=`%v` --db-url=`mysql://%v:%v@%v:%v/%v_%v`", Site.site_name, database.getUser(), database.getPass(), database.getHost(), database.getPort(), Site.site_name, Site.timestamp)
-	x.SetCommand(thisCmd)
-	_, err = x.Output()
+	output, _ := exec.Command("mysql", sqlUser, sqlPass, "-e", "show databases;").Output()
+	if strings.Contains(string(output), Site.name+"_"+Site.timestamp) == false {
+		log.Printf("Database %v_%v could not be created.\n", Site.name, Site.timestamp)
+	} else {
+		log.Printf("Database %v_%v was successfully created.\n", Site.name, Site.timestamp)
+	}
+	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v_%v", Site.name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), Site.name, Site.timestamp)
+	output, err = exec.Command("sh", "-c", "cd "+Site.path+"_"+Site.timestamp+" && drush "+thisCmd).Output()
 	if err != nil {
-		log.Println(err)
+		_, statErr := os.Stat(Site.path + "_" + Site.timestamp + "sites/aussiejobs/settings.php")
+		if statErr == nil {
+			log.Println("Drush error:", err)
+			log.Println(string(output))
+			log.Println("cd " + Site.path + "_" + Site.timestamp + " && drush " + thisCmd)
+		} else {
+			log.Println("Drush install succeeded")
+		}
+	} else {
+		log.Println("Drush install succeeded")
 	}
+	vhost := vhost.NewVirtualHost(Site.name, Site.path+"_"+Site.timestamp, "nginx", "/etc/nginx/sites-enabled")
+	vhost.Install()
 }
 
-func (Site *Site) Build(database *makeDB) {
-	if Site.AliasExists(Site.site_name) == true {
-		Site.site_path = fmt.Sprintf("%v%v", Site.site_path, Site.GetTimeStamp())
+func (Site *Site) SetDatabase(database *makeDB) {
+	Site.database = database
+}
+
+func (Site *Site) Build() {
+	if Site.AliasExists(Site.name) == true {
+		Site.path = fmt.Sprintf("%v%v", Site.path, Site.GetTimeStamp())
 		//Site.ProcessMakes([]string{"core.make", "libraries.make", "contrib.make", "custom.make"})
-		Site.Install(database)
+		Site.Install()
 	}
 }
 
-func (Site *Site) Rebuild(database *makeDB) {
-	if Site.AliasExists(Site.site_name) == true {
+func (Site *Site) Rebuild() {
+	if Site.AliasExists(Site.name) == true {
 		Site.SetTimeStamp()
-		Site.site_path = fmt.Sprintf("%v%v", Site.site_path, Site.GetTimeStamp())
+		Site.path = fmt.Sprintf("%v%v", Site.path, Site.GetTimeStamp())
 		Site.ProcessMakes([]string{"core.make", "libraries.make", "contrib.make", "custom.make"})
-		Site.Install(database)
+		Site.Install()
 	}
 }
 
-func (Site *Site) Destroy(database *makeDB) {
-	if Site.AliasExists(Site.site_name) == true {
-		Site.site_path = fmt.Sprintf("%v", Site.site_path)
-		_, err := os.Stat(Site.site_path)
+func (Site *Site) Destroy() {
+	if Site.AliasExists(Site.name) == true {
+		Site.path = fmt.Sprintf("%v", Site.path)
+		_, err := os.Stat(Site.path)
 		if err == nil {
-			os.Remove(Site.site_path)
+			os.Remove(Site.path)
 		}
 	}
 }
