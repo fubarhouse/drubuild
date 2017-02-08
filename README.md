@@ -79,6 +79,15 @@ $ go get github.com/fubarhouse/golang-drush/...
     Example usage:
         module-scanner -aliases="alias1, alias2, alias3" -make="/path/to/make.make"
     ````
+* rewrite-make
+    ````
+    Accepts a path to an existing make file, completely rewrites the make file with the latest recommended versions.
+    
+    This program has not been tested with custom modules.
+    
+    Example usage:
+        rewrite-make -make="/path/to/make.make"
+    ````
 
 ## License
 

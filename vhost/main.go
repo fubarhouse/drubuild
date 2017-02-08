@@ -53,13 +53,15 @@ func (VirtualHost *VirtualHost) GetInstallationDirectory() string {
 func (VirtualHost *VirtualHost) Install() {
 	log.Println("Adding vhost", VirtualHost.GetName())
 	tpl, err := template.ParseGlob("templates/" + VirtualHost.webserver + "*")
-	file, err := os.Create(VirtualHost.installationDirectory + "/" + VirtualHost.GetUri() + ".conf")
-	tpl.Execute(file, struct {
-		Name                  string
-		Root                  string
-		Webserver             string
-		InstallationDirectory string
-	}{VirtualHost.GetName(), VirtualHost.GetUri(), VirtualHost.GetWebServer(), VirtualHost.GetInstallationDirectory()})
+	file, err := os.Create(VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetName() + ".conf")
+	fmt.Println(VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetName() + ".conf")
+	tpl.Execute(file, nil)
+	//		struct {
+	//	Name                  string
+	//	Root                  string
+	//	Webserver             string
+	//	InstallationDirectory string
+	//}{VirtualHost.GetName(), VirtualHost.GetUri(), VirtualHost.GetWebServer(), VirtualHost.GetInstallationDirectory()})
 
 	if err != nil {
 		log.Println("Error reading files:", err)

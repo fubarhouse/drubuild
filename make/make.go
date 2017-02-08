@@ -144,38 +144,36 @@ func (Site *Site) ProcessCoreMake() {
 	}
 }
 
-func (Site *Site) ProcessMakes(makeFiles []string) {
+func (Site *Site) ProcessMake(makeFile string) {
 
 	// TODO: Consider doing away with makes and/or copying the data from the codebase folder.
 
-	for _, makefile := range makeFiles {
-		fullPath := fmt.Sprintf("%v/%v/%v", Site.path, makefile)
-		_, err := os.Stat(fullPath)
-		if err != nil {
-			log.Println("Error! File not found:", err)
-			os.Exit(1)
-		}
+	fullPath := fmt.Sprintf("%v", makeFile)
+	_, err := os.Stat(fullPath)
+	if err != nil {
+		log.Println("Error! File not found:", err)
+		os.Exit(1)
+	}
 
-		if strings.Contains(makefile, "core") == true {
-			Site.ProcessCoreMake()
-		} else {
-			log.Println("Building from", makefile)
-			// So this works - even on the host.
-			// TODO: Consider copying from codebase instead of drush making...
-			// TODO: Rewrite files separately elsewhere...
-			drushCommand := fmt.Sprintf("-y --no-core --working-copy make %v %v", fullPath, Site.path)
-			drushMake := command.NewDrushCommand()
-			drushMake.Set("", drushCommand, true)
-			cmd, err := drushMake.Output()
-			if err != nil {
-				if string(err.Error()) == "exit status 1" {
-					fmt.Println("Completed with errors.")
-				} else {
-					fmt.Println(err)
-				}
+	if strings.Contains(makeFile, "core") == true {
+		Site.ProcessCoreMake()
+	} else {
+		log.Println("Building from", makeFile)
+		// So this works - even on the host.
+		// TODO: Consider copying from codebase instead of drush making...
+		// TODO: Rewrite files separately elsewhere...
+		drushCommand := fmt.Sprintf("-y --no-core --working-copy make %v %v_%v", fullPath, Site.path, Site.timestamp)
+		drushMake := command.NewDrushCommand()
+		drushMake.Set("", drushCommand, true)
+		cmd, err := drushMake.Output()
+		if err != nil {
+			if string(err.Error()) == "exit status 1" {
+				fmt.Println("Completed with errors.")
 			} else {
-				fmt.Sprintln(cmd)
+				fmt.Println(err)
 			}
+		} else {
+			fmt.Sprintln(cmd)
 		}
 	}
 }
@@ -228,8 +226,8 @@ func (Site *Site) Rebuild() {
 	if Site.AliasExists(Site.name) == true {
 		Site.SetTimeStamp()
 		Site.path = fmt.Sprintf("%v%v", Site.path, Site.GetTimeStamp())
-		Site.ProcessMakes([]string{"core.make", "libraries.make", "contrib.make", "custom.make"})
-		Site.Install()
+		//Site.ProcessMake()
+		//Site.Install()
 	}
 }
 
