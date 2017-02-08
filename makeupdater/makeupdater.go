@@ -103,9 +103,11 @@ func GenerateMake(Projects []string, File string) {
 	for _, Project := range Projects {
 
 		if Project != "drupal" {
-			x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+Project+" | grep Recommended | cut -d',' -f2").Output()
-			ProjectVersion := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
-			headerLines = append(headerLines, fmt.Sprintf("projects[%v][version] = \"%v\"", Project, ProjectVersion))
+			x, y := exec.Command("sh", "-c", "drush pm-releases --pipe "+Project+" | grep Recommended | cut -d',' -f2").Output()
+			if y == nil {
+				ProjectVersion := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
+				headerLines = append(headerLines, fmt.Sprintf("projects[%v][version] = \"%v\"", Project, ProjectVersion))
+			}
 		}
 	}
 
