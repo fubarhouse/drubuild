@@ -60,6 +60,7 @@ func GetProjectsFromMake(fullpath string) []string {
 	y, _ := exec.Command("sh", "-c", catCmd).Output()
 	rawProjects := strings.Split(string(y), "\n")
 	for _, project := range rawProjects {
+		project = strings.Replace(project, " ", "", -1)
 		if project != "" {
 			Projects = append(Projects, project)
 		}
@@ -99,6 +100,8 @@ func GenerateMake(Projects []string, File string) {
 
 	// Rewrite contrib
 	headerLines = append(headerLines, "; modules")
+	headerLines = append(headerLines, "defaults[projects][subdir] = contrib")
+	headerLines = append(headerLines, "")
 
 	for _, Project := range Projects {
 

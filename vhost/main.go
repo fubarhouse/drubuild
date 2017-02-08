@@ -52,21 +52,21 @@ func (VirtualHost *VirtualHost) GetInstallationDirectory() string {
 
 func (VirtualHost *VirtualHost) Install() {
 	log.Println("Adding vhost", VirtualHost.GetName())
-	tpl, err := template.ParseGlob("templates/" + VirtualHost.webserver + "*")
-	file, err := os.Create(VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetName() + ".conf")
-	fmt.Println(VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetName() + ".conf")
-	tpl.Execute(file, nil)
-	//		struct {
-	//	Name                  string
-	//	Root                  string
-	//	Webserver             string
-	//	InstallationDirectory string
-	//}{VirtualHost.GetName(), VirtualHost.GetUri(), VirtualHost.GetWebServer(), VirtualHost.GetInstallationDirectory()})
-
-	if err != nil {
-		log.Println("Error reading files:", err)
+	data := map[string]string{
+		"Name": VirtualHost.GetName(),
+		"Root": VirtualHost.GetUri(),
 	}
-	defer file.Close()
+	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetName() + ".conf"
+	tpl, err := template.ParseFiles("templates/" + VirtualHost.GetWebServer() + "-template.gotpl")
+	nf, err := os.Create(filename)
+	if err != nil {
+		log.Fatalln("Could not create file:", err)
+	}
+	defer nf.Close()
+	err = tpl.Execute(nf, data)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (VirtualHost *VirtualHost) Uninstall() {

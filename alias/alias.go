@@ -44,19 +44,28 @@ func (Alias *Alias) GetPath() string {
 
 func (Alias *Alias) Install() {
 	log.Println("Adding alias", Alias.uri)
-	tpl, err := template.ParseGlob("templates/*")
-	file, err := os.Create("templates/" + Alias.GetUri() + ".alias.drushrc.php")
-	tpl.Execute(file, struct {
-		Name string
-		Path string
-		Uri  string
-	}{Alias.GetName(), Alias.GetPath(), Alias.GetUri()})
-
+	data := map[string]string{
+		"Name":  Alias.GetName(),
+		"Root":  Alias.GetPath(),
+		"Alias": Alias.GetUri(),
+	}
+	usr, _ := user.Current()
+	filename := usr.HomeDir + "/.drush/" + Alias.uri + ".alias.drushrc.php"
+	tpl, err := template.ParseFiles("templates/alias-template.gotpl")
 	if err != nil {
-		log.Println("Error reading files:", err)
+		log.Fatalln(err)
 	}
 
-	defer file.Close()
+	nf, err := os.Create(filename)
+	if err != nil {
+		log.Fatalln("error creating file", err)
+	}
+	defer nf.Close()
+
+	err = tpl.Execute(nf, data)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (Alias *Alias) Uninstall() {
