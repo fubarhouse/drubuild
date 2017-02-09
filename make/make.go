@@ -1,6 +1,7 @@
 package make
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/aliases"
@@ -215,28 +216,34 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
-	newMakeFile := []string{"core = 7.x", "api = 2"}
+	// TODO Add a way to specify the branch for cloning in an independent way
+	log.Println("Generating temporary make file...")
+	newMakeFilePath := "/tmp/tmp.make"
+	file, crErr := os.Create(newMakeFilePath)
+	if crErr != nil {
+		log.Println("Error creating "+newMakeFilePath+":", crErr)
+	}
+	writer := bufio.NewWriter(file)
+	defer file.Close()
+
+	fmt.Fprintln(writer, "core = 7.x")
+	fmt.Fprintln(writer, "api = 2")
+
 	for _, Makefile := range Makefiles {
 		cmdOut, _ := exec.Command("cat", Makefile).Output()
 		output := strings.Split(string(cmdOut), "\n")
 		for _, line := range output {
 			if strings.HasPrefix(line, "core") == false && strings.HasPrefix(line, "api") == false {
 				if strings.HasPrefix(line, "projects") == true || strings.HasPrefix(line, "libraries") == true || strings.HasPrefix(line, "defaults") == true {
-					newMakeFile = append(newMakeFile, line)
+					fmt.Fprintln(writer, line)
 				}
 			}
 		}
 	}
-	newMakeFilePath := "/acquia/sites/codebases/book/temp.make"
-	file, _ := os.Create(newMakeFilePath)
-	defer file.Close()
 
-	for _, line := range newMakeFile {
-		file, _ := os.Open(newMakeFilePath)
-		file.WriteString(line)
-	}
+	writer.Flush()
 	Site.ProcessMake(newMakeFilePath)
-	os.Remove(newMakeFilePath)
+	//os.Remove(newMakeFilePath)
 }
 
 func (Site *Site) ActionDatabaseDumpLocal(path string) {
