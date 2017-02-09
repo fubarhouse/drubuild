@@ -11,6 +11,7 @@ import (
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/command"
+	"log"
 	"os/exec"
 	"strings"
 )
@@ -61,16 +62,36 @@ func main() {
 				}
 				if strings.Contains(string(output), "enabled") {
 					if *boolVerbose {
-						fmt.Printf("Found module %v on site %v\n", thisModule, cmd.GetAlias())
+						log.Printf("%v installed on %v\n", thisModule, cmd.GetAlias())
 					}
 					count++
+				} else if strings.Contains(string(output), "was not found") {
+					cmdQ := command.NewDrushCommand()
+					cmdQ.SetAlias(value)
+					cmdQ.SetCommand("sql-query \"SELECT name from system where name = " + thisModule + "\"")
+					outputQ, _ := cmd.Run()
+					if strings.Contains(string(outputQ), thisModule) {
+						if *boolVerbose {
+							log.Printf("%v is enabled and missing on %v", thisModule, cmd.GetAlias())
+						}
+					} else {
+						if *boolVerbose {
+							log.Printf("%v is missing from %v", thisModule, cmd.GetAlias())
+						}
+					}
 				} else {
 					if *boolVerbose {
-						fmt.Printf("Did not find module %v on site %v\n", thisModule, cmd.GetAlias())
+						log.Printf("%v not installed on %v\n", thisModule, cmd.GetAlias())
 					}
 				}
 			}
-			fmt.Printf("Out of the %v tested sites, %v have the module %v installed.\n", aliasList.Count(), count, thisModule)
+			if *boolVerbose {
+				log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
+			} else {
+				if count == 0 {
+					log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
+				}
+			}
 		}
 	} else {
 		flag.Usage()
