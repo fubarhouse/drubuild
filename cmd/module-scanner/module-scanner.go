@@ -70,7 +70,7 @@ func main() {
 					cmdQ.SetAlias(value)
 					cmdQ.SetCommand("sql-query \"SELECT name from system where name = " + thisModule + "\"")
 					outputQ, _ := cmd.Run()
-					if strings.Contains(string(outputQ), thisModule) {
+					if strings.Contains(string(outputQ), thisModule) == true {
 						if *boolVerbose {
 							log.Printf("%v is installed and missing on %v", thisModule, cmd.GetAlias())
 						} else {
