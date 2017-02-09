@@ -90,7 +90,7 @@ func main() {
 			if *boolVerbose {
 				log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
 			} else {
-				if count == 0 {
+				if count >= 0 {
 					log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
 				}
 			}
