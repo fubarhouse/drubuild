@@ -69,10 +69,10 @@ func main() {
 					cmdQ := command.NewDrushCommand()
 					cmdQ.SetAlias(value)
 					cmdQ.SetCommand("sql-query \"SELECT name from system where name = " + thisModule + "\"")
-					outputQ, _ := cmd.Run()
-					if strings.Contains(string(outputQ), thisModule) == true {
+					outputQ, _ := cmdQ.Run()
+					if strings.Contains(string(outputQ), thisModule) == false {
 						if *boolVerbose {
-							log.Printf("%v is installed and missing on %v", thisModule, cmd.GetAlias())
+							log.Printf("Error: %v is installed and missing on %v", thisModule, cmd.GetAlias())
 						} else {
 							log.Printf("Error: %v is installed and missing from %v", thisModule, cmd.GetAlias())
 						}
