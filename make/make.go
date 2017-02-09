@@ -3,8 +3,6 @@ package make
 import (
 	"bufio"
 	"fmt"
-	"github.com/fubarhouse/golang-drush/alias"
-	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/vhost"
 	"io/ioutil"
@@ -36,58 +34,6 @@ func RestartWebServer(webserver string) {
 	}
 }
 
-type makeDB struct {
-	dbHost string
-	dbUser string
-	dbPass string
-	dbPort int
-}
-
-func NewmakeDB(dbHost, dbUser, dbPass string, dbPort int) *makeDB {
-	newDB := &makeDB{}
-	newDB.setHost(dbHost)
-	newDB.setUser(dbUser)
-	newDB.setPass(dbPass)
-	newDB.setPort(dbPort)
-	return newDB
-}
-
-func (db *makeDB) setHost(dbHost string) {
-	db.dbHost = dbHost
-}
-
-func (db *makeDB) getHost() string {
-	return db.dbHost
-}
-
-func (db *makeDB) setUser(dbUser string) {
-	db.dbUser = dbUser
-}
-
-func (db *makeDB) getUser() string {
-	return db.dbUser
-}
-
-func (db *makeDB) setPass(dbPass string) {
-	db.dbPass = dbPass
-}
-
-func (db *makeDB) getPass() string {
-	return db.dbPass
-}
-
-func (db *makeDB) setPort(dbPort int) {
-	db.dbPort = dbPort
-}
-
-func (db *makeDB) getPort() int {
-	return db.dbPort
-}
-
-func (db *makeDB) getInfo() *makeDB {
-	return db
-}
-
 type Site struct {
 	Timestamp string
 	Path      string
@@ -95,37 +41,20 @@ type Site struct {
 	Name      string
 	Alias     string
 	database  *makeDB
+	Webserver string
+	Vhostpath string
 }
 
-func NewSite(make, name, path, alias string) *Site {
+func NewSite(make, name, path, alias, webserver, vhostpath string) *Site {
 	Site := &Site{}
 	Site.TimeStampReset()
 	Site.Make = make
 	Site.Name = name
 	Site.Alias = alias
 	Site.Path = path
+	Site.Webserver = webserver
+	Site.Vhostpath = vhostpath
 	return Site
-}
-
-func (Site *Site) AliasExists(filter string) bool {
-	y := aliases.NewAliasList()
-	y.Generate(filter)
-	for _, z := range y.GetNames() {
-		if strings.Contains(z, Site.Alias) {
-			return true
-		}
-	}
-	return false
-}
-
-func (Site *Site) AliasInstall() {
-	siteAlias := alias.NewAlias(Site.Name, Site.Path+"_latest", Site.Alias)
-	siteAlias.Install()
-}
-
-func (Site *Site) AliasUninstall() {
-	siteAlias := alias.NewAlias(Site.Name, Site.Path+"_latest", Site.Alias)
-	siteAlias.Uninstall()
 }
 
 func (Site *Site) ActionBuild() {
@@ -135,25 +64,6 @@ func (Site *Site) ActionBuild() {
 		//Site.ProcessMakes([]string{"core.make", "libraries.make", "contrib.make", "custom.make"})
 		Site.ActionInstall()
 	}
-}
-
-func (Site *Site) ActionDestroy() {
-	// Destroy will remove all traces of said site.
-	for _, database := range Site.DatabasesGet() {
-		sqlQuery := fmt.Sprintf("DROP DATABASE %v;", database)
-		sqlUser := fmt.Sprintf("--user=%v", Site.database.getUser())
-		sqlPass := fmt.Sprintf("--password=%v", Site.database.getPass())
-		_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
-		if err == nil {
-			log.Printf("Database %v was dropped.\n")
-		} else {
-			log.Printf("Database %v was notdropped: %v\n", err)
-		}
-	}
-	// TODO: Delete folders
-	// TODO: Delete drush aliases
-	// TODO: Delete virtual hosts
-	// TODO: Delete symlink
 }
 
 func (Site *Site) ActionInstall() {
@@ -425,16 +335,4 @@ func (Site *Site) ProcessMake(makeFile string) {
 	} else {
 		fmt.Sprintln(cmd)
 	}
-}
-
-func (Site *Site) VhostInstall(webserver, path string) {
-	vhostPath := strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
-	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, webserver, path)
-	vhostFile.Install()
-}
-
-func (Site *Site) VhostUninstall(webserver, path string) {
-	vhostPath := strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
-	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, webserver, path)
-	vhostFile.Uninstall()
 }
