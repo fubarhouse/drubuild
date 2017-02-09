@@ -164,23 +164,23 @@ func (Site *Site) ActionInstall() {
 		log.Println("MySQL Error:", err)
 	}
 	output, _ := exec.Command("mysql", sqlUser, sqlPass, "-e", "show databases;").Output()
-	if strings.Contains(string(output), Site.Name+"_"+Site.Timestamp) == false {
+	if strings.Contains(string(output), Site.Name+Site.Timestamp) == false {
 		log.Printf("Database %v_%v could not be created.\n", Site.Name, Site.Timestamp)
 	} else {
 		log.Printf("Database %v_%v was successfully created.\n", Site.Name, Site.Timestamp)
 	}
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v_%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), Site.Name, Site.Timestamp)
-	output, err = exec.Command("sh", "-c", "cd "+Site.Path+"_"+Site.Timestamp+" && drush "+thisCmd).Output()
-	_, cpErr := exec.Command("cp", "-f", Site.Path+"_"+Site.Timestamp+"/sites/"+Site.Name+"/settings.php", Site.Path+"_"+Site.Timestamp+"/sites/default/settings.php").Output()
+	output, err = exec.Command("sh", "-c", "cd "+Site.Path+Site.Timestamp+" && drush "+thisCmd).Output()
+	_, cpErr := exec.Command("cp", "-f", Site.Path+Site.Timestamp+"/sites/"+Site.Name+"/settings.php", Site.Path+Site.Timestamp+"/sites/default/settings.php").Output()
 	if cpErr != nil {
 		panic("copy failed")
 	}
 	if err != nil {
-		_, statErr := os.Stat(Site.Path + "_" + Site.Timestamp + "sites/" + Site.Name + "/settings.php")
+		_, statErr := os.Stat(Site.Path + Site.Timestamp + "sites/" + Site.Name + "/settings.php")
 		if statErr == nil {
 			log.Println("Drush error:", err)
 			log.Println(string(output))
-			log.Println("cd " + Site.Path + "_" + Site.Timestamp + " && drush " + thisCmd)
+			log.Println("cd " + Site.Path + Site.Timestamp + " && drush " + thisCmd)
 		} else {
 			log.Println("Drush install succeeded")
 		}
@@ -209,6 +209,34 @@ func (Site *Site) ActionRebuild() {
 		//Site.ProcessMake()
 		//Site.ActionInstall()
 	}
+}
+
+func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
+	// This function exists for the sole purpose of
+	// rebuilding a specific Drupal codebase in a specific
+	// directory for Release management type work.
+	newMakeFile := []string{"core = 7.x", "api = 2"}
+	for _, Makefile := range Makefiles {
+		cmdOut, _ := exec.Command("cat", Makefile).Output()
+		output := strings.Split(string(cmdOut), "\n")
+		for _, line := range output {
+			if strings.HasPrefix(line, "core") == false && strings.HasPrefix(line, "api") == false {
+				if strings.HasPrefix(line, "projects") == true || strings.HasPrefix(line, "libraries") == true || strings.HasPrefix(line, "defaults") == true {
+					newMakeFile = append(newMakeFile, line)
+				}
+			}
+		}
+	}
+	newMakeFilePath := "/acquia/sites/codebases/book/temp.make"
+	file, _ := os.Create(newMakeFilePath)
+	defer file.Close()
+
+	for _, line := range newMakeFile {
+		file, _ := os.Open(newMakeFilePath)
+		file.WriteString(line)
+	}
+	Site.ProcessMake(newMakeFilePath)
+	os.Remove(newMakeFilePath)
 }
 
 func (Site *Site) ActionDatabaseDumpLocal(path string) {
@@ -321,7 +349,7 @@ func (Site *Site) DatabasesGet() []string {
 
 func (Site *Site) SymInstall(timestamp string) {
 	Symlink := Site.Path + "_latest"
-	err := os.Symlink(Site.Path+"_"+Site.TimeStampGet(), Symlink)
+	err := os.Symlink(Site.Path+Site.TimeStampGet(), Symlink)
 	if err == nil {
 		log.Println("Symlink has been created.")
 	} else {
@@ -348,12 +376,12 @@ func (Site *Site) TimeStampGet() string {
 }
 
 func (Site *Site) TimeStampSet(value string) {
-	Site.Timestamp = fmt.Sprintf("%v", value)
+	Site.Timestamp = fmt.Sprintf(".%v", value)
 }
 
 func (Site *Site) TimeStampReset() {
 	now := time.Now()
-	Site.Timestamp = fmt.Sprintf("%v", now.Format("20060102150405"))
+	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
 }
 
 func (Site *Site) ProcessMake(makeFile string) {
@@ -366,17 +394,17 @@ func (Site *Site) ProcessMake(makeFile string) {
 	}
 
 	_, err = os.Stat(Site.Path)
-	if err == nil {
-		log.Println("Creating directory for site at", Site.Path+"_"+Site.Timestamp)
+	if err != nil {
+		log.Println("Creating directory for site at", Site.Path+Site.Timestamp)
 		os.MkdirAll(Site.Path, 0755)
 	}
 
 	drushCommand := ""
 	// @TODO: Figure out a way to run make without core, but optionally based on makefile.
 	if strings.Contains(makeFile, "core") == true {
-		drushCommand = fmt.Sprintf("make -y --working-copy %v %v_%v", fullPath, Site.Path, Site.Timestamp)
+		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
 	} else {
-		drushCommand = fmt.Sprintf("make -y --no-core --working-copy %v %v_%v", fullPath, Site.Path, Site.Timestamp)
+		drushCommand = fmt.Sprintf("make -y --overwrite --no-core --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
 	}
 	log.Println("Building from", makeFile)
 	drushMake := command.NewDrushCommand()
@@ -384,7 +412,7 @@ func (Site *Site) ProcessMake(makeFile string) {
 	cmd, err := drushMake.Output()
 	if err != nil {
 		if string(err.Error()) == "exit status 1" {
-			log.Println("Processed make file was completed with errors. :", drushCommand)
+			log.Println("Processed make file was completed with errors. :", err.Error())
 
 		}
 	} else {
@@ -393,13 +421,13 @@ func (Site *Site) ProcessMake(makeFile string) {
 }
 
 func (Site *Site) VhostInstall(webserver, path string) {
-	vhostPath := strings.Replace(Site.Path+"_"+Site.TimeStampGet(), "_"+Site.TimeStampGet(), "_latest", -1)
+	vhostPath := strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, webserver, path)
 	vhostFile.Install()
 }
 
 func (Site *Site) VhostUninstall(webserver, path string) {
-	vhostPath := strings.Replace(Site.Path+"_"+Site.TimeStampGet(), "_"+Site.TimeStampGet(), "_latest", -1)
+	vhostPath := strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, webserver, path)
 	vhostFile.Uninstall()
 }
