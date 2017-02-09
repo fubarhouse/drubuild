@@ -72,15 +72,13 @@ func main() {
 					outputQ, _ := cmd.Run()
 					if strings.Contains(string(outputQ), thisModule) {
 						if *boolVerbose {
-							log.Printf("%v is enabled and missing on %v", thisModule, cmd.GetAlias())
+							log.Printf("%v is installed and missing on %v", thisModule, cmd.GetAlias())
 						} else {
-							log.Printf("Error: %v missing from %v", thisModule, cmd.GetAlias())
+							log.Printf("Error: %v is installed and missing from %v", thisModule, cmd.GetAlias())
 						}
 					} else {
 						if *boolVerbose {
-							log.Printf("%v is missing from %v", thisModule, cmd.GetAlias())
-						} else {
-							log.Printf("Error: %v missing from %v", thisModule, cmd.GetAlias())
+							log.Printf("%v is not installed and missing from %v", thisModule, cmd.GetAlias())
 						}
 					}
 				} else {
