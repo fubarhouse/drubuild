@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/fubarhouse/golang-drush/command"
-	"github.com/fubarhouse/golang-drush/vhost"
 	"io/ioutil"
 	"log"
 	"os"
