@@ -36,6 +36,21 @@ func (list *AliasList) Generate(key string) {
 	}
 }
 
+func (list *AliasList) Filter(key string) {
+	// Filter an existing list with a key string
+	values := list.GetNames()
+	newList := NewAliasList()
+	for _, currAlias := range values {
+		if strings.Contains(currAlias, key) == true {
+			thisAlias := alias.NewAlias(currAlias, "", "")
+			newList.Add(thisAlias)
+		} else {
+			fmt.Sprintln("Filtered out", currAlias)
+		}
+	}
+	*list = *newList
+}
+
 func (list *AliasList) Count() int {
 	count := 0
 	for _, thisAlias := range list.value {

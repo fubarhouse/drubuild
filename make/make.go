@@ -24,12 +24,12 @@ func replaceTextInFile(fullPath string, oldString string, newString string) {
 	}
 }
 
-func RestartWebServer(webserver string) {
-	_, stdErr := exec.Command("sudo", "service", webserver, "restart").Output()
+func (Site *Site) RestartWebServer() {
+	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "restart").Output()
 	if stdErr != nil {
 		log.Fatalln(stdErr)
 	} else {
-		log.Printf("Webserver %v successfully restarted.\n", webserver)
+		log.Printf("Webserver %v successfully restarted.\n", Site.Webserver)
 	}
 }
 
