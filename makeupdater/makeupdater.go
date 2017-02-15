@@ -109,9 +109,13 @@ func GenerateMake(Projects []string, File string) {
 			x, y := exec.Command("sh", "-c", "drush pm-releases --pipe "+Project+" | grep Recommended | cut -d',' -f2").Output()
 			if y == nil {
 				ProjectVersion := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
+				ProjectType := "contrib"
+				if ProjectVersion == "" {
+					ProjectType = "custom"
+				}
 				headerLines = append(headerLines, fmt.Sprintf("projects[%v][version] = \"%v\"", Project, ProjectVersion))
 				headerLines = append(headerLines, fmt.Sprintf("projects[%v][type] = \"module\"", Project))
-				headerLines = append(headerLines, fmt.Sprintf("projects[%v][subdir] = \"contrib\"", Project))
+				headerLines = append(headerLines, fmt.Sprintf("projects[%v][subdir] = \"%v\"", Project, ProjectType))
 				headerLines = append(headerLines, fmt.Sprint(""))
 			}
 		}
