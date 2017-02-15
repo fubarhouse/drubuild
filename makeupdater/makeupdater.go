@@ -110,8 +110,8 @@ func GenerateMake(Projects []string, File string) {
 			if y == nil {
 				ProjectVersion := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
 				headerLines = append(headerLines, fmt.Sprintf("projects[%v][version] = \"%v\"", Project, ProjectVersion))
-				headerLines = append(headerLines, fmt.Sprintf("projects[%v][type] = \"module\"", Project, ProjectVersion))
-				headerLines = append(headerLines, fmt.Sprintf("projects[%v][subdir] = \"contrib\"", Project, ProjectVersion))
+				headerLines = append(headerLines, fmt.Sprintf("projects[%v][type] = \"module\"", Project))
+				headerLines = append(headerLines, fmt.Sprintf("projects[%v][subdir] = \"contrib\"", Project))
 				headerLines = append(headerLines, fmt.Sprint(""))
 			}
 		}
