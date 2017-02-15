@@ -1,4 +1,5 @@
-//package uiutil
+package uiutil
+
 //
 //import (
 //	"fmt"
@@ -21,3 +22,7 @@
 //
 //	return selected
 //}
+
+func init() {
+
+}
