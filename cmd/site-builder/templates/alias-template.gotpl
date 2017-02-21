@@ -1,0 +1,9 @@
+<?php
+
+$aliases['{{ .Alias }}'] = array(
+  'root' => '{{ .Root }}',
+  'uri' => '{{ .Alias }}',
+  'path-aliases' => array(
+    '%files' => 'sites/{{ .Name }}/files'
+  ),
+);

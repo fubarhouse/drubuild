@@ -1,0 +1,15 @@
+DirectoryIndex index.php
+
+<VirtualHost *:80>
+
+    ServerName template.url
+    DocumentRoot template.docroot
+
+    <Directory "template.docroot">
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Options -Indexes +FollowSymLinks
+      Require all granted
+    </Directory>
+
+</VirtualHost>

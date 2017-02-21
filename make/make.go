@@ -2,13 +2,16 @@ package make
 
 import (
 	"bufio"
+	"database/sql"
 	"fmt"
 	"github.com/fubarhouse/golang-drush/command"
+	_ "github.com/go-sql-driver/mysql"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
+	"text/template"
 	"time"
 )
 
@@ -66,36 +69,36 @@ func (Site *Site) ActionBuild() {
 }
 
 func (Site *Site) ActionInstall() {
-	sqlQuery := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %v_%v;", Site.Name, Site.Timestamp)
-	sqlUser := fmt.Sprintf("--user=%v", Site.database.getUser())
-	sqlPass := fmt.Sprintf("--password=%v", Site.database.getPass())
-	_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
+	// Obtain a string value from the Port value in db config.
+	stringPort := fmt.Sprintf("%v", Site.database.getPort())
+	// Open a mysql connection
+	db, dbErr := sql.Open("mysql", Site.database.getUser()+":"+Site.database.getPass()+"@tcp("+Site.database.dbHost+":"+stringPort+")/")
+	// Defer the connection
+	defer db.Close()
+	// Report any connection errors
+	if dbErr != nil {
+		log.Println(dbErr)
+	}
+	// Create database
+	dbName := strings.Replace(Site.Name+Site.Timestamp, ".", "_", -1)
+	_, dbErr = db.Exec("CREATE DATABASE IF NOT EXISTS " + dbName)
+	if dbErr != nil {
+		panic(dbErr)
+	}
+	// Drush site-install
+	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
+	output, _ := exec.Command("sh", "-c", "cd "+Site.Path+Site.Timestamp+" && drush "+thisCmd).Output()
+	drushLog := strings.Split(string(output), "\n")
+	for _, logEntry := range drushLog {
+		// Print output in a fairly standardized format.
+		log.Println(logEntry)
+	}
+	// Reset file system permissions...
+	err := os.Chmod(Site.Path+Site.Timestamp+"/sites/"+Site.Name, os.FileMode(0755))
 	if err != nil {
-		log.Println("MySQL Error:", err)
-	}
-	output, _ := exec.Command("mysql", sqlUser, sqlPass, "-e", "show databases;").Output()
-	if strings.Contains(string(output), Site.Name+Site.Timestamp) == false {
-		log.Printf("Database %v_%v could not be created.\n", Site.Name, Site.Timestamp)
+		log.Println("Unable to reset file system permissions for", Site.Path+Site.Timestamp+"/sites/"+Site.Name)
 	} else {
-		log.Printf("Database %v_%v was successfully created.\n", Site.Name, Site.Timestamp)
-	}
-	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v_%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), Site.Name, Site.Timestamp)
-	output, err = exec.Command("sh", "-c", "cd "+Site.Path+Site.Timestamp+" && drush "+thisCmd).Output()
-	_, cpErr := exec.Command("cp", "-f", Site.Path+Site.Timestamp+"/sites/"+Site.Name+"/settings.php", Site.Path+Site.Timestamp+"/sites/default/settings.php").Output()
-	if cpErr != nil {
-		panic("copy failed")
-	}
-	if err != nil {
-		_, statErr := os.Stat(Site.Path + Site.Timestamp + "sites/" + Site.Name + "/settings.php")
-		if statErr == nil {
-			log.Println("Drush error:", err)
-			log.Println(string(output))
-			log.Println("cd " + Site.Path + Site.Timestamp + " && drush " + thisCmd)
-		} else {
-			log.Println("Drush install succeeded")
-		}
-	} else {
-		log.Println("Drush install succeeded")
+		log.Println("Successfully reset file system permissions for", Site.Path+Site.Timestamp+"/sites/"+Site.Name)
 	}
 }
 
@@ -143,7 +146,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		output := strings.Split(string(cmdOut), "\n")
 		for _, line := range output {
 			if strings.HasPrefix(line, "core") == false && strings.HasPrefix(line, "api") == false {
-				if strings.HasPrefix(line, "projects") == true || strings.HasPrefix(line, "libraries") == true || strings.HasPrefix(line, "defaults") == true {
+				if strings.HasPrefix(line, "projects") == true || strings.HasPrefix(line, "libraries") == true {
 					fmt.Fprintln(writer, line)
 				}
 			}
@@ -151,8 +154,10 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 
 	writer.Flush()
+	//replaceTextInFile(newMakeFilePath, "rewriteme", "master")
 	Site.ProcessMake(newMakeFilePath)
-	//os.Remove(newMakeFilePath)
+	log.Println("Removing temporary make file", newMakeFilePath)
+	os.Remove(newMakeFilePath)
 }
 
 func (Site *Site) ActionDatabaseDumpLocal(path string) {
@@ -264,7 +269,8 @@ func (Site *Site) DatabasesGet() []string {
 }
 
 func (Site *Site) SymInstall(timestamp string) {
-	Symlink := Site.Path + "_latest"
+	// TODO make this relative to the lowest possible level
+	Symlink := Site.Path + ".latest"
 	err := os.Symlink(Site.Path+Site.TimeStampGet(), Symlink)
 	if err == nil {
 		log.Println("Symlink has been created.")
@@ -274,7 +280,7 @@ func (Site *Site) SymInstall(timestamp string) {
 }
 
 func (Site *Site) SymUninstall(timestamp string) {
-	Symlink := Site.Path + "_latest"
+	Symlink := Site.Path + ".latest"
 	_, statErr := os.Stat(Symlink)
 	if statErr == nil {
 		os.Remove(Symlink)
@@ -309,19 +315,7 @@ func (Site *Site) ProcessMake(makeFile string) {
 		os.Exit(1)
 	}
 
-	_, err = os.Stat(Site.Path)
-	if err != nil {
-		log.Println("Creating directory for site at", Site.Path+Site.Timestamp)
-		os.MkdirAll(Site.Path, 0755)
-	}
-
-	drushCommand := ""
-	// @TODO: Figure out a way to run make without core, but optionally based on makefile.
-	if strings.Contains(makeFile, "core") == true {
-		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
-	} else {
-		drushCommand = fmt.Sprintf("make -y --overwrite --no-core --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
-	}
+	drushCommand := fmt.Sprintf("make -y --overwrite --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
 	log.Println("Building from", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushMake.Set("", drushCommand, true)
@@ -329,9 +323,48 @@ func (Site *Site) ProcessMake(makeFile string) {
 	if err != nil {
 		if string(err.Error()) == "exit status 1" {
 			log.Println("Processed make file was completed with errors. :", err.Error())
-
+			log.Printf("Could not execute `drush %v`", drushCommand)
 		}
+	}
+	log.Printf("Creating directory for site at %v", Site.Path+Site.Timestamp)
+	drushLog := cmd
+	for _, logEntry := range drushLog {
+		// Print output in a fairly standardized format.
+		log.Println(logEntry)
+	}
+}
+
+func (Site *Site) RebuildRegistry() {
+	drushCommand := command.NewDrushCommand()
+	drushCommand.Set(Site.Alias, "rr", false)
+	_, err := drushCommand.Output()
+	if err != nil {
+		log.Println("Could not rebuild registry...")
 	} else {
-		fmt.Sprintln(cmd)
+		log.Println("Rebuilt registry...")
+	}
+}
+
+func (Site *Site) InstallSiteRef() {
+	log.Println("Adding", Site.Path+Site.Timestamp+"/sites/sites.php")
+	data := map[string]string{
+		"Name":  Site.Name,
+		"Alias": Site.Alias,
+	}
+	filename := Site.Path + Site.Timestamp + "/sites/sites.php"
+	tpl, err := template.ParseFiles("templates/sites-template.gotpl")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	nf, err := os.Create(filename)
+	if err != nil {
+		log.Fatalln("error creating file", err)
+	}
+	defer nf.Close()
+
+	err = tpl.Execute(nf, data)
+	if err != nil {
+		log.Fatalln(err)
 	}
 }

@@ -11,6 +11,7 @@ import (
 
 func main() {
 
+	var Path = flag.String("path", "", "Path to site")
 	var Site = flag.String("site", "", "Shortname of site")
 	var Environment = flag.String("environment", "", "Name of environment (acts as Drush alias filter initially)")
 	var Filter = flag.String("filter", "", "Filter the available drush aliases with this sting to find a concise list of sites")
@@ -19,7 +20,7 @@ func main() {
 	var BuildID = flag.String("build", "", "optional timestamp of site")
 
 	// Usage:
-	// -site="mysite" -filter="mysite.dev" -makes="/path/to/make1.make, /path/to/make2.make" -action="build"
+	// -path="/path/to/site" -site="mysite" -filter="mysite.dev" -makes="/path/to/make1.make, /path/to/make2.make" -action="build"
 
 	flag.Parse()
 
@@ -38,7 +39,7 @@ func main() {
 		Sites = append(Sites, name)
 	}
 
-	x := make.NewSite(fmt.Sprintf(string(*Makes)), string(*Site), fmt.Sprintf("/acquia/sites/%v/%v.loc.gbuild.net", string(*Site), string(*Site)), fmt.Sprintf("%v.loc.gbuild.net", string(*Site)), "nginx", "/etc/nginx/sites-enabled")
+	x := make.NewSite(string(*Makes), string(*Site), string(*Path), string(*Site), "nginx", "/etc/nginx/sites-enabled")
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
 	if string(*BuildID) == "" {
@@ -56,7 +57,7 @@ func main() {
 		x.ActionInstall()
 		x.VhostInstall()
 		x.AliasInstall()
-		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Site)))
+		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Site))) // Needs work!
 		x.RebuildRegistry()
 		x.SymReinstall(x.TimeStampGet())
 		x.RestartWebServer()

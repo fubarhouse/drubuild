@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"strings"
 	"text/template"
 )
 
@@ -46,7 +47,7 @@ func (Alias *Alias) Install() {
 	log.Println("Adding alias", Alias.uri)
 	data := map[string]string{
 		"Name":  Alias.GetName(),
-		"Root":  Alias.GetPath(),
+		"Root":  strings.Replace(Alias.GetPath(), "_", ".", -1),
 		"Alias": Alias.GetUri(),
 	}
 	usr, _ := user.Current()
