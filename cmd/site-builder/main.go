@@ -51,11 +51,11 @@ func main() {
 		x.ActionRebuildCodebase(MakeFiles)
 		x.InstallSiteRef()
 		x.ActionInstall()
+		x.SymReinstall(x.TimeStampGet())
 		x.VhostInstall()
 		x.AliasInstall()
 		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Remote))) // Needs work!
 		x.RebuildRegistry()
-		x.SymReinstall(x.TimeStampGet())
 		x.RestartWebServer()
 	} else if string(*Action) == "destroy" {
 		x.ActionDestroy()
