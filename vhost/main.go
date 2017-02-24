@@ -79,13 +79,13 @@ func (VirtualHost *VirtualHost) Install() {
 	VirtualHost.Uninstall()
 	nf, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("error creating file", err)
+		log.Fatalln("ERR: error creating file", err)
 	}
 	_, err = nf.WriteString(tpl)
 	if err != nil {
-		log.Println("Could not add vhost", VirtualHost.GetName())
+		log.Println("WARN: Could not add vhost", VirtualHost.GetName())
 	} else {
-		log.Println("Successfully added vhost", VirtualHost.GetName())
+		log.Println("OK: Successfully added vhost", VirtualHost.GetName())
 	}
 	defer nf.Close()
 }
@@ -95,9 +95,9 @@ func (VirtualHost *VirtualHost) Uninstall() {
 	if statErr == nil {
 		err := os.Remove(VirtualHost.installationDirectory + "/" + VirtualHost.GetUri() + ".conf")
 		if err != nil {
-			log.Println("Could not remove vhost", VirtualHost.GetName())
+			log.Println("WARN: Could not remove vhost", VirtualHost.GetName())
 		} else {
-			log.Println("Successfully removed vhost", VirtualHost.GetName())
+			log.Println("OK: Successfully removed vhost", VirtualHost.GetName())
 		}
 	}
 

@@ -29,9 +29,9 @@ func replaceTextInFile(fullPath string, oldString string, newString string) {
 func (Site *Site) RestartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "restart").Output()
 	if stdErr != nil {
-		log.Fatalln(stdErr)
+		log.Fatalln("ERR:", stdErr)
 	} else {
-		log.Printf("Webserver %v successfully restarted.\n", Site.Webserver)
+		log.Printf("OK: Webserver %v successfully restarted.\n", Site.Webserver)
 	}
 }
 
@@ -78,7 +78,7 @@ func (Site *Site) ActionInstall() {
 	defer db.Close()
 	// Report any connection errors
 	if dbErr != nil {
-		log.Println(dbErr)
+		log.Println("WARN:", dbErr)
 	}
 	// Create database
 	dbName := strings.Replace(Site.Name+Site.Timestamp, ".", "_", -1)
@@ -90,10 +90,10 @@ func (Site *Site) ActionInstall() {
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	_, installErr := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd).Output()
 	if installErr != nil {
-		log.Println("Unable to install Drupal.")
+		log.Println("WARN: Unable to install Drupal.")
 		log.Println("drush", thisCmd)
 	} else {
-		log.Println("Successfully installed Drupal.")
+		log.Println("OK: Successfully installed Drupal.")
 	}
 }
 
@@ -124,11 +124,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
 	// TODO Add a way to specify the branch for cloning in an independent way
-	log.Println("Generating temporary make file...")
 	newMakeFilePath := "/tmp/tmp.make"
 	file, crErr := os.Create(newMakeFilePath)
-	if crErr != nil {
-		log.Println("Error creating "+newMakeFilePath+":", crErr)
+	if crErr == nil {
+		log.Println("OK: Successfully generated temporary make file...")
+	} else {
+		log.Println("ERR: Error creating "+newMakeFilePath+":", crErr)
 	}
 	writer := bufio.NewWriter(file)
 	defer file.Close()
@@ -153,9 +154,9 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	Site.ProcessMake(newMakeFilePath)
 	err := os.Remove(newMakeFilePath)
 	if err != nil {
-		log.Println("Could not remove temporary make file", newMakeFilePath)
+		log.Println("WARN: Could not remove temporary make file", newMakeFilePath)
 	} else {
-		log.Println("Removed temporary make file", newMakeFilePath)
+		log.Println("OK: Removed temporary make file", newMakeFilePath)
 	}
 }
 
@@ -165,10 +166,9 @@ func (Site *Site) ActionDatabaseDumpLocal(path string) {
 	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Database dump complete.")
-		log.Println("Dump can be found at", path)
+		log.Println("OK: Database dump complete. Dump can be found at", path)
 	} else {
-		log.Println("Database dump could not complete.")
+		log.Println("ERR: Database dump could not complete.")
 	}
 }
 
@@ -178,10 +178,9 @@ func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Database dump complete.")
-		log.Println("Dump can be found at", path)
+		log.Println("OK: Database dump complete. Dump can be found at", path)
 	} else {
-		log.Println("Database dump could not complete.")
+		log.Println("ERR: Database dump could not complete.")
 	}
 }
 
@@ -192,9 +191,9 @@ func (Site *Site) ActionDatabaseSyncLocal(alias string) {
 	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Database syncronise complete.")
+		log.Println("OK: Database syncronise complete.")
 	} else {
-		log.Println("Database syncronise could not complete.")
+		log.Println("ERR: Database syncronise could not complete.")
 	}
 }
 
@@ -205,9 +204,9 @@ func (Site *Site) ActionDatabaseSyncRemote(alias string) {
 	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Database syncronise complete.")
+		log.Println("OK: Database syncronise complete.")
 	} else {
-		log.Println("Database syncronise could not complete.")
+		log.Println("ERR: Database syncronise could not complete.")
 	}
 }
 
@@ -218,16 +217,16 @@ func (Site *Site) ActionFilesSyncLocal(alias string) {
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Public file system has been synced.")
+		log.Println("OK: Public file system has been synced.")
 	} else {
-		log.Println("Public file system has not been synced.")
+		log.Println("WARN: Public file system has not been synced.")
 	}
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
 	_, err = x.Output()
 	if err == nil {
-		log.Println("Private file system has been synced.")
+		log.Println("OK: Private file system has been synced.")
 	} else {
-		log.Println("Private file system has not been synced.")
+		log.Println("WARN: Private file system has not been synced.")
 	}
 }
 
@@ -238,16 +237,16 @@ func (Site *Site) ActionFilesSyncRemote(alias string) {
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("Public file system has been synced.")
+		log.Println("OK: Public file system has been synced.")
 	} else {
-		log.Println("Public file system has not been synced.")
+		log.Println("WARN: Public file system has not been synced.")
 	}
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
 	_, err = x.Output()
 	if err == nil {
-		log.Println("Private file system has been synced.")
+		log.Println("OK: Private file system has been synced.")
 	} else {
-		log.Println("Private file system has not been synced.")
+		log.Println("WARN: Private file system has not been synced.")
 	}
 }
 
@@ -269,24 +268,24 @@ func (Site *Site) DatabasesGet() []string {
 
 func (Site *Site) SymInstall(timestamp string) {
 	// TODO make this relative to the lowest possible level
-	Symlink := Site.Path + "/" + Site.Name + ".latest"
+	Symlink := "./" + Site.Name + ".latest"
 	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
 	if err == nil {
-		log.Println("Symlink has been created.")
+		log.Println("OK: Symlink has been created.")
 	} else {
-		log.Println("Symlink has not been created:", err)
+		log.Println("ERR: Symlink has not been created:", err)
 	}
 }
 
 func (Site *Site) SymUninstall(timestamp string) {
-	Symlink := Site.Path + "/" + Site.Name + ".latest"
-	_, statErr := os.Stat(Symlink)
+	Symlink := "./" + Site.Name + ".latest"
+	_, statErr := os.Stat(Site.Path + "/" + Symlink)
 	if statErr == nil {
 		err := os.Remove(Symlink)
 		if err != nil {
-			log.Println("Symlink could not be removed.")
+			log.Println("ERR: Symlink could not be removed.")
 		} else {
-			log.Println("Symlink has been removed.")
+			log.Println("OK: Symlink has been removed.")
 		}
 	}
 }
@@ -320,24 +319,24 @@ func (Site *Site) ProcessMake(makeFile string) {
 	}
 
 	// Test the file system, create it if it doesn't exist!
-	dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
-	_, err = os.Stat(dirPath)
-	if err != nil {
-		dirErr := os.MkdirAll(dirPath, 0755)
-		if dirErr != nil {
-			log.Println("Could not create file system", dirPath)
-		} else {
-			log.Println("Successfully created file system", dirPath)
-		}
-	}
+	//dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
+	//_, err = os.Stat(dirPath)
+	//if err != nil {
+	//	dirErr := os.MkdirAll(dirPath, 0755)
+	//	if dirErr != nil {
+	//		log.Println("ERR: Could not create file system", dirPath)
+	//	} else {
+	//		log.Println("OK: Successfully created file system", dirPath)
+	//	}
+	//}
 
-	log.Println("Building from", makeFile)
+	log.Printf("NOTIFY: Building from %v...\n", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushCommand := fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
 	drushMake.Set("", drushCommand, true)
 	cmd, err := drushMake.Output()
 	if err != nil {
-		log.Println("Could not execute Drush make without errors.", err.Error())
+		log.Println("ERR: Could not execute Drush make without errors.", err.Error())
 		drushLog := cmd
 		for _, logEntry := range drushLog {
 			// Print output in a fairly standardized format.
@@ -347,7 +346,7 @@ func (Site *Site) ProcessMake(makeFile string) {
 			}
 		}
 	} else {
-		log.Println("Completed building from", makeFile)
+		log.Println("OK: Completed building from", makeFile)
 	}
 }
 
@@ -356,20 +355,20 @@ func (Site *Site) RebuildRegistry() {
 	drushCommand.Set(Site.Alias, "rr", false)
 	_, err := drushCommand.Output()
 	if err != nil {
-		log.Println("Could not rebuild registry...")
+		log.Println("ERR: Could not rebuild registry...")
 	} else {
-		log.Println("Rebuilt registry...")
+		log.Println("OK: Rebuilt registry...")
 	}
 }
 
 func (Site *Site) InstallSiteRef() {
 
 	// Reset file system permissions...
-	err := os.Chmod(Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name, os.FileMode(0755))
+	err := os.Chmod(Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name, 0755)
 	if err != nil {
-		log.Println("Unable to reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
+		log.Println("ERR: Unable to reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
 	} else {
-		log.Println("Successfully reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
+		log.Println("OK: Successfully reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
 	}
 
 	data := map[string]string{
@@ -384,13 +383,13 @@ func (Site *Site) InstallSiteRef() {
 
 	nf, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("error creating file", err)
+		log.Fatalln("ERR: error creating file", err)
 	}
 	_, err = nf.WriteString(tpl)
 	if err != nil {
-		log.Println("Could not add", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
+		log.Println("ERR: Could not add", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
 	} else {
-		log.Println("Successfully added", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
+		log.Println("OK: Successfully added", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
 	}
 	defer nf.Close()
 }

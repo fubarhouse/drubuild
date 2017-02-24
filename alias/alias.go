@@ -65,13 +65,13 @@ func (Alias *Alias) Install() {
 	Alias.Uninstall()
 	nf, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("error creating file", err)
+		log.Fatalln("ERR: error creating file", err)
 	}
 	_, err = nf.WriteString(tpl)
 	if err != nil {
-		log.Println("Could not add alias", Alias.GetUri())
+		log.Println("WARN: Could not add alias", Alias.GetUri())
 	} else {
-		log.Println("Successfully added alias", Alias.GetUri())
+		log.Println("OK: Successfully added alias", Alias.GetUri())
 	}
 	defer nf.Close()
 }
@@ -82,9 +82,9 @@ func (Alias *Alias) Uninstall() {
 	if statErr == nil {
 		err := os.Remove(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
 		if err != nil {
-			log.Println("Could not remove alias file")
+			log.Println("WARN: Could not remove alias file")
 		} else {
-			log.Println("Successfully removed alias file")
+			log.Println("OK: Successfully removed alias file")
 		}
 	}
 
@@ -117,7 +117,7 @@ func (Alias *Alias) PrintStatus() {
 func getHome() string {
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("FAIL:", err)
 	}
 	return usr.HomeDir
 }
