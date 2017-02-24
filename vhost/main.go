@@ -74,7 +74,7 @@ func (VirtualHost *VirtualHost) Install() {
 	tpl := fmt.Sprintf("%v", string(buffer[:]))
 	tpl = strings.Replace(tpl, "Domain", data["Domain"], -1)
 	tpl = strings.Replace(tpl, "ServerRoot", data["ServerRoot"], -1)
-	tpl = strings.Replace(tpl, ".latest", VirtualHost.GetName()+".latest", -1)
+	tpl = strings.Replace(tpl, ".latest", "/"+VirtualHost.GetName()+".latest", -1)
 
 	VirtualHost.Uninstall()
 	nf, err := os.Create(filename)

@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
@@ -15,7 +14,7 @@ func main() {
 	var Site = flag.String("site", "", "Shortname of site")
 	var Domain = flag.String("domain", "", "Domain of site")
 	var Alias = flag.String("alias", "", "Alias of site")
-	var Filter = flag.String("filter", "", "Optional filter to filter the available drush aliases with this string to find a concise list of sites")
+	var Remote = flag.String("remote", "", "Remote alias to sync up with.")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
 	var Action = flag.String("action", "", "action to perform (build|destroy)")
 	var BuildID = flag.String("build", "", "optional timestamp of site")
@@ -36,17 +35,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	Aliases := aliases.NewAliasList()
-	Aliases.Generate(string(*Filter))
-
-	Sites := []string{}
-	for _, name := range Aliases.GetNames() {
-		Sites = append(Sites, name)
-	}
-
 	x := make.NewSite(string(*Makes), string(*Site), string(*Path), string(*Alias), "nginx", string(*Domain), "/etc/nginx/sites-enabled")
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
-	x.Alias = ""
 	x.DatabaseSet(y)
 	if string(*BuildID) == "" {
 		x.TimeStampReset()
@@ -63,7 +53,7 @@ func main() {
 		x.ActionInstall()
 		x.VhostInstall()
 		x.AliasInstall()
-		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Site))) // Needs work!
+		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Remote))) // Needs work!
 		x.RebuildRegistry()
 		x.SymReinstall(x.TimeStampGet())
 		x.RestartWebServer()

@@ -268,7 +268,7 @@ func (Site *Site) DatabasesGet() []string {
 
 func (Site *Site) SymInstall(timestamp string) {
 	// TODO make this relative to the lowest possible level
-	Symlink := "./" + Site.Name + ".latest"
+	Symlink := Site.Path + "/" + Site.Name + ".latest"
 	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
 	if err == nil {
 		log.Println("OK: Symlink has been created.")
@@ -278,7 +278,7 @@ func (Site *Site) SymInstall(timestamp string) {
 }
 
 func (Site *Site) SymUninstall(timestamp string) {
-	Symlink := "./" + Site.Name + ".latest"
+	Symlink := Site.Path + "/" + Site.Name + ".latest"
 	_, statErr := os.Stat(Site.Path + "/" + Symlink)
 	if statErr == nil {
 		err := os.Remove(Symlink)
@@ -362,14 +362,6 @@ func (Site *Site) RebuildRegistry() {
 }
 
 func (Site *Site) InstallSiteRef() {
-
-	// Reset file system permissions...
-	err := os.Chmod(Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name, 0755)
-	if err != nil {
-		log.Println("ERR: Unable to reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
-	} else {
-		log.Println("OK: Successfully reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
-	}
 
 	data := map[string]string{
 		"Name":   Site.Name,
