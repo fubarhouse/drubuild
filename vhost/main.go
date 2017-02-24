@@ -94,11 +94,11 @@ func (VirtualHost *VirtualHost) Uninstall() {
 	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetDomain() + ".conf"
 	_, statErr := os.Stat(filename)
 	if statErr == nil {
-		err := os.Remove(VirtualHost.installationDirectory + "/" + VirtualHost.GetUri() + ".conf")
+		err := os.Remove(filename)
 		if err != nil {
-			log.Println("WARN: Could not remove vhost", VirtualHost.GetName())
+			log.Println("WARN: Could not remove vhost", VirtualHost.GetDomain())
 		} else {
-			log.Println("OK: Successfully removed vhost", VirtualHost.GetName())
+			log.Println("OK: Successfully removed vhost", VirtualHost.GetDomain())
 		}
 	}
 

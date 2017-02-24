@@ -29,9 +29,9 @@ func replaceTextInFile(fullPath string, oldString string, newString string) {
 func (Site *Site) RestartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "restart").Output()
 	if stdErr != nil {
-		log.Fatalln("ERR:", stdErr)
+		log.Printf("ERR: Could not restart webserver %v. %v\n", Site.Webserver, stdErr)
 	} else {
-		log.Printf("OK: Webserver %v successfully restarted.\n", Site.Webserver)
+		log.Printf("OK: Successfully restarted webserver %v.\n", Site.Webserver)
 	}
 }
 
@@ -156,7 +156,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	if err != nil {
 		log.Println("WARN: Could not remove temporary make file", newMakeFilePath)
 	} else {
-		log.Println("OK: Removed temporary make file", newMakeFilePath)
+		log.Println("OK: Succesfully removed temporary make file", newMakeFilePath)
 	}
 }
 
@@ -166,9 +166,9 @@ func (Site *Site) ActionDatabaseDumpLocal(path string) {
 	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Database dump complete. Dump can be found at", path)
+		log.Println("OK: Successfully dumped complete. Dump can be found at", path)
 	} else {
-		log.Println("ERR: Database dump could not complete.")
+		log.Println("ERR: Could not dump database.", err)
 	}
 }
 
@@ -178,9 +178,9 @@ func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Database dump complete. Dump can be found at", path)
+		log.Println("OK: Successfully dumped complete. Dump can be found at", path)
 	} else {
-		log.Println("ERR: Database dump could not complete.")
+		log.Println("ERR: Could not dump database.", err)
 	}
 }
 
@@ -191,9 +191,9 @@ func (Site *Site) ActionDatabaseSyncLocal(alias string) {
 	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Database syncronise complete.")
+		log.Println("OK: Successfully syncronised databases complete.")
 	} else {
-		log.Println("ERR: Database syncronise could not complete.")
+		log.Println("ERR: Could not syncronise databases.")
 	}
 }
 
@@ -204,9 +204,9 @@ func (Site *Site) ActionDatabaseSyncRemote(alias string) {
 	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Database syncronise complete.")
+		log.Println("OK: Successfully syncronised databases complete.")
 	} else {
-		log.Println("ERR: Database syncronise could not complete.")
+		log.Println("ERR: Could not syncronise databases.")
 	}
 }
 
@@ -217,14 +217,14 @@ func (Site *Site) ActionFilesSyncLocal(alias string) {
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Public file system has been synced.")
+		log.Println("OK: Successfully synced public file system.")
 	} else {
 		log.Println("WARN: Public file system has not been synced.")
 	}
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
 	_, err = x.Output()
 	if err == nil {
-		log.Println("OK: Private file system has been synced.")
+		log.Println("OK: Successfully synced private file system.")
 	} else {
 		log.Println("WARN: Private file system has not been synced.")
 	}
@@ -237,14 +237,14 @@ func (Site *Site) ActionFilesSyncRemote(alias string) {
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
-		log.Println("OK: Public file system has been synced.")
+		log.Println("OK: Successfully synced public file system.")
 	} else {
 		log.Println("WARN: Public file system has not been synced.")
 	}
 	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
 	_, err = x.Output()
 	if err == nil {
-		log.Println("OK: Private file system has been synced.")
+		log.Println("OK: Successfully synced private file system.")
 	} else {
 		log.Println("WARN: Private file system has not been synced.")
 	}
@@ -271,9 +271,9 @@ func (Site *Site) SymInstall(timestamp string) {
 	Symlink := Site.Path + "/" + Site.Name + ".latest"
 	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
 	if err == nil {
-		log.Println("OK: Symlink has been created.")
+		log.Println("OK: Successfully created symlink")
 	} else {
-		log.Println("ERR: Symlink has not been created:", err)
+		log.Println("ERR: Could not create symlink:", err)
 	}
 }
 
@@ -283,9 +283,9 @@ func (Site *Site) SymUninstall(timestamp string) {
 	if statErr == nil {
 		err := os.Remove(Symlink)
 		if err != nil {
-			log.Println("ERR: Symlink could not be removed.")
+			log.Println("ERR: Could not remove symlink.")
 		} else {
-			log.Println("OK: Symlink has been removed.")
+			log.Println("OK: Successfully removed symlink.")
 		}
 	}
 }
@@ -346,7 +346,7 @@ func (Site *Site) ProcessMake(makeFile string) {
 			}
 		}
 	} else {
-		log.Println("OK: Completed building from", makeFile)
+		log.Println("OK: Successfully finished building new codebase without errors")
 	}
 }
 
@@ -355,9 +355,9 @@ func (Site *Site) RebuildRegistry() {
 	drushCommand.Set(Site.Alias, "rr", false)
 	_, err := drushCommand.Output()
 	if err != nil {
-		log.Println("ERR: Could not rebuild registry...")
+		log.Println("ERR: Could not rebuild registry...", err)
 	} else {
-		log.Println("OK: Rebuilt registry...")
+		log.Println("OK: Successfully rebuilt registry...")
 	}
 }
 

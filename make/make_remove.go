@@ -14,9 +14,9 @@ func (Site *Site) ActionDestroyDatabases() {
 		sqlPass := fmt.Sprintf("--password=%v", Site.database.getPass())
 		_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
 		if err == nil {
-			log.Printf("OK: Database %v was dropped.\n", database)
+			log.Printf("OK: Successfully dropped database %v.\n", database)
 		} else {
-			log.Printf("WARN: Database %v was not dropped: %v\n", database, err)
+			log.Printf("WARN: Could not drop database %v: %v\n", database, err)
 		}
 	}
 }
@@ -40,7 +40,7 @@ func (Site *Site) ActionDestroyFiles() {
 		if err != nil {
 			log.Printf("WARN: Could not remove file system for %v at %v\n", Site.Name, Site.Path)
 		} else {
-			log.Printf("OK: Removed file system for %v at %v\n", Site.Name, Site.Path)
+			log.Printf("OK: Successfully removed file system for %v at %v\n", Site.Name, Site.Path)
 		}
 	}
 }
