@@ -22,23 +22,27 @@ func (Site *Site) ActionDestroyDatabases() {
 }
 
 func (Site *Site) ActionDestroyAlias() {
-	log.Printf("Removing file system for %v at %v\n", Site.Name, Site.Path)
 	Site.AliasUninstall()
 }
 
 func (Site *Site) ActionDestroyVhost() {
-	log.Printf("Removing Virtual Host file for site %v\n", Site.Name)
 	Site.VhostUninstall()
 }
 
 func (Site *Site) ActionDestroySym() {
-	log.Printf("Removing symlink for site %v\n", Site.Name)
 	Site.SymUninstall(Site.Timestamp)
 }
 
 func (Site *Site) ActionDestroyFiles() {
-	log.Printf("Removing file system for %v at %v\n", Site.Name, Site.Path)
-	os.RemoveAll(Site.Path + "/../")
+	_, statErr := os.Stat(Site.Path)
+	if statErr == nil {
+		err := os.RemoveAll(Site.Path)
+		if err != nil {
+			log.Printf("Could not remove file system for %v at %v\n", Site.Name, Site.Path)
+		} else {
+			log.Printf("Removed file system for %v at %v\n", Site.Name, Site.Path)
+		}
+	}
 }
 
 func (Site *Site) ActionDestroy() {

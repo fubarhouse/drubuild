@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"text/template"
 	"time"
 )
 
@@ -42,19 +41,21 @@ type Site struct {
 	Make      string
 	Name      string
 	Alias     string
+	Domain    string
 	database  *makeDB
 	Webserver string
 	Vhostpath string
 }
 
-func NewSite(make, name, path, alias, webserver, vhostpath string) *Site {
+func NewSite(make, name, path, alias, webserver, domain, vhostpath string) *Site {
 	Site := &Site{}
 	Site.TimeStampReset()
 	Site.Make = make
 	Site.Name = name
-	Site.Alias = alias
 	Site.Path = path
 	Site.Webserver = webserver
+	Site.Alias = alias
+	Site.Domain = domain
 	Site.Vhostpath = vhostpath
 	return Site
 }
@@ -87,18 +88,12 @@ func (Site *Site) ActionInstall() {
 	}
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
-	output, _ := exec.Command("sh", "-c", "cd "+Site.Path+Site.Timestamp+" && drush "+thisCmd).Output()
-	drushLog := strings.Split(string(output), "\n")
-	for _, logEntry := range drushLog {
-		// Print output in a fairly standardized format.
-		log.Println(logEntry)
-	}
-	// Reset file system permissions...
-	err := os.Chmod(Site.Path+Site.Timestamp+"/sites/"+Site.Name, os.FileMode(0755))
-	if err != nil {
-		log.Println("Unable to reset file system permissions for", Site.Path+Site.Timestamp+"/sites/"+Site.Name)
+	_, installErr := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd).Output()
+	if installErr != nil {
+		log.Println("Unable to install Drupal.")
+		log.Println("drush", thisCmd)
 	} else {
-		log.Println("Successfully reset file system permissions for", Site.Path+Site.Timestamp+"/sites/"+Site.Name)
+		log.Println("Successfully installed Drupal.")
 	}
 }
 
@@ -156,8 +151,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	writer.Flush()
 	//replaceTextInFile(newMakeFilePath, "rewriteme", "master")
 	Site.ProcessMake(newMakeFilePath)
-	log.Println("Removing temporary make file", newMakeFilePath)
-	os.Remove(newMakeFilePath)
+	err := os.Remove(newMakeFilePath)
+	if err != nil {
+		log.Println("Could not remove temporary make file", newMakeFilePath)
+	} else {
+		log.Println("Removed temporary make file", newMakeFilePath)
+	}
 }
 
 func (Site *Site) ActionDatabaseDumpLocal(path string) {
@@ -270,8 +269,8 @@ func (Site *Site) DatabasesGet() []string {
 
 func (Site *Site) SymInstall(timestamp string) {
 	// TODO make this relative to the lowest possible level
-	Symlink := Site.Path + ".latest"
-	err := os.Symlink(Site.Path+Site.TimeStampGet(), Symlink)
+	Symlink := Site.Path + "/" + Site.Name + ".latest"
+	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
 	if err == nil {
 		log.Println("Symlink has been created.")
 	} else {
@@ -280,11 +279,15 @@ func (Site *Site) SymInstall(timestamp string) {
 }
 
 func (Site *Site) SymUninstall(timestamp string) {
-	Symlink := Site.Path + ".latest"
+	Symlink := Site.Path + "/" + Site.Name + ".latest"
 	_, statErr := os.Stat(Symlink)
 	if statErr == nil {
-		os.Remove(Symlink)
-		log.Println("Symlink has been removed.")
+		err := os.Remove(Symlink)
+		if err != nil {
+			log.Println("Symlink could not be removed.")
+		} else {
+			log.Println("Symlink has been removed.")
+		}
 	}
 }
 
@@ -308,6 +311,7 @@ func (Site *Site) TimeStampReset() {
 
 func (Site *Site) ProcessMake(makeFile string) {
 
+	// Test the make file exists
 	fullPath := makeFile
 	_, err := os.Stat(fullPath)
 	if err != nil {
@@ -315,22 +319,35 @@ func (Site *Site) ProcessMake(makeFile string) {
 		os.Exit(1)
 	}
 
-	drushCommand := fmt.Sprintf("make -y --overwrite --working-copy %v %v%v", fullPath, Site.Path, Site.Timestamp)
+	// Test the file system, create it if it doesn't exist!
+	dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
+	_, err = os.Stat(dirPath)
+	if err != nil {
+		dirErr := os.MkdirAll(dirPath, 0755)
+		if dirErr != nil {
+			log.Println("Could not create file system", dirPath)
+		} else {
+			log.Println("Successfully created file system", dirPath)
+		}
+	}
+
 	log.Println("Building from", makeFile)
 	drushMake := command.NewDrushCommand()
+	drushCommand := fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
 	drushMake.Set("", drushCommand, true)
 	cmd, err := drushMake.Output()
 	if err != nil {
-		if string(err.Error()) == "exit status 1" {
-			log.Println("Processed make file was completed with errors. :", err.Error())
-			log.Printf("Could not execute `drush %v`", drushCommand)
+		log.Println("Could not execute Drush make without errors.", err.Error())
+		drushLog := cmd
+		for _, logEntry := range drushLog {
+			// Print output in a fairly standardized format.
+			logEntryLines := strings.Split(logEntry, "\n")
+			for _, logEntryLine := range logEntryLines {
+				log.Println(logEntryLine)
+			}
 		}
-	}
-	log.Printf("Creating directory for site at %v", Site.Path+Site.Timestamp)
-	drushLog := cmd
-	for _, logEntry := range drushLog {
-		// Print output in a fairly standardized format.
-		log.Println(logEntry)
+	} else {
+		log.Println("Completed building from", makeFile)
 	}
 }
 
@@ -346,25 +363,34 @@ func (Site *Site) RebuildRegistry() {
 }
 
 func (Site *Site) InstallSiteRef() {
-	log.Println("Adding", Site.Path+Site.Timestamp+"/sites/sites.php")
-	data := map[string]string{
-		"Name":  Site.Name,
-		"Alias": Site.Alias,
-	}
-	filename := Site.Path + Site.Timestamp + "/sites/sites.php"
-	tpl, err := template.ParseFiles("templates/sites-template.gotpl")
+
+	// Reset file system permissions...
+	err := os.Chmod(Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name, os.FileMode(0755))
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("Unable to reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
+	} else {
+		log.Println("Successfully reset file system permissions for", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/"+Site.Name)
 	}
+
+	data := map[string]string{
+		"Name":   Site.Name,
+		"Domain": Site.Domain,
+	}
+	filename := Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/sites.php"
+	buffer := []byte{60, 63, 112, 104, 112, 10, 10, 47, 42, 42, 10, 32, 42, 32, 64, 102, 105, 108, 101, 10, 32, 42, 32, 67, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 32, 102, 105, 108, 101, 32, 102, 111, 114, 32, 68, 114, 117, 112, 97, 108, 39, 115, 32, 109, 117, 108, 116, 105, 45, 115, 105, 116, 101, 32, 100, 105, 114, 101, 99, 116, 111, 114, 121, 32, 97, 108, 105, 97, 115, 105, 110, 103, 32, 102, 101, 97, 116, 117, 114, 101, 46, 10, 32, 42, 47, 10, 10, 32, 32, 32, 36, 115, 105, 116, 101, 115, 91, 39, 68, 111, 109, 97, 105, 110, 39, 93, 32, 61, 32, 39, 78, 97, 109, 101, 39, 59, 10, 10, 63, 62, 10}
+	tpl := fmt.Sprintf("%v", string(buffer[:]))
+	tpl = strings.Replace(tpl, "Name", data["Name"], -1)
+	tpl = strings.Replace(tpl, "Domain", data["Domain"], -1)
 
 	nf, err := os.Create(filename)
 	if err != nil {
 		log.Fatalln("error creating file", err)
 	}
-	defer nf.Close()
-
-	err = tpl.Execute(nf, data)
+	_, err = nf.WriteString(tpl)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("Could not add", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
+	} else {
+		log.Println("Successfully added", Site.Path+"/"+Site.Name+Site.Timestamp+"/sites/sites.php")
 	}
+	defer nf.Close()
 }

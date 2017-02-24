@@ -27,7 +27,7 @@ func (list *AliasList) Generate(key string) {
 	sites := command.NewDrushCommand()
 	sites.Set("", "sa", false)
 	values, _ := sites.Output()
-	values = strings.Split(values[0], "\n")
+	values = strings.Split(fmt.Sprintf("%v", values), "\n")
 	for _, currAlias := range values {
 		if strings.Contains(currAlias, key) == true {
 			thisAlias := alias.NewAlias(currAlias, "", "")
