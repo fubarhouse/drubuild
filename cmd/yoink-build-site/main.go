@@ -16,7 +16,6 @@ func main() {
 	var Alias = flag.String("alias", "", "Alias of site")
 	var Remote = flag.String("remote", "", "Remote alias to sync up with.")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
-	var Action = flag.String("action", "", "action to perform (build|destroy)")
 	var BuildID = flag.String("build", "", "optional timestamp of site")
 
 	// Usage:
@@ -26,11 +25,10 @@ func main() {
 	// -alias="mysite.dev" \
 	// -filter="mysite.dev" \
 	// -makes="/path/to/make1.make, /path/to/make2.make" \
-	// -action="build"
 
 	flag.Parse()
 
-	if string(*Site) == "" || string(*Alias) == "" || string(*Makes) == "" || string(*Path) == "" || string(*Domain) == "" || string(*Action) == "" {
+	if string(*Site) == "" || string(*Alias) == "" || string(*Makes) == "" || string(*Path) == "" || string(*Domain) == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -47,17 +45,13 @@ func main() {
 	MakefilesFormatted := strings.Replace(x.Make, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 
-	if string(*Action) == "build" {
-		x.ActionRebuildCodebase(MakeFiles)
-		x.InstallSiteRef()
-		x.ActionInstall()
-		x.SymReinstall(x.TimeStampGet())
-		x.VhostInstall()
-		x.AliasInstall()
-		x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Remote))) // Needs work!
-		x.RebuildRegistry()
-		x.RestartWebServer()
-	} else if string(*Action) == "destroy" {
-		x.ActionDestroy()
-	}
+	x.ActionRebuildCodebase(MakeFiles)
+	x.InstallSiteRef()
+	x.ActionInstall()
+	x.SymReinstall(x.TimeStampGet())
+	x.VhostInstall()
+	x.AliasInstall()
+	x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Remote)))
+	x.RebuildRegistry()
+	x.RestartWebServer()
 }
