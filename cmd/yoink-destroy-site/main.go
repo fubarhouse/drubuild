@@ -12,6 +12,8 @@ func main() {
 	var Site = flag.String("site", "", "Shortname of site")
 	var Domain = flag.String("domain", "", "Domain of site")
 	var Alias = flag.String("alias", "", "Alias of site")
+	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
+	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 
 	// Usage:
 	// -path="/path/to/site" \
@@ -26,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	x := make.NewSite("none", string(*Site), string(*Path), string(*Alias), "nginx", string(*Domain), "/etc/nginx/sites-enabled")
+	x := make.NewSite("none", string(*Site), string(*Path), string(*Alias), string(*WebserverName), string(*Domain), string(*VHostDir))
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
 	x.ActionDestroy()

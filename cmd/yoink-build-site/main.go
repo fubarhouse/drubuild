@@ -17,6 +17,8 @@ func main() {
 	var Remote = flag.String("remote", "", "Remote alias to sync up with.")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
 	var BuildID = flag.String("build", "", "optional timestamp of site")
+	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
+	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 
 	// Usage:
 	// -path="/path/to/site" \
@@ -33,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	x := make.NewSite(string(*Makes), string(*Site), string(*Path), string(*Alias), "nginx", string(*Domain), "/etc/nginx/sites-enabled")
+	x := make.NewSite(string(*Makes), string(*Site), string(*Path), string(*Alias), string(*WebserverName), string(*Domain), string(*VHostDir))
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
 	if string(*BuildID) == "" {
