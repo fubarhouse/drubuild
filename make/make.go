@@ -124,7 +124,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
 	// TODO Add a way to specify the branch for cloning in an independent way
-	newMakeFilePath := "/tmp/tmp.make"
+	newMakeFilePath := "/tmp/drupal-" + Site.Name + "-" + Site.TimeStampGet() + ".make"
 	file, crErr := os.Create(newMakeFilePath)
 	if crErr == nil {
 		log.Println("OK: Successfully generated temporary make file...")
