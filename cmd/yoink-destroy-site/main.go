@@ -23,12 +23,12 @@ func main() {
 
 	flag.Parse()
 
-	if string(*Site) == "" || string(*Alias) == "" || string(*Path) == "" || string(*Domain) == "" {
+	if *Site == "" || *Alias == "" || *Path == "" || *Domain == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	x := make.NewSite("none", string(*Site), string(*Path), string(*Alias), string(*WebserverName), string(*Domain), string(*VHostDir))
+	x := make.NewSite("none", *Site, *Path, *Alias, *WebserverName, *Domain, *VHostDir)
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
 	x.ActionDestroy()

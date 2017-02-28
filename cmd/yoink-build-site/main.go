@@ -30,18 +30,18 @@ func main() {
 
 	flag.Parse()
 
-	if string(*Site) == "" || string(*Alias) == "" || string(*Makes) == "" || string(*Path) == "" || string(*Domain) == "" {
+	if *Site == "" || *Alias == "" || *Makes == "" || *Path == "" || *Domain == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	x := make.NewSite(string(*Makes), string(*Site), string(*Path), string(*Alias), string(*WebserverName), string(*Domain), string(*VHostDir))
+	x := make.NewSite(*Makes, *Site, *Path, *Alias, *WebserverName, *Domain, *VHostDir)
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
-	if string(*BuildID) == "" {
+	if *BuildID == "" {
 		x.TimeStampReset()
 	} else {
-		x.TimeStampSet(string(*BuildID))
+		x.TimeStampSet(*BuildID)
 	}
 
 	MakefilesFormatted := strings.Replace(x.Make, " ", "", -1)
@@ -53,7 +53,7 @@ func main() {
 	x.SymReinstall(x.TimeStampGet())
 	x.VhostInstall()
 	x.AliasInstall()
-	x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", string(*Remote)))
+	x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", *Remote))
 	x.RebuildRegistry()
 	x.RestartWebServer()
 }

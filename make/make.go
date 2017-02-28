@@ -123,8 +123,10 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
-	// TODO Add a way to specify the branch for cloning in an independent way
-	newMakeFilePath := "/tmp/drupal-" + Site.Name + "-" + Site.TimeStampGet() + ".make"
+	if Site.Timestamp == "." {
+		Site.Timestamp = ""
+	}
+	newMakeFilePath := "/tmp/drupal-" + Site.Name + Site.TimeStampGet() + ".make"
 	file, crErr := os.Create(newMakeFilePath)
 	if crErr == nil {
 		log.Println("OK: Successfully generated temporary make file...")
@@ -332,11 +334,18 @@ func (Site *Site) ProcessMake(makeFile string) {
 
 	log.Printf("NOTIFY: Building from %v...\n", makeFile)
 	drushMake := command.NewDrushCommand()
-	drushCommand := fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
+	drushCommand := ""
+	if Site.Name == "" {
+		// TODO: I don't want a --no-core flag here...
+		drushCommand = fmt.Sprintf("make -y --no-core --overwrite --working-copy %v %v/%v", fullPath, Site.Path, Site.Timestamp)
+	} else {
+		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
+	}
 	drushMake.Set("", drushCommand, true)
 	cmd, err := drushMake.Output()
 	if err != nil {
 		log.Println("ERR: Could not execute Drush make without errors.", err.Error())
+		log.Println("drush", drushCommand)
 		drushLog := cmd
 		for _, logEntry := range drushLog {
 			// Print output in a fairly standardized format.
