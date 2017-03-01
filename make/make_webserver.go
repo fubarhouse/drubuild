@@ -12,7 +12,6 @@ func (Site *Site) VhostPathSet(value string) {
 func (Site *Site) VhostInstall() {
 	vhostPath := strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, Site.Webserver, Site.Domain, Site.Vhostpath)
-	vhost.NewVirtualHost("", "", "", "", "")
 	vhostFile.Install()
 }
 

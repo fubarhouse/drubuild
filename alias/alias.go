@@ -2,7 +2,7 @@ package alias
 
 import (
 	"fmt"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"os"
 	"os/user"
 	"strings"
@@ -64,13 +64,13 @@ func (Alias *Alias) Install() {
 	Alias.Uninstall()
 	nf, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("ERR: error creating file", err)
+		log.Fatalln("Error creating file", err)
 	}
 	_, err = nf.WriteString(tpl)
 	if err != nil {
-		log.Println("WARN: Could not add alias", Alias.GetUri())
+		log.Warnln("Could not add alias", Alias.GetUri())
 	} else {
-		log.Println("OK: Successfully added alias", Alias.GetUri())
+		log.Infoln("Added alias", Alias.GetUri())
 	}
 	defer nf.Close()
 }
@@ -82,9 +82,9 @@ func (Alias *Alias) Uninstall() {
 	if statErr == nil {
 		err := os.Remove(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
 		if err != nil {
-			log.Println("WARN: Could not remove alias file")
+			log.Warnln("Could not remove alias file")
 		} else {
-			log.Println("OK: Successfully removed alias file")
+			log.Infoln("Removed alias file")
 		}
 	}
 
@@ -117,7 +117,8 @@ func (Alias *Alias) PrintStatus() {
 func getHome() string {
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal("FAIL:", err)
+		log.Fatalln(err)
+		os.Exit(1)
 	}
 	return usr.HomeDir
 }

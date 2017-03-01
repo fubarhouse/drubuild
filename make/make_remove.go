@@ -2,7 +2,7 @@ package make
 
 import (
 	"fmt"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"os"
 	"os/exec"
 )
@@ -14,9 +14,9 @@ func (Site *Site) ActionDestroyDatabases() {
 		sqlPass := fmt.Sprintf("--password=%v", Site.database.getPass())
 		_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
 		if err == nil {
-			log.Printf("OK: Successfully dropped database %v.\n", database)
+			log.Infoln("Dropped database", database)
 		} else {
-			log.Printf("WARN: Could not drop database %v: %v\n", database, err)
+			log.Warnln("Could not drop database", database, err)
 		}
 	}
 }
@@ -38,9 +38,9 @@ func (Site *Site) ActionDestroyFiles() {
 	if statErr == nil {
 		err := os.RemoveAll(Site.Path)
 		if err != nil {
-			log.Printf("WARN: Could not remove file system for %v at %v\n", Site.Name, Site.Path)
+			log.Warnf("Could not remove file system for %v at %v\n", Site.Name, Site.Path)
 		} else {
-			log.Printf("OK: Successfully removed file system for %v at %v\n", Site.Name, Site.Path)
+			log.Infof("Removed file system for %v at %v\n", Site.Name, Site.Path)
 		}
 	}
 }
