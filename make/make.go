@@ -332,7 +332,7 @@ func (Site *Site) ProcessMake(makeFile string) {
 	//	}
 	//}
 
-	log.Infof("Building from %v...\n", makeFile)
+	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushCommand := ""
 	if Site.Name == "" {
