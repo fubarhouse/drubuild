@@ -216,14 +216,14 @@ func (Site *Site) ActionFilesSyncLocal(alias string) {
 	x := command.NewDrushCommand()
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	destAlias := strings.Replace(Site.Alias, "@", "", -1)
-	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
+	x.Set("", fmt.Sprintf("--yes rsync --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
 	_, err := x.Output()
 	if err == nil {
 		log.Infoln("Synced public file system.")
 	} else {
 		log.Warnln("Public file system has not been synced.")
 	}
-	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
+	x.Set("", fmt.Sprintf("--yes rsync --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
 	_, err = x.Output()
 	if err == nil {
 		log.Infoln("Synced private file system.")
@@ -366,7 +366,7 @@ func (Site *Site) RebuildRegistry() {
 	if err != nil {
 		log.Warnln("Could not rebuild registry...", err)
 	} else {
-		log.Infoln("Rebuilt registry...")
+		log.Infoln("Rebuilt registry.")
 	}
 }
 
@@ -393,4 +393,19 @@ func (Site *Site) InstallSiteRef() {
 		log.Infoln("Added", filename)
 	}
 	defer nf.Close()
+}
+
+func (Site *Site) InstallPrivateFileSystem() {
+	// Test the file system, create it if it doesn't exist!
+	filename := "sites/" + Site.Name + "/private"
+	dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
+	_, err := os.Stat(dirPath + "/" + filename)
+	if err != nil {
+		dirErr := os.MkdirAll(dirPath, 0755)
+		if dirErr != nil {
+			log.Errorln("Could not create private file system", filename)
+		} else {
+			log.Infoln("Created file system", filename)
+		}
+	}
 }

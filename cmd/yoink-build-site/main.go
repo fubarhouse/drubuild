@@ -51,6 +51,7 @@ func main() {
 	x.InstallSiteRef()
 	x.ActionInstall()
 	x.SymReinstall(x.TimeStampGet())
+	x.InstallPrivateFileSystem()
 	x.VhostInstall()
 	x.AliasInstall()
 	x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", *Remote))
