@@ -9,14 +9,16 @@ import (
 
 func main() {
 
-	var SourceAlias = flag.String("source-alias", "", "Alias of target site")
-	var DestAlias = flag.String("dest-alias", "", "Alias of source site")
+	var SourceAlias = flag.String("source-alias", "", "Alias of source site")
+	var DestAlias = flag.String("dest-alias", "", "Alias of destination site")
 	var SyncDB = flag.Bool("db", false, "Mark database for syncronization")
 	var SyncFiles = flag.Bool("files", false, "Mark files for syncronization")
 
 	// Usage:
 	// -local-alias="mysite.dev" \
 	// -remote-alias="mysite.dev" \
+	// -db \
+	// -files
 
 	flag.Parse()
 
