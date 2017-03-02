@@ -3,15 +3,17 @@ package main
 import (
 	"flag"
 	"github.com/fubarhouse/golang-drush/makeupdater"
+	"strings"
 )
 
 func main() {
-	// TODO: add error handler for input make file
-	// TODO: remove the fact the program always outputs "already updated"
-	var strMake = flag.String("make", "", "Absolute path to make file")
+	var strMake = flag.String("makes", "", "Comma-separated list of absolute paths to make files to update.")
 	flag.Parse()
 	if *strMake != "" {
-		makeupdater.UpdateMake(*strMake)
+		Makes := strings.Split(*strMake, ",")
+		for _, Makefile := range Makes {
+			makeupdater.UpdateMake(Makefile)
+		}
 	} else {
 		flag.Usage()
 	}

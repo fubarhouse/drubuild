@@ -186,7 +186,8 @@ func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	}
 }
 
-func (Site *Site) ActionDatabaseSyncLocal(alias string) {
+func (Site *Site) ActionDatabaseSync(alias string) {
+	/* So our binary and this function combined support two-way traffic...  */
 	x := command.NewDrushCommand()
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	destAlias := strings.Replace(Site.Alias, "@", "", -1)
@@ -199,20 +200,7 @@ func (Site *Site) ActionDatabaseSyncLocal(alias string) {
 	}
 }
 
-func (Site *Site) ActionDatabaseSyncRemote(alias string) {
-	x := command.NewDrushCommand()
-	srcAlias := strings.Replace(Site.Alias, "@", "", -1)
-	destAlias := strings.Replace(alias, "@", "", -1)
-	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Infoln("Syncronised databases complete.")
-	} else {
-		log.Errorln("Could not syncronise databases.")
-	}
-}
-
-func (Site *Site) ActionFilesSyncLocal(alias string) {
+func (Site *Site) ActionFilesSync(alias string) {
 	x := command.NewDrushCommand()
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	destAlias := strings.Replace(Site.Alias, "@", "", -1)
@@ -229,26 +217,6 @@ func (Site *Site) ActionFilesSyncLocal(alias string) {
 		log.Infoln("Synced private file system.")
 	} else {
 		log.Warnln("Private file system has not been synced.")
-	}
-}
-
-func (Site *Site) ActionFilesSyncRemote(alias string) {
-	x := command.NewDrushCommand()
-	srcAlias := strings.Replace(Site.Alias, "@", "", -1)
-	destAlias := strings.Replace(alias, "@", "", -1)
-	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Infoln("Synced public file system.")
-	} else {
-		log.Warnln("Public file system has not been synced.")
-	}
-	x.Set("", fmt.Sprintf("rsync -y --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
-	_, err = x.Output()
-	if err == nil {
-		log.Infoln("Synced private file system.")
-	} else {
-		log.Warnln("WARN: Private file system has not been synced.")
 	}
 }
 

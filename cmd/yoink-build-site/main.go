@@ -14,7 +14,6 @@ func main() {
 	var Site = flag.String("site", "", "Shortname of site")
 	var Domain = flag.String("domain", "", "Domain of site")
 	var Alias = flag.String("alias", "", "Alias of site")
-	var Remote = flag.String("remote", "", "Remote alias to sync up with.")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
 	var BuildID = flag.String("build", "", "optional timestamp of site")
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
@@ -25,7 +24,6 @@ func main() {
 	// -site="mysite" \
 	// -domain="mysite.dev" \
 	// -alias="mysite.dev" \
-	// -filter="mysite.dev" \
 	// -makes="/path/to/make1.make, /path/to/make2.make" \
 
 	flag.Parse()
@@ -54,7 +52,6 @@ func main() {
 	x.InstallPrivateFileSystem()
 	x.VhostInstall()
 	x.AliasInstall()
-	x.ActionDatabaseSyncLocal(fmt.Sprintf("@%v", *Remote))
 	x.RebuildRegistry()
 	x.RestartWebServer()
 }

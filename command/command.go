@@ -70,6 +70,6 @@ func (drush *Command) Run() ([]byte, error) {
 		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
-	comm, err := exec.Command("sh", "-c", PATH_DRUSH + " " + args).Output()
+	comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).Output()
 	return comm, err
 }

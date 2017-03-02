@@ -31,11 +31,14 @@ func removeChar(input string, chars ...string) string {
 
 func UpdateMake(fullpath string) {
 	// Update the version numbers in a specified make file
+	_, err := os.Stat(fullpath)
+	if err != nil {
+		panic(err)
+	}
 	projects := GetProjectsFromMake(fullpath)
 	count := 0
 	for _, project := range projects {
 		if project != "" {
-
 			catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
 			z, _ := exec.Command("sh", "-c", catCmd).Output()
 			versionOld := removeChar(string(z), " ", "\"", "\n")
@@ -48,7 +51,7 @@ func UpdateMake(fullpath string) {
 			}
 		}
 	}
-	if count != 0 {
+	if count == 0 {
 		fmt.Println(fullpath, "is already up to date.")
 	}
 }
