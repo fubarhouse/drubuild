@@ -3,14 +3,14 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/make"
+	"github.com/fubarhouse/golang-drush/command"
 	"os"
 )
 
 func main() {
 
-	var LocalAlias = flag.String("local-alias", "", "Alias of target site")
-	var RemoteAlias = flag.String("remote-alias", "", "Alias of source site")
+	var SourceAlias = flag.String("source-alias", "", "Alias of target site")
+	var DestAlias = flag.String("dest-alias", "", "Alias of source site")
 	var SyncDB = flag.Bool("db", false, "Mark database for syncronization")
 	var SyncFiles = flag.Bool("files", false, "Mark files for syncronization")
 
@@ -20,23 +20,21 @@ func main() {
 
 	flag.Parse()
 
-	if *LocalAlias == "" || *RemoteAlias == "" {
+	if *SourceAlias == "" || *DestAlias == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	x := make.Site{}
-	x.Alias = *LocalAlias
 	if *SyncDB == true {
 		log.Infoln("Database was marked for syncing, working now...")
-		x.ActionDatabaseSyncLocal(*RemoteAlias)
+		command.DrushDatabaseSync(*SourceAlias, *DestAlias)
 	}
 	if *SyncFiles == true {
 		log.Infoln("Files were marked for syncing, working now...")
-		x.ActionFilesSyncLocal(*RemoteAlias)
+		command.DrushFilesSync(*SourceAlias, *DestAlias)
 	}
 	if *SyncDB == true || *SyncFiles == true {
 		log.Infoln("Attempting to rebuild registries...")
-		x.RebuildRegistry()
+		command.DrushRebuildRegistry(*DestAlias)
 	}
 }

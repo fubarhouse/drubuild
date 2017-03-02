@@ -186,40 +186,6 @@ func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	}
 }
 
-func (Site *Site) ActionDatabaseSync(alias string) {
-	/* So our binary and this function combined support two-way traffic...  */
-	x := command.NewDrushCommand()
-	srcAlias := strings.Replace(alias, "@", "", -1)
-	destAlias := strings.Replace(Site.Alias, "@", "", -1)
-	x.Set("", fmt.Sprintf("sql-sync @%v @%v -y", srcAlias, destAlias), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Infoln("Syncronised databases complete.")
-	} else {
-		log.Errorln("Could not syncronise databases.")
-	}
-}
-
-func (Site *Site) ActionFilesSync(alias string) {
-	x := command.NewDrushCommand()
-	srcAlias := strings.Replace(alias, "@", "", -1)
-	destAlias := strings.Replace(Site.Alias, "@", "", -1)
-	x.Set("", fmt.Sprintf("--yes rsync --exclude-other-sites --exclude-conf @%v:%%files @%v:%%files", srcAlias, destAlias), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Infoln("Synced public file system.")
-	} else {
-		log.Warnln("Public file system has not been synced.")
-	}
-	x.Set("", fmt.Sprintf("--yes rsync --exclude-other-sites --exclude-conf @%v:%%private @%v:%%private", srcAlias, destAlias), true)
-	_, err = x.Output()
-	if err == nil {
-		log.Infoln("Synced private file system.")
-	} else {
-		log.Warnln("Private file system has not been synced.")
-	}
-}
-
 func (Site *Site) DatabaseSet(database *makeDB) {
 	Site.database = database
 }
@@ -324,17 +290,6 @@ func (Site *Site) ProcessMake(makeFile string) {
 		}
 	} else {
 		log.Infoln("Finished building new codebase without errors")
-	}
-}
-
-func (Site *Site) RebuildRegistry() {
-	drushCommand := command.NewDrushCommand()
-	drushCommand.Set(Site.Alias, "rr", false)
-	_, err := drushCommand.Output()
-	if err != nil {
-		log.Warnln("Could not rebuild registry...", err)
-	} else {
-		log.Infoln("Rebuilt registry.")
 	}
 }
 

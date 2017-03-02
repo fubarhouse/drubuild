@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
@@ -52,6 +53,6 @@ func main() {
 	x.InstallPrivateFileSystem()
 	x.VhostInstall()
 	x.AliasInstall()
-	x.RebuildRegistry()
+	command.DrushRebuildRegistry(x.Alias)
 	x.RestartWebServer()
 }
