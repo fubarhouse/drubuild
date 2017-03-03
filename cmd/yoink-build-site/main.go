@@ -53,6 +53,7 @@ func main() {
 	x.InstallPrivateFileSystem()
 	x.VhostInstall()
 	x.AliasInstall()
+	command.DrushUpdateDatabase(x.Alias)
 	command.DrushRebuildRegistry(x.Alias)
 	x.RestartWebServer()
 }
