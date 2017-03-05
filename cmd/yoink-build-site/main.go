@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
