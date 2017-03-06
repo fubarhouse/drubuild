@@ -254,31 +254,14 @@ func (Site *Site) ProcessMake(makeFile string) {
 		os.Exit(1)
 	}
 
-	// Test the file system, create it if it doesn't exist!
-	//dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
-	//_, err = os.Stat(dirPath)
-	//if err != nil {
-	//	dirErr := os.MkdirAll(dirPath, 0755)
-	//	if dirErr != nil {
-	//		log.Errorln("Could not create file system", dirPath)
-	//	} else {
-	//		log.Infoln("Created file system", dirPath)
-	//	}
-	//}
-
 	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushCommand := ""
-	if Site.Name == "" {
-		// TODO: I don't want a --no-core flag here...
-		drushCommand = fmt.Sprintf("make -y --no-core --overwrite --working-copy %v %v/%v", fullPath, Site.Path, Site.Timestamp)
-	} else {
-		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
-	}
+	drushCommand = fmt.Sprintf("make -y --no-core --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
 	drushMake.Set("", drushCommand, true)
 	cmd, err := drushMake.Output()
 	if err != nil {
-		log.Warnln("ERR: Could not execute Drush make without errors.", err.Error())
+		log.Warnln("Could not execute Drush make without errors.", err.Error())
 		log.Warnln("drush", drushCommand)
 		drushLog := cmd
 		for _, logEntry := range drushLog {
