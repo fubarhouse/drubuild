@@ -9,16 +9,3 @@ DirectoryIndex index.php
       Require all granted
     </Directory>
 </VirtualHost>
-
-
-
-
-go run
-./cmd/site-builder/main.go
--path="/acquia/sites/mysite/"
--site="mysite"
--filter="ssc.aceusapps.dev"
--makes="/acquia/codebases/make/book/core.make, /acquia/codebases/make/book/contrib.make, /acquia/codebases/make/book/libraries.make, /acquia/codebases/make/book/custom.make"
--domain="educationact.loc.gbuild.net"
--alias="educationact.loc.gbuild.net"
--action="build"

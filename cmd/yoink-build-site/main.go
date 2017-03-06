@@ -42,7 +42,7 @@ func main() {
 		x.TimeStampSet(*BuildID)
 	}
 
-	MakefilesFormatted := strings.Replace(x.Make, " ", "", -1)
+	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 
 	x.ActionRebuildCodebase(MakeFiles)
