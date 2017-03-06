@@ -154,6 +154,30 @@ func DrushUpdateDatabase(alias string) {
 	}
 }
 
+// Performs a database update task on an input site alias with the use of Drush.
+func DrushDownloadToPath(path, project string) {
+	drushCommand := NewDrushCommand()
+	drushCommand.Set("", "pm-download --yes "+project+" --destination="+path, false)
+	_, err := drushCommand.Output()
+	if err != nil {
+		log.Warnln("Could not download module ", project, err)
+	} else {
+		log.Infoln("Downloaded module ", project, err)
+	}
+}
+
+// Performs a database update task on an input site alias with the use of Drush.
+func DrushDownloadToAlias(alias, project string) {
+	drushCommand := NewDrushCommand()
+	drushCommand.Set(alias, "pm-download --yes "+project, false)
+	_, err := drushCommand.Output()
+	if err != nil {
+		log.Warnln("Could not download module ", project, err)
+	} else {
+		log.Infoln("Downloaded module ", project)
+	}
+}
+
 // Performs all drush commands associated to specifying a solr core.
 func DrushSolrSetup(Alias, CoreName string) {
 

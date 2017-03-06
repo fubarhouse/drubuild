@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -116,6 +117,75 @@ func (Site *Site) ActionRebuild() {
 		Site.Path = fmt.Sprintf("%v%v", Site.Path, Site.TimeStampGet())
 		//Site.ProcessMake()
 		//Site.ActionInstall()
+	}
+}
+
+func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string) {
+	log.Infoln("Searching for module/theme...")
+	moduleFound := false
+	var moduleType string
+	var moduleCat string
+	err := new(error)
+	_ = filepath.Walk(Site.Path, func(path string, _ os.FileInfo, _ error) error {
+		realpath := strings.Split(string(path), "\n")
+		for _, name := range realpath {
+			if strings.Contains(name, "/contrib/"+Project+"/") || strings.Contains(name, "/custom/"+Project+"/") {
+				if strings.Contains(name, "/contrib/"+Project+"/") {
+					moduleType = "contrib"
+				} else {
+					moduleType = "custom"
+				}
+				if strings.Contains(name, "/modules/"+moduleType+"/"+Project+"/") {
+					moduleCat = "modules"
+				} else if strings.Contains(name, "/themes/"+moduleType+"/"+Project+"/") {
+					moduleCat = "themes"
+				}
+				moduleFound = true
+			}
+		}
+		return *err
+	})
+
+	if moduleFound {
+		log.Infoln("Found module at", Site.Path+"/sites/all/"+moduleCat+"/"+moduleType+"/"+Project+"/")
+	}
+
+	if moduleType != "" && moduleCat != "" {
+		ProjectDir := Site.Path + "/sites/all/" + moduleCat + "/" + moduleType + "/" + Project + "/"
+		_, errMod := os.Stat(ProjectDir)
+		if errMod == nil {
+			*err = os.RemoveAll(ProjectDir)
+			if *err == nil {
+				log.Infoln("Removed", ProjectDir)
+			} else {
+				log.Warn("Could not remove ", ProjectDir)
+			}
+		}
+	}
+
+	if moduleFound == false {
+		log.Infoln("Could not find", Project)
+		os.Exit(127)
+	} else {
+		path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
+		if moduleType == "contrib" {
+			command.DrushDownloadToPath(path, Project)
+		} else {
+			//git clone -b my-branch git@github.com:user/myproject.git
+			gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, path+"/"+Project)
+			_, *err = gitCmd.Output()
+			if *err == nil {
+				log.Infof("Downloaded package %v from %v to %v", Project, GitPath, path+"/"+Project)
+				*err = os.RemoveAll(path + "/" + Project + "/.git")
+				if *err == nil {
+					log.Infoln("Removed .git folder from file system.")
+				} else {
+					log.Warnln("Unable to remove .git folder from file system.")
+				}
+			} else {
+				log.Errorf("Could not clone %v from %v: %v\n", Project, GitPath, *err)
+			}
+		}
 	}
 }
 
