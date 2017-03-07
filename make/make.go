@@ -331,10 +331,10 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushCommand := ""
-	if Site.Name == "" {
-		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
-	} else {
+	if Site.Timestamp == "" {
 		drushCommand = fmt.Sprintf("make -y --no-core --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
+	} else {
+		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
 	}
 	drushMake.Set("", drushCommand, true)
 	cmd, err := drushMake.Output()
