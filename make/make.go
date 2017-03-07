@@ -223,12 +223,16 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 
 	writer.Flush()
 	//replaceTextInFile(newMakeFilePath, "rewriteme", "master")
-	Site.ProcessMake(newMakeFilePath)
-	err := os.Remove(newMakeFilePath)
-	if err != nil {
-		log.Warnln("Could not remove temporary make file", newMakeFilePath)
+	drushMake := Site.ProcessMake(newMakeFilePath)
+	if drushMake {
+		err := os.Remove(newMakeFilePath)
+		if err != nil {
+			log.Warnln("Could not remove temporary make file", newMakeFilePath)
+		} else {
+			log.Infoln("Removed temporary make file", newMakeFilePath)
+		}
 	} else {
-		log.Infoln("Removed temporary make file", newMakeFilePath)
+		log.Warnln("Temporary make file has not been removed due to the above notices.")
 	}
 }
 
@@ -314,7 +318,7 @@ func (Site *Site) TimeStampReset() {
 	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
 }
 
-func (Site *Site) ProcessMake(makeFile string) {
+func (Site *Site) ProcessMake(makeFile string) bool {
 
 	// Test the make file exists
 	fullPath := makeFile
@@ -345,8 +349,10 @@ func (Site *Site) ProcessMake(makeFile string) {
 				log.Infoln(logEntryLine)
 			}
 		}
+		return true
 	} else {
 		log.Infoln("Finished building new codebase without errors")
+		return false
 	}
 }
 
