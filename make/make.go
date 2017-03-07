@@ -349,10 +349,10 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 				log.Infoln(logEntryLine)
 			}
 		}
-		return true
+		return false
 	} else {
 		log.Infoln("Finished building new codebase without errors")
-		return false
+		return true
 	}
 }
 
