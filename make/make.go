@@ -383,7 +383,7 @@ func (Site *Site) InstallSiteRef() {
 
 func (Site *Site) InstallPrivateFileSystem() {
 	// Test the file system, create it if it doesn't exist!
-	filename := "sites/" + Site.Name + "/private"
+	filename := "sites/" + Site.Name + "/private/files"
 	dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
 	_, err := os.Stat(dirPath + "/" + filename)
 	if err != nil {
