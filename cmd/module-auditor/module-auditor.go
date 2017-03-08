@@ -19,18 +19,25 @@ import (
 func main() {
 	var strAliases = flag.String("aliases", "", "alias1,alias2,alias3")
 	var strModules = flag.String("modules", "", "views,features,admin_menu")
-	var strMakefile = flag.String("make", "", "/path/to/make.make")
+	var strMakefiles = flag.String("make", "", "/path/to/make.make,/path/to/make-other.make")
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
 
-	getModulesFromMake := false
-	projects := []string{}
+	var getModulesFromMake = false
+	var projects []string
+	var MakeProjects []string
 
-	if *strMakefile != "" {
-		catCmd := "cat " + *strMakefile + " | grep projects | cut -d'[' -f2 | cut -d']' -f1 | uniq | sort"
-		y, _ := exec.Command("sh", "-c", catCmd).Output()
-		projects = strings.Split(string(y), "\n")
-		if len(projects) != 0 {
+	if *strMakefiles != "" {
+		MakefileNames := strings.Split(*strMakefiles, ",")
+		for _, Makefile := range MakefileNames {
+			catCmd := "cat " + Makefile + " | grep projects | cut -d'[' -f2 | cut -d']' -f1 | uniq | sort"
+			y, _ := exec.Command("sh", "-c", catCmd).Output()
+			projects = strings.Split(string(y), "\n")
+			for _, Project := range projects {
+				MakeProjects = append(MakeProjects, Project)
+			}
+		}
+		if len(MakeProjects) != 0 {
 			getModulesFromMake = true
 		}
 	}
@@ -39,8 +46,8 @@ func main() {
 		aliasList := aliases.NewAliasList()
 		aliases := strings.Split(*strAliases, ",")
 		modules := strings.Split(*strModules, ",")
-		if len(projects) != 0 {
-			modules = projects
+		if len(MakeProjects) != 0 {
+			modules = MakeProjects
 		}
 		for _, value := range aliases {
 			thisAliasA := strings.Replace(value, "@", "", -1)
