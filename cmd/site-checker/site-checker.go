@@ -17,6 +17,18 @@ func main() {
 
 	var FinalOutput []string
 
+	if !strings.Contains(*strPattern, "%v") {
+		log.Errorln("Specified pattern does not include alias modifier.")
+	}
+
+	if *strAliases != "" {
+		log.Errorln("Aliases are not specified.")
+	}
+
+	if *strCommands != "" {
+		log.Errorln("Commands are not specified.")
+	}
+
 	if *strAliases != "" {
 		for _, Alias := range strings.Split(*strAliases, ",") {
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
