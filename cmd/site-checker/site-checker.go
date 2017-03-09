@@ -21,15 +21,14 @@ func main() {
 		log.Errorln("Specified pattern does not include alias modifier.")
 	}
 
-	if *strAliases != "" {
-		log.Errorln("Aliases are not specified.")
-	}
-
 	if *strCommands != "" {
 		log.Errorln("Commands are not specified.")
 	}
 
-	if *strAliases != "" {
+	if *strAliases == "" {
+		flag.Usage()
+		log.Errorln("Aliases are not specified.")
+	} else {
 		for _, Alias := range strings.Split(*strAliases, ",") {
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
 			for _, Command := range strings.Split(*strCommands, ",") {
@@ -58,7 +57,5 @@ func main() {
 				log.Println(value)
 			}
 		}
-	} else {
-		flag.Usage()
 	}
 }
