@@ -1,3 +1,6 @@
+/*
+	Site-checker runs a slice of commands on a slice of Drush aliases matching a specified pattern.
+*/
 package main
 
 import (
