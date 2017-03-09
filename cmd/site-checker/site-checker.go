@@ -27,21 +27,21 @@ func main() {
 			cmdR := command.NewDrushCommand()
 			cmdR.SetAlias(Alias)
 			cmdR.SetCommand("updb --yes")
-			_, errR := cmdQ.Output()
+			_, errR := cmdR.Output()
 			if errR != nil {
-				log.Warnf("%v, %v, unsuccessful.\n", cmdQ.GetAlias(), cmdQ.GetCommand())
+				log.Warnf("%v, %v, unsuccessful.\n", cmdR.GetAlias(), cmdR.GetCommand())
 			} else {
-				log.Infof("%v, %v, unsuccessful.\n", cmdQ.GetAlias(), cmdQ.GetCommand())
+				log.Infof("%v, %v, unsuccessful.\n", cmdR.GetAlias(), cmdR.GetCommand())
 			}
 
 			cmdS := command.NewDrushCommand()
 			cmdS.SetAlias(Alias)
 			cmdS.SetCommand("cc all")
-			_, errS := cmdQ.Output()
+			_, errS := cmdS.Output()
 			if errS != nil {
-				log.Warnf("%v, %v, unsuccessful.\n", cmdQ.GetAlias(), cmdQ.GetCommand())
+				log.Warnf("%v, %v, unsuccessful.\n", cmdS.GetAlias(), cmdS.GetCommand())
 			} else {
-				log.Infof("%v, %v, unsuccessful.\n", cmdQ.GetAlias(), cmdQ.GetCommand())
+				log.Infof("%v, %v, unsuccessful.\n", cmdS.GetAlias(), cmdS.GetCommand())
 			}
 
 		}
