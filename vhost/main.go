@@ -76,18 +76,22 @@ func (VirtualHost *VirtualHost) Install() {
 	tpl = strings.Replace(tpl, "ServerRoot", data["ServerRoot"], -1)
 	tpl = strings.Replace(tpl, ".latest", "/"+VirtualHost.GetName()+".latest", -1)
 
-	VirtualHost.Uninstall()
-	nf, err := os.Create(filename)
-	if err != nil {
-		log.Fatalln("Error creating file", err)
-	}
-	_, err = nf.WriteString(tpl)
-	if err != nil {
-		log.Warnln("Could not add vhost", VirtualHost.GetDomain())
+	_, statErr := os.Stat(filename)
+	if statErr != nil {
+		nf, err := os.Create(filename)
+		if err != nil {
+			log.Fatalln("Error creating file", err)
+		}
+		_, err = nf.WriteString(tpl)
+		if err != nil {
+			log.Warnln("Could not add vhost", VirtualHost.GetDomain())
+		} else {
+			log.Infoln("Added vhost", VirtualHost.GetDomain())
+		}
+		defer nf.Close()
 	} else {
-		log.Infoln("Added vhost", VirtualHost.GetDomain())
+		log.Warnln("Vhost already created")
 	}
-	defer nf.Close()
 }
 
 func (VirtualHost *VirtualHost) Uninstall() {
@@ -100,6 +104,8 @@ func (VirtualHost *VirtualHost) Uninstall() {
 		} else {
 			log.Infoln("Removed vhost", VirtualHost.GetDomain())
 		}
+	} else {
+		log.Warnln("Vhost file was not found.")
 	}
 
 }

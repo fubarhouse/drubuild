@@ -8,6 +8,7 @@ import (
 )
 
 func (Site *Site) ActionDestroyDatabases() {
+	var dbDeleteCount int
 	for _, database := range Site.DatabasesGet() {
 		sqlQuery := fmt.Sprintf("DROP DATABASE %v;", database)
 		sqlUser := fmt.Sprintf("--user=%v", Site.database.getUser())
@@ -15,9 +16,15 @@ func (Site *Site) ActionDestroyDatabases() {
 		_, err := exec.Command("mysql", sqlUser, sqlPass, "-e", sqlQuery).Output()
 		if err == nil {
 			log.Infoln("Dropped database", database)
+			dbDeleteCount++
 		} else {
 			log.Warnln("Could not drop database", database, err)
 		}
+	}
+	if dbDeleteCount == 0 {
+		log.Warnln("No database was found")
+	} else {
+		log.Infof("%v databases were removed", dbDeleteCount)
 	}
 }
 
@@ -42,6 +49,8 @@ func (Site *Site) ActionDestroyFiles() {
 		} else {
 			log.Infof("Removed file system for %v at %v\n", Site.Name, Site.Path)
 		}
+	} else {
+		log.Warnln("Site directory was not found.")
 	}
 }
 

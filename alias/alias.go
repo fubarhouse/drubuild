@@ -73,18 +73,22 @@ func (Alias *Alias) Install() {
 	tpl = strings.Replace(tpl, "ALIAS", data["Alias"], -1)
 	tpl = strings.Replace(tpl, "DOMAIN", data["Domain"], -1)
 
-	Alias.Uninstall()
-	nf, err := os.Create(fullpath)
-	if err != nil {
-		log.Fatalln("Error creating file", err)
-	}
-	_, err = nf.WriteString(tpl)
-	if err != nil {
-		log.Warnln("Could not add alias", filename)
+	_, statErr := os.Stat(fullpath)
+	if statErr != nil {
+		nf, err := os.Create(fullpath)
+		if err != nil {
+			log.Fatalln("Error creating file", err)
+		}
+		_, err = nf.WriteString(tpl)
+		if err != nil {
+			log.Warnln("Could not add alias", filename)
+		} else {
+			log.Infoln("Added alias", filename)
+		}
+		defer nf.Close()
 	} else {
-		log.Infoln("Added alias", filename)
+		log.Warnln("Alias already created")
 	}
-	defer nf.Close()
 }
 
 func (Alias *Alias) Uninstall() {
@@ -100,6 +104,8 @@ func (Alias *Alias) Uninstall() {
 		} else {
 			log.Infoln("Removed alias file", filename)
 		}
+	} else {
+		log.Warnln("Alias file was not found.")
 	}
 
 }
