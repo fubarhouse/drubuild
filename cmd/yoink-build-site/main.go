@@ -31,7 +31,7 @@ func main() {
 
 	if *Site == "" || *Alias == "" || *Makes == "" || *Path == "" || *Domain == "" {
 		flag.Usage()
-		fmt.Printf("%v, %v, %v, %v, %v\n", *Site, *Alias, *Makes, *Path, *Domain)
+		fmt.Printf("Site:%v\n, Alias:%v\n, Makes:%v\n, Path:%v\n, Domain:%v\n", *Site, *Alias, *Domain, *Path, *Makes)
 		os.Exit(1)
 	}
 
