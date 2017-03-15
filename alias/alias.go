@@ -81,9 +81,9 @@ func (Alias *Alias) Install() {
 		}
 		_, err = nf.WriteString(tpl)
 		if err != nil {
-			log.Warnln("Could not add alias", filename)
+			log.Warnln("Could not add alias", fullpath)
 		} else {
-			log.Infoln("Added alias", filename)
+			log.Infoln("Added alias", fullpath)
 		}
 		defer nf.Close()
 	} else {
@@ -96,16 +96,16 @@ func (Alias *Alias) Uninstall() {
 	filedir := usr.HomeDir + "/.drush"
 	filename := Alias.GetUri() + ".alias.drushrc.php"
 	fullpath := filedir + "/" + filename
-	_, statErr := os.Stat(filename)
+	_, statErr := os.Stat(fullpath)
 	if statErr == nil {
 		err := os.Remove(fullpath)
 		if err != nil {
-			log.Warnln("Could not remove alias file", filename)
+			log.Warnln("Could not remove alias file", err)
 		} else {
-			log.Infoln("Removed alias file", filename)
+			log.Infoln("Removed alias file", fullpath)
 		}
 	} else {
-		log.Warnln("Alias file was not found.")
+		log.Warnln("Alias file was not found.", fullpath)
 	}
 
 }
