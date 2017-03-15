@@ -4,7 +4,6 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/make"
-	"os"
 )
 
 func main() {
