@@ -24,7 +24,7 @@ func main() {
 		log.Errorln("Specified pattern does not include alias modifier.")
 	}
 
-	if *strCommands != "" {
+	if *strCommands == "" {
 		log.Errorln("Commands are not specified.")
 	}
 

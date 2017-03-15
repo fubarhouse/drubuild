@@ -346,7 +346,9 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 			// Print output in a fairly standardized format.
 			logEntryLines := strings.Split(logEntry, "\n")
 			for _, logEntryLine := range logEntryLines {
-				log.Infoln(logEntryLine)
+				if strings.Contains(logEntryLine, "ould not") || strings.Contains(logEntryLine, "rror") {
+					log.Warnln(logEntryLine)
+				}
 			}
 		}
 		return false
@@ -362,13 +364,29 @@ func (Site *Site) InstallSiteRef() {
 		"Name":   Site.Name,
 		"Domain": Site.Domain,
 	}
-	filename := Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/sites.php"
+	dirPath := Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/"
+	dirErr := os.Mkdir(dirPath+Site.Name, 0755)
+	if dirErr != nil {
+		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)
+	} else {
+		log.Infoln("Created directory", dirPath+Site.Name)
+	}
+
+	dirErr = os.Chmod(dirPath+Site.Name, 0775)
+	if dirErr != nil {
+		log.Errorln("Could not set permissions 0755 on", dirPath+Site.Name, dirErr)
+	} else {
+		log.Infoln("Permissions set to 0755 on", dirPath+Site.Name)
+	}
+
+	filename := dirPath + "/sites.php"
 	buffer := []byte{60, 63, 112, 104, 112, 10, 10, 47, 42, 42, 10, 32, 42, 32, 64, 102, 105, 108, 101, 10, 32, 42, 32, 67, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 32, 102, 105, 108, 101, 32, 102, 111, 114, 32, 68, 114, 117, 112, 97, 108, 39, 115, 32, 109, 117, 108, 116, 105, 45, 115, 105, 116, 101, 32, 100, 105, 114, 101, 99, 116, 111, 114, 121, 32, 97, 108, 105, 97, 115, 105, 110, 103, 32, 102, 101, 97, 116, 117, 114, 101, 46, 10, 32, 42, 47, 10, 10, 32, 32, 32, 36, 115, 105, 116, 101, 115, 91, 39, 68, 111, 109, 97, 105, 110, 39, 93, 32, 61, 32, 39, 78, 97, 109, 101, 39, 59, 10, 10, 63, 62, 10}
 	tpl := fmt.Sprintf("%v", string(buffer[:]))
 	tpl = strings.Replace(tpl, "Name", data["Name"], -1)
 	tpl = strings.Replace(tpl, "Domain", data["Domain"], -1)
 
 	nf, err := os.Create(filename)
+	nf.Chmod(0755)
 	if err != nil {
 		log.Fatalln("Could not create", err)
 	}
@@ -383,15 +401,53 @@ func (Site *Site) InstallSiteRef() {
 
 func (Site *Site) InstallPrivateFileSystem() {
 	// Test the file system, create it if it doesn't exist!
-	filename := "sites/" + Site.Name + "/private/files"
-	dirPath := fmt.Sprintf("%v/%v%v", Site.Path, Site.Name, Site.Timestamp)
-	_, err := os.Stat(dirPath + "/" + filename)
+	dirPath := fmt.Sprintf("%v/%v%v/sites/%v/private", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	_, err := os.Stat(dirPath)
 	if err != nil {
 		dirErr := os.MkdirAll(dirPath, 0755)
 		if dirErr != nil {
-			log.Errorln("Could not create private file system", filename)
+			log.Errorln("Couldn't create", dirPath, dirErr)
 		} else {
-			log.Infoln("Created file system", filename)
+			log.Infoln("Created", dirPath)
 		}
+	}
+	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/private/files", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	_, err = os.Stat(dirPath + "/" + dirPath)
+	if err != nil {
+		dirErr := os.MkdirAll(dirPath, 0755)
+		if dirErr != nil {
+			log.Errorln("Couldn't create", dirPath, dirErr)
+		} else {
+			log.Infoln("Created", dirPath)
+		}
+	}
+	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/private/temp", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	_, err = os.Stat(dirPath + "/" + dirPath)
+	if err != nil {
+		dirErr := os.MkdirAll(dirPath, 0755)
+		if dirErr != nil {
+			log.Errorln("Couldn't create", dirPath, dirErr)
+		} else {
+			log.Infoln("Created", dirPath)
+		}
+	}
+}
+
+func (Site *Site) ReInstallCToolsCache() {
+	// We need to remove and re-add the ctools cache directory as 0777.
+	cToolsDir := fmt.Sprintf("%v/%v%v/sites/%v/files/ctools", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	// Remove the directory!
+	cToolsErr := os.RemoveAll(cToolsDir)
+	if cToolsErr != nil {
+		log.Errorln("Couldn't remove", cToolsDir)
+	} else {
+		log.Infoln("Created", cToolsDir)
+	}
+	// Add the directory!
+	cToolsErr = os.Mkdir(cToolsDir, 0777)
+	if cToolsErr != nil {
+		log.Errorln("Couldn't remove", cToolsDir)
+	} else {
+		log.Infoln("Created", cToolsDir)
 	}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
@@ -30,6 +31,7 @@ func main() {
 
 	if *Site == "" || *Alias == "" || *Makes == "" || *Path == "" || *Domain == "" {
 		flag.Usage()
+		fmt.Printf("%v, %v, %v, %v, %v\n", *Site, *Alias, *Makes, *Path, *Domain)
 		os.Exit(1)
 	}
 
@@ -47,9 +49,9 @@ func main() {
 
 	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
+	x.InstallPrivateFileSystem()
 	x.ActionInstall()
 	x.SymReinstall(x.TimeStampGet())
-	x.InstallPrivateFileSystem()
 	x.VhostInstall()
 	x.AliasInstall()
 	command.DrushUpdateDatabase(x.Alias)
