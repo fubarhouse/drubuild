@@ -8,6 +8,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
+	"os"
 	"strings"
 )
 
@@ -31,7 +32,9 @@ func main() {
 	if *strAliases == "" {
 		flag.Usage()
 		log.Errorln("Aliases are not specified.")
-	} else {
+	}
+
+	if *strAliases != "" && *strCommands != "" {
 		for _, Alias := range strings.Split(*strAliases, ",") {
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
 			for _, Command := range strings.Split(*strCommands, ",") {
@@ -60,5 +63,8 @@ func main() {
 				log.Println(value)
 			}
 		}
+	} else {
+		flag.Usage()
+		os.Exit(1)
 	}
 }

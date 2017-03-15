@@ -25,9 +25,21 @@ func main() {
 
 	flag.Parse()
 
-	if *Create == false && *Delete == false && *Name == "" {
-		flag.Usage()
-		os.Exit(1)
+	if !*Create {
+		log.Infoln("Create flag has not been switched on")
+	}
+	if !*Delete {
+		log.Infoln("Delete flag has not been switched on")
+	}
+	if *Name == "" {
+		log.Infoln("Name input is empty")
+	}
+
+	if !*Create || !*Delete {
+		if *Name == "" {
+			flag.Usage()
+			os.Exit(1)
+		}
 	}
 
 	SolrCore := make.SolrCore{*Address, *Name, *Resources, *Path}

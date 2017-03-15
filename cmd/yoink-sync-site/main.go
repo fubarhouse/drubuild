@@ -22,20 +22,33 @@ func main() {
 
 	flag.Parse()
 
+	if *SourceAlias == "" {
+		log.Infoln("Source input is empty")
+	}
+	if *DestAlias == "" {
+		log.Infoln("Destination input is empty")
+	}
+	if !*SyncDB {
+		log.Infoln("Database flag is switched off")
+	}
+	if !*SyncFiles {
+		log.Infoln("Files flag is switched off")
+	}
+
 	if *SourceAlias == "" || *DestAlias == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	if *SyncDB == true {
+	if *SyncDB {
 		log.Infoln("Database was marked for syncing, working now...")
 		command.DrushDatabaseSync(*SourceAlias, *DestAlias)
 	}
-	if *SyncFiles == true {
+	if *SyncFiles {
 		log.Infoln("Files were marked for syncing, working now...")
 		command.DrushFilesSync(*SourceAlias, *DestAlias)
 	}
-	if *SyncDB == true || *SyncFiles == true {
+	if *SyncDB || *SyncFiles {
 		log.Infoln("Attempting to rebuild registries...")
 		command.DrushRebuildRegistry(*DestAlias)
 	}

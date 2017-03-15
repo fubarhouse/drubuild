@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 )
@@ -22,6 +23,19 @@ func main() {
 	// -alias="mysite.dev" \
 
 	flag.Parse()
+
+	if *Site == "" {
+		log.Infoln("Site input is empty")
+	}
+	if *Alias == "" {
+		log.Infoln("Alias input is empty")
+	}
+	if *Path == "" {
+		log.Infoln("Path input is empty")
+	}
+	if *Domain == "" {
+		log.Infoln("Domain input is empty")
+	}
 
 	if *Site == "" || *Alias == "" || *Path == "" || *Domain == "" {
 		flag.Usage()

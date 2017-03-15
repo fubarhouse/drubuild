@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
@@ -29,9 +30,24 @@ func main() {
 
 	flag.Parse()
 
+	if *Site == "" {
+		log.Infoln("Site input is empty")
+	}
+	if *Alias == "" {
+		log.Infoln("Alias input is empty")
+	}
+	if *Path == "" {
+		log.Infoln("Path input is empty")
+	}
+	if *Domain == "" {
+		log.Infoln("Domain input is empty")
+	}
+	if *Makes == "" {
+		log.Infoln("Makes input is empty")
+	}
+
 	if *Site == "" || *Alias == "" || *Makes == "" || *Path == "" || *Domain == "" {
 		flag.Usage()
-		fmt.Printf("\nSite: %v\nAlias: %v\nMakes: %v\nPath: %v\nDomain: %v\n", *Site, *Alias, *Makes, *Domain, *Path)
 		os.Exit(1)
 	}
 

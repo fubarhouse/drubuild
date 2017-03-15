@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/makeupdater"
 )
 
@@ -11,5 +12,7 @@ func main() {
 	if *strMake != "" {
 		Projects := makeupdater.GetProjectsFromMake(*strMake)
 		makeupdater.GenerateMake(Projects, *strMake)
+	} else {
+		log.Infoln("Invalid input make, must be of type string and != ''")
 	}
 }

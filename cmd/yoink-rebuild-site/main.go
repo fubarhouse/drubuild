@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
@@ -23,6 +24,13 @@ func main() {
 	// -makes="/path/to/make1.make, /path/to/make2.make" \
 
 	flag.Parse()
+
+	if *Makes == "" {
+		log.Infoln("Makes input is empty")
+	}
+	if *Path == "" {
+		log.Infoln("Path input is empty")
+	}
 
 	if *Makes == "" || *Path == "" {
 		flag.Usage()

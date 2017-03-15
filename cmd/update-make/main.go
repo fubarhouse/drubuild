@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/makeupdater"
 	"strings"
 )
@@ -15,6 +16,7 @@ func main() {
 			makeupdater.UpdateMake(Makefile)
 		}
 	} else {
+		log.Infoln("Invalid make file input")
 		flag.Usage()
 	}
 }
