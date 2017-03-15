@@ -5,6 +5,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/vhost"
+	"os"
+	"os/user"
 )
 
 func main() {
@@ -16,6 +18,15 @@ func main() {
 
 	log.Println("Instanciating Alias")
 	Alias := alias.NewAlias("temporaryAlias", "/tmp", "temporaryAlias")
+	log.Println("Checking folder for Alias")
+	usr, _ := user.Current()
+	filedir := usr.HomeDir + "/.drush"
+	_, statErr := os.Stat(filedir)
+	if statErr != nil {
+		log.Println("Could not find", filedir)
+	} else {
+		log.Println("Found", filedir)
+	}
 	log.Println("Installing Alias")
 	Alias.Install()
 	log.Println("Uninstalling Alias")
@@ -23,6 +34,13 @@ func main() {
 
 	log.Println("Instanciating Vhost")
 	VirtualHost := vhost.NewVirtualHost("temporaryVhost", "/tmp", *Webserver, "temporary.vhost", *WebserverDir)
+	log.Println("Checking folder for Vhost")
+	_, statErr = os.Stat(*WebserverDir)
+	if statErr != nil {
+		log.Println("Could not find", *WebserverDir)
+	} else {
+		log.Println("Found", *WebserverDir)
+	}
 	log.Println("Installing Vhost")
 	VirtualHost.Install()
 	log.Println("Uninstalling Vhost")
