@@ -3,6 +3,7 @@ package make
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"io/ioutil"
 	"os"
 	"os/exec"
 )
@@ -37,13 +38,21 @@ func (Site *Site) ActionDestroyVhost() {
 }
 
 func (Site *Site) ActionDestroyPermissions() {
-	privateFilesPath := Site.Path + "/" + Site.Name + ".latest/sites/" + Site.Name
-
-	chmodErr := os.Chmod(privateFilesPath, 0777)
-	if chmodErr != nil {
-		log.Warnf("Could not set permissions of %v to %v: %v", privateFilesPath, "0777", chmodErr)
+	privateFilesPath := Site.Path
+	_, statErr := os.Stat(privateFilesPath)
+	if statErr == nil {
+		files, _ := ioutil.ReadDir(privateFilesPath)
+		for _, file := range files {
+			privateFilesPathTarget := privateFilesPath + "/" + file.Name() + "/sites/" + Site.Name
+			chmodErr := os.Chmod(privateFilesPathTarget, 0777)
+			if chmodErr != nil {
+				log.Warnf("Could not set permissions of %v to %v: %v", privateFilesPathTarget, "0777", chmodErr)
+			} else {
+				log.Infof("Set permissions of %v to %v", privateFilesPathTarget, "0777")
+			}
+		}
 	} else {
-		log.Infof("Set permissions of %v to %v", privateFilesPath, "0777")
+		log.Warnln("Could not find target folders", privateFilesPath)
 	}
 }
 
