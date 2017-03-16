@@ -19,6 +19,12 @@ func main() {
 	var BuildID = flag.String("build", "", "optional timestamp of site")
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
+	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
+
+	// Templates will replace the following strings in the provided template with the values inputted to the program.
+	// Failing to provide this file path, it will fall-back to a template stored inside the go code.
+	// "Name": Name of the site
+	// "Domain": Configured domain of the site
 
 	// Usage:
 	// -path="/path/to/site" \
@@ -50,7 +56,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	x := make.NewSite(*Makes, *Site, *Path, *Alias, *WebserverName, *Domain, *VHostDir)
+	x := make.NewSite(*Makes, *Site, *Path, *Alias, *WebserverName, *Domain, *VHostDir, *CustomTemplate)
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
 	if *BuildID == "" {

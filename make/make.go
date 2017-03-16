@@ -46,9 +46,10 @@ type Site struct {
 	database  *makeDB
 	Webserver string
 	Vhostpath string
+	Template  string
 }
 
-func NewSite(make, name, path, alias, webserver, domain, vhostpath string) *Site {
+func NewSite(make, name, path, alias, webserver, domain, vhostpath, template string) *Site {
 	Site := &Site{}
 	Site.TimeStampReset()
 	Site.Make = make
@@ -58,6 +59,7 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath string) *Site
 	Site.Alias = alias
 	Site.Domain = domain
 	Site.Vhostpath = vhostpath
+	Site.Template = template
 	return Site
 }
 

@@ -36,6 +36,17 @@ func (Site *Site) ActionDestroyVhost() {
 	Site.VhostUninstall()
 }
 
+func (Site *Site) ActionDestroyPermissions() {
+	privateFilesPath := Site.Path + "/" + Site.Name + ".latest/sites/" + Site.Name
+
+	chmodErr := os.Chmod(privateFilesPath, 0777)
+	if chmodErr != nil {
+		log.Warnf("Could not set permissions of %v to %v: %v", privateFilesPath, "0777", chmodErr)
+	} else {
+		log.Infof("Set permissions of %v to %v", privateFilesPath, "0777")
+	}
+}
+
 func (Site *Site) ActionDestroySym() {
 	Site.SymUninstall(Site.Timestamp)
 }
@@ -50,7 +61,7 @@ func (Site *Site) ActionDestroyFiles() {
 			log.Infof("Removed file system for %v at %v\n", Site.Name, Site.Path)
 		}
 	} else {
-		log.Warnln("Site directory was not found.")
+		log.Warnln("Site directory was not found: ", Site.Path)
 	}
 }
 
@@ -59,6 +70,7 @@ func (Site *Site) ActionDestroy() {
 	Site.ActionDestroyDatabases()
 	Site.ActionDestroyAlias()
 	Site.ActionDestroyVhost()
-	Site.ActionDestroySym()
+	Site.ActionDestroyPermissions()
 	Site.ActionDestroyFiles()
+	Site.ActionDestroySym()
 }
