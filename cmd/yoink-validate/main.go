@@ -4,6 +4,7 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/alias"
+	"github.com/fubarhouse/golang-drush/make"
 	"github.com/fubarhouse/golang-drush/vhost"
 	"os"
 	"os/user"
@@ -45,4 +46,11 @@ func main() {
 	VirtualHost.Install()
 	log.Println("Uninstalling Vhost")
 	VirtualHost.Uninstall()
+
+	log.Println("Instanciating Solr core")
+	SolrCore := make.SolrCore{"http://localhost:8983", "blah", "/acquia/scripts/conf", "/var/solr", true}
+	log.Println("Installing Solr core")
+	SolrCore.Install()
+	log.Println("Uninstalling Solr core")
+	SolrCore.Uninstall()
 }
