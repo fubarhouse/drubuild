@@ -25,7 +25,7 @@ func (Site *Site) ActionDestroyDatabases() {
 	if dbDeleteCount == 0 {
 		log.Warnln("No database was found")
 	} else {
-		log.Infof("%v databases were removed", dbDeleteCount)
+		log.Infof("Database(s) removed: %v", dbDeleteCount)
 	}
 }
 
