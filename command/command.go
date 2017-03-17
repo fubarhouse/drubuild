@@ -66,6 +66,21 @@ func (drush *Command) Output() ([]string, error) {
 	return response, err
 }
 
+func (drush *Command) CombinedOutput() ([]byte, error) {
+	if strings.Contains(drush.alias, "@") == true {
+		drush.alias = strings.Replace(drush.alias, "@", "", -1)
+	}
+	if drush.alias != "" {
+		drush.alias = fmt.Sprintf("@%v", drush.alias)
+	}
+	if drush.verbose == true {
+		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
+	}
+	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
+	comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
+	return comm, err
+}
+
 // Run an individual Command object, does not support []Command items.
 func (drush *Command) Run() ([]byte, error) {
 	if strings.Contains(drush.alias, "@") == true {
