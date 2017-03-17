@@ -131,13 +131,22 @@ func (SolrCore *SolrCore) Install() {
 }
 
 func (SolrCore *SolrCore) Uninstall() {
+
+	dataDir := ""
+	if SolrCore.Legacy {
+		log.Infoln("Installing legacy file system for Solr < 5.0")
+		dataDir = SolrCore.Path + "/" + SolrCore.Name
+	} else {
+		dataDir = SolrCore.Path + "/data/" + SolrCore.Name
+	}
+
 	_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
 	if err == nil {
 		log.Infoln("Core has been successfully uninstalled.")
 	} else {
 		log.Errorln("Core could not be uninstalled:", err)
 	}
-	err = os.RemoveAll(SolrCore.Path + "/" + SolrCore.Name)
+	err = os.RemoveAll(dataDir)
 	if err == nil {
 		log.Infoln("Core resources have been removed.")
 	} else {

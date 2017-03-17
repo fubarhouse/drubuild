@@ -13,7 +13,7 @@ func main() {
 
 	var Address = flag.String("address", "http://localhost:8983", "http address of solr installation where solr version < 5.")
 	var Name = flag.String("name", "", "Name of core to create")
-	var Path = flag.String("path", "", "Path to Solr data folder")
+	var Path = flag.String("path", "/var/solr", "Path to Solr data folder")
 
 	flag.Parse()
 
