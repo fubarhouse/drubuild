@@ -146,21 +146,25 @@ func (SolrCore *SolrCore) Install() {
 }
 
 func (SolrCore *SolrCore) Uninstall() {
-	if logSolrInstall() && logSolrCLI() && logResources(SolrCore.Template) && logSolrCore(SolrCore) || !logSolrCore(SolrCore) {
-		log.Infoln("All checks have passed.")
-		// Uninstall core
+	if verifySolrInstall() && verifySolrCLI() {
 		_, err := exec.Command("sh", "-c", "/opt/solr/bin/solr", "delete", "-c", SolrCore.Name).Output()
 		if err == nil {
 			log.Infoln("Core has been successfully uninstalled.")
 		} else {
 			log.Errorln("Core could not be uninstalled:", err)
 		}
-		// Delete resources.
-		err = os.RemoveAll(SolrCore.Path + "/" + SolrCore.Name)
+	} else if verifySolrInstall() && !verifySolrCLI() {
+		_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
 		if err == nil {
-			log.Infoln("Core resources have been removed.")
+			log.Infoln("Core has been successfully uninstalled.")
 		} else {
-			log.Errorln("Core resources could not be removed:", err)
+			log.Errorln("Core could not be uninstalled:", err)
 		}
+	}
+	err := os.RemoveAll(SolrCore.Path + "/" + SolrCore.Name)
+	if err == nil {
+		log.Infoln("Core resources have been removed.")
+	} else {
+		log.Errorln("Core resources could not be removed:", err)
 	}
 }
