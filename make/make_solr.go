@@ -120,48 +120,24 @@ func (SolrCore *SolrCore) Install() {
 			log.Errorln("Configuration could not be synced with boilerplate resources:", err.Error())
 		}
 
-		if logSolrCLI() == true {
-			// Install core via CLI
-			cliOut, err := exec.Command("/opt/solr/bin/solr", "create", "-c", SolrCore.Name).Output()
-			if err == nil && strings.Contains(string(cliOut), "Unable to create core") == false {
-				if verifySolrCore(SolrCore) {
-					log.Infoln("Core has been installed and verified successfully.")
-				} else {
-					log.Errorln("Core could not be installed, check logs for details.")
-				}
-			} else {
-				log.Errorln("Core could not be installed:", err.Error(), string(cliOut))
-			}
+		_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir=data&config=solrconfig.xml&schema=schema.xml").Output()
+		if err == nil {
+			log.Infoln("Core has been successfully installed.")
 		} else {
-			// Install core via CURL
-			_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir=data&config=solrconfig.xml&schema=schema.xml").Output()
-			if err == nil {
-				log.Infoln("Core has been successfully installed.")
-			} else {
-				log.Errorln("Core could not be installed:", err)
-			}
+			log.Errorln("Core could not be installed:", err)
 		}
 	}
 	verifySolrCore(SolrCore)
 }
 
 func (SolrCore *SolrCore) Uninstall() {
-	if verifySolrInstall() && verifySolrCLI() {
-		_, err := exec.Command("sh", "-c", "/opt/solr/bin/solr", "delete", "-c", SolrCore.Name).Output()
-		if err == nil {
-			log.Infoln("Core has been successfully uninstalled.")
-		} else {
-			log.Errorln("Core could not be uninstalled:", err)
-		}
-	} else if verifySolrInstall() && !verifySolrCLI() {
-		_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
-		if err == nil {
-			log.Infoln("Core has been successfully uninstalled.")
-		} else {
-			log.Errorln("Core could not be uninstalled:", err)
-		}
+	_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
+	if err == nil {
+		log.Infoln("Core has been successfully uninstalled.")
+	} else {
+		log.Errorln("Core could not be uninstalled:", err)
 	}
-	err := os.RemoveAll(SolrCore.Path + "/" + SolrCore.Name)
+	err = os.RemoveAll(SolrCore.Path + "/" + SolrCore.Name)
 	if err == nil {
 		log.Infoln("Core resources have been removed.")
 	} else {
