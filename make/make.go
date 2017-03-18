@@ -36,6 +36,13 @@ func (Site *Site) RestartWebServer() {
 	}
 }
 
+type DrupalProject struct {
+	Type   string
+	Name   string
+	Subdir string
+	Status bool
+}
+
 type Site struct {
 	Timestamp string
 	Path      string
@@ -320,6 +327,58 @@ func (Site *Site) TimeStampReset() {
 	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
 }
 
+func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
+	unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(makeFile)
+	Projects := make([]DrupalProject, 50)
+	if unprocessedMakeErr != nil {
+		log.Infoln("Could not read from", unprocessedMakeErr)
+	}
+	for _, Line := range strings.Split(string(unprocessedMakes), "\n") {
+		var Type string
+		if strings.Contains(Line, "subdir") || strings.Contains(Line, "directory_name") {
+			currentType := strings.SplitAfter(Line, "=")
+			Type = strings.Replace(currentType[1], "\"", "", -1)
+			Type = strings.Replace(Type, " ", "", -1)
+		}
+		if Type != "" {
+			if strings.HasPrefix(Line, "projects") {
+				Project := strings.SplitAfter(Line, "[")
+				Project[1] = strings.Replace(Project[1], "[", "", -1)
+				Project[1] = strings.Replace(Project[1], "]", "", -1)
+				thisProject := DrupalProject{"modules", Project[1], Type, false}
+				Projects = append(Projects, thisProject)
+			}
+			if strings.HasPrefix(Line, "libraries") {
+				Library := strings.SplitAfter(Line, "[")
+				Library[1] = strings.Replace(Library[1], "[", "", -1)
+				Library[1] = strings.Replace(Library[1], "]", "", -1)
+				thisProject := DrupalProject{"libraries", Library[1], Type, false}
+				Projects = append(Projects, thisProject)
+			}
+		}
+	}
+	var foundModules int
+	for index, Project := range Projects {
+		if Project.Name != "" {
+			//log.Printf("Package %v is of type %v, belonging to subdir %v", Project.Name, Project.Type, Project.Subdir)
+			err := new(error)
+			_ = filepath.Walk(Site.Path, func(path string, _ os.FileInfo, _ error) error {
+				realpath := strings.Split(Site.Path, "\n")
+				for _, name := range realpath {
+					if strings.Contains(path, "custom/"+Project.Name+"/") || strings.Contains(path, "contrib/"+Project.Name+"/") || strings.Contains(path, "libraries/"+Project.Subdir+"/") {
+						fmt.Sprintln(name)
+						foundModules++
+						Projects[index].Status = true
+						break
+					}
+				}
+				return *err
+			})
+		}
+	}
+	return Projects
+}
+
 func (Site *Site) ProcessMake(makeFile string) bool {
 
 	// Test the make file exists
@@ -339,18 +398,16 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
 	}
 	drushMake.Set("", drushCommand, true)
-	cmd, err := drushMake.Output()
+	cmd, err := drushMake.CombinedOutput()
 	if err != nil {
 		log.Warnln("Could not execute Drush make without errors.", err.Error())
-		log.Warnln("drush", drushCommand)
-		drushLog := cmd
-		for _, logEntry := range drushLog {
-			// Print output in a fairly standardized format.
-			logEntryLines := strings.Split(logEntry, "\n")
-			for _, logEntryLine := range logEntryLines {
-				if strings.Contains(logEntryLine, "ould not") || strings.Contains(logEntryLine, "rror") {
-					log.Warnln(logEntryLine)
-				}
+		logEntryLines := strings.SplitAfter(string(cmd), "]")
+		for _, logEntryLine := range logEntryLines {
+			if strings.Contains(logEntryLine, "[error]") {
+				logEntryLine = strings.Replace(logEntryLine, " from ", "", -1)
+				logEntryLine = strings.Replace(logEntryLine, "[error]", "", -1)
+				logEntryLine = strings.Replace(logEntryLine, "\n", " ", -1)
+				log.Warnln(logEntryLine)
 			}
 		}
 		return false
