@@ -72,7 +72,7 @@ func main() {
 	x.InstallSiteRef()
 	x.InstallPrivateFileSystem()
 	x.ActionInstall()
-	x.SymReinstall(x.TimeStampGet())
+	x.SymReinstall()
 	x.VhostInstall()
 	x.AliasInstall()
 	command.DrushUpdateDatabase(x.Alias)
