@@ -285,7 +285,7 @@ func (Site *Site) DatabasesGet() []string {
 	return siteDbs
 }
 
-func (Site *Site) SymInstall(timestamp string) {
+func (Site *Site) SymInstall() {
 	// TODO make this relative to the lowest possible level
 	Symlink := Site.Path + "/" + Site.Name + ".latest"
 	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
@@ -296,22 +296,22 @@ func (Site *Site) SymInstall(timestamp string) {
 	}
 }
 
-func (Site *Site) SymUninstall(timestamp string) {
-	Symlink := Site.Path + "/" + Site.Name + ".latest"
+func (Site *Site) SymUninstall() {
+	Symlink := Site.Name + ".latest"
 	_, statErr := os.Stat(Site.Path + "/" + Symlink)
 	if statErr == nil {
-		err := os.Remove(Symlink)
+		err := os.Remove(Site.Path + "/" + Symlink)
 		if err != nil {
-			log.Errorln("Could not remove symlink.")
+			log.Errorln("Could not remove symlink.", err)
 		} else {
 			log.Infoln("Removed symlink.")
 		}
 	}
 }
 
-func (Site *Site) SymReinstall(timestamp string) {
-	Site.SymUninstall(timestamp)
-	Site.SymInstall(timestamp)
+func (Site *Site) SymReinstall() {
+	Site.SymUninstall()
+	Site.SymInstall()
 }
 
 func (Site *Site) TimeStampGet() string {
@@ -407,6 +407,7 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 				logEntryLine = strings.Replace(logEntryLine, " from ", "", -1)
 				logEntryLine = strings.Replace(logEntryLine, "[error]", "", -1)
 				logEntryLine = strings.Replace(logEntryLine, "\n", " ", -1)
+				logEntryLine = strings.Replace(logEntryLine, "  ", " ", -1)
 				log.Warnln(logEntryLine)
 			}
 		}
