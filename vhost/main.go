@@ -69,7 +69,7 @@ func (VirtualHost *VirtualHost) Install(Templates ...string) {
 	buffer := []byte{}
 	for _, val := range Templates {
 		moreBytes, moreBytesErr := ioutil.ReadFile(val)
-		if moreBytesErr != nil {
+		if moreBytesErr != nil && val != "" {
 			log.Warnf("Could not read from %v: %v", val, moreBytesErr)
 		}
 		for _, value := range moreBytes {
