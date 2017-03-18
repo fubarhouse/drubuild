@@ -55,40 +55,52 @@ $ go get github.com/fubarhouse/golang-drush/...
 
 ## Included binaries on build
 
-* update-make
+All of the following binaries should be used with the -h flag to invoke the usage. Usage will not be supplied here explicitly as there are a lot of binaries and a lot of potential parameters for them.
+
+* module-auditor
     ````
-    This package comes with the update-make binary which accepts a single string for the value of flag 'make'.
-    
-    It will accept a valid absolute path of a Drupal 7 make file and execute the make file updater on that makefile.
-      
-    It is assumed that any git-related activity is to not be handled by git, and that action is executed manually after the script has finished.
-    
-    Example usage:
-        update-make -make="/path/to/make.make"
-    ````
-* module-scanner
-    ````
-    For cases where you need to find the 'enabled' status for multiple modules in multiple sites and store the output, this module fits the bill.
-    
-    Capable of loading up projects from a D7 make file with the -make flag, all you need to do is input installed aliases in the -aliases flag.
-    
-    Optionally you can input the specific modules with the -modules flag.
-    
-    Modules and aliases need to be inputted in a comma separated format.
-    
-    Example usage:
-        module-scanner -aliases="alias1, alias2, alias3" -make="/path/to/make.make"
+    Uses Drush to run run a report against make files and Drush aliases.
     ````
 * rewrite-make
     ````
-    Accepts a path to an existing make file, completely rewrites the make file with the latest recommended versions.
-    
-    This program has not been tested with custom modules.
-    
-    Example usage:
-        rewrite-make -make="/path/to/make.make"
+    Completely rewrites a make file - supports contributed make files only.
     ````
-
+* site-checker
+    ````
+    Binary name needs to be rewritten, but it will run a series of commands on a series of aliases matching a specified pattern and report results and verbose output if desired.
+    ````
+* update-make
+    ````
+    Runs through a make file with pm-info and updates version numbers to the latest available recommended version for each project.
+    ````
+* yoink-build-site
+    ````
+    Builds a Drupal website based upon MySQL with a drush alias, virtualhosts from specified make files, and supports infinite amount of builds per site.
+    ````
+* yoink-destroy-site
+    ````
+    Removes everything put in place by the build program. 
+    ````
+* yoink-rebuild-site
+    ````
+    Rebuilds a site without virtual hosts, aliases or anything, it will build a site at a specific location with given make files.
+    ````
+* yoink-solr-build
+    ````
+    Installs a solr core with provided resource files.
+    ````
+* yoink-solr-destroy
+    ````
+    Removes a solr core installed by the solr build program.
+    ````
+* yoink-sync-site
+    ````
+    Syncs files and/or database between a source and destination alias.
+    ````
+* yoink-validate
+    ````
+    Runs some basic system tests to ensure funtionality will execute.
+    ````
 ## License
 
 MIT
