@@ -15,15 +15,15 @@ import (
 	"time"
 )
 
-func replaceTextInFile(fullPath string, oldString string, newString string) {
+func ReplaceTextInFile(fullPath string, oldString string, newString string) {
 	read, err := ioutil.ReadFile(fullPath)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	newContents := strings.Replace(string(read), oldString, newString, -1)
 	err = ioutil.WriteFile(fullPath, []byte(newContents), 0)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 }
 
@@ -231,7 +231,6 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 
 	writer.Flush()
-	//replaceTextInFile(newMakeFilePath, "rewriteme", "master")
 	drushMake := Site.ProcessMake(newMakeFilePath)
 	if drushMake {
 		err := os.Remove(newMakeFilePath)
