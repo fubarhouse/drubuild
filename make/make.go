@@ -286,9 +286,9 @@ func (Site *Site) DatabasesGet() []string {
 }
 
 func (Site *Site) SymInstall() {
-	// TODO make this relative to the lowest possible level
-	Symlink := Site.Path + "/" + Site.Name + ".latest"
-	err := os.Symlink(Site.Path+"/"+Site.Name+Site.TimeStampGet(), Symlink)
+	Target := filepath.Join(Site.Name + Site.TimeStampGet())
+	Symlink := filepath.Join(Site.Path, Site.Domain+".latest")
+	err := os.Symlink(Target, Symlink)
 	if err == nil {
 		log.Infoln("Created symlink")
 	} else {
@@ -297,7 +297,7 @@ func (Site *Site) SymInstall() {
 }
 
 func (Site *Site) SymUninstall() {
-	Symlink := Site.Name + ".latest"
+	Symlink := Site.Domain + ".latest"
 	_, statErr := os.Stat(Site.Path + "/" + Symlink)
 	if statErr == nil {
 		err := os.Remove(Site.Path + "/" + Symlink)
