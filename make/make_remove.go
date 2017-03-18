@@ -57,7 +57,7 @@ func (Site *Site) ActionDestroyPermissions() {
 }
 
 func (Site *Site) ActionDestroySym() {
-	Site.SymUninstall(Site.Timestamp)
+	Site.SymUninstall()
 }
 
 func (Site *Site) ActionDestroyFiles() {
