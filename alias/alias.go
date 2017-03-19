@@ -53,7 +53,7 @@ func (Alias *Alias) Install() {
 	if strings.HasSuffix(Root, "_") == true {
 		Root = strings.TrimSuffix(Root, "_")
 	}
-	Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetName())
+	Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetUri())
 
 	data := map[string]string{
 		"Name":   Alias.GetName(),
@@ -83,7 +83,7 @@ func (Alias *Alias) Install() {
 		if err != nil {
 			log.Warnln("Could not add alias", fullpath)
 		} else {
-			log.Infoln("Added alias", fullpath)
+			log.Infoln("Added alias", filename)
 		}
 		defer nf.Close()
 	} else {
@@ -100,7 +100,7 @@ func (Alias *Alias) Uninstall() {
 	if statErr == nil {
 		err := os.Remove(fullpath)
 		if err != nil {
-			log.Warnln("Could not remove alias file", err)
+			log.Warnln("Could not remove alias file", fullpath)
 		} else {
 			log.Infoln("Removed alias file", fullpath)
 		}
