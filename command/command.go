@@ -10,9 +10,10 @@ import (
 
 type Command struct {
 	// Our structured data/object for Command
-	alias   string
-	command string
-	verbose bool
+	alias      string
+	command    string
+	verbose    bool
+	workingdir string
 }
 
 const PATH_DRUSH = "/usr/local/bin/drush"
@@ -27,6 +28,17 @@ func (drush *Command) Set(alias string, command string, verbose bool) {
 	drush.alias = alias
 	drush.command = command
 	drush.verbose = verbose
+	drush.workingdir = "."
+}
+
+// Returns the specified working directory used with executed Drush commands.
+func (drush *Command) GetWorkingDir() string {
+	return drush.workingdir
+}
+
+// Sets the specified working directory used with executed Drush commands.
+func (drush *Command) SetWorkingDir(value string) {
+	drush.workingdir = value
 }
 
 // Returns the alias used to executed Drush commands.
@@ -77,8 +89,13 @@ func (drush *Command) CombinedOutput() ([]byte, error) {
 		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
-	comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
-	return comm, err
+	if drush.GetWorkingDir() != "." {
+		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args).CombinedOutput()
+		return comm, err
+	} else {
+		comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
+		return comm, err
+	}
 }
 
 // Run an individual Command object, does not support []Command items.
@@ -93,8 +110,13 @@ func (drush *Command) Run() ([]byte, error) {
 		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
-	comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).Output()
-	return comm, err
+	if drush.GetWorkingDir() != "." {
+		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args).CombinedOutput()
+		return comm, err
+	} else {
+		comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
+		return comm, err
+	}
 }
 
 // Executes a database synchronisation task from a source to destination with the use of Drush.
