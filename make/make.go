@@ -231,6 +231,37 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 
 	writer.Flush()
+
+	chmodErr := os.Chmod(Site.Path, 0777)
+	if chmodErr != nil {
+		log.Warnln("Could not change permissions on codebase directory")
+	} else {
+		log.Infoln("Changed docroot permissions to 0777 for file removal.")
+	}
+
+	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
+		realpath := strings.Split(Site.Path, "\n")
+		err := new(error)
+		for _, name := range realpath {
+			if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
+				fmt.Sprintf(name)
+				if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
+					os.Chmod(path, 0777)
+					delErr := os.RemoveAll(path)
+					if delErr != nil {
+						log.Warnln("Could not remove", path)
+					}
+				} else if !Info.IsDir() {
+					delErr := os.Remove(path)
+					if delErr != nil {
+						log.Warnln("Could not remove", path)
+					}
+				}
+			}
+		}
+		return *err
+	})
+
 	drushMake := Site.ProcessMake(newMakeFilePath)
 	if drushMake {
 		err := os.Remove(newMakeFilePath)
@@ -390,13 +421,9 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 
 	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
-	drushCommand := ""
-	if Site.Timestamp == "" {
-		drushCommand = fmt.Sprintf("make -y --no-core --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
-	} else {
-		drushCommand = fmt.Sprintf("make -y --overwrite --working-copy %v %v/%v%v", fullPath, Site.Path, Site.Name, Site.Timestamp)
-	}
+	drushCommand := fmt.Sprintf("make --yes %v", makeFile)
 	drushMake.Set("", drushCommand, true)
+	drushMake.SetWorkingDir(Site.Path)
 	cmd, err := drushMake.CombinedOutput()
 	if err != nil {
 		log.Warnln("Could not execute Drush make without errors.", err.Error())
