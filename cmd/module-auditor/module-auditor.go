@@ -7,10 +7,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/aliases"
 	"github.com/fubarhouse/golang-drush/command"
-	"log"
 	"os/exec"
 	"strings"
 )
@@ -19,12 +19,17 @@ func main() {
 	var strAliases = flag.String("aliases", "", "alias1,alias2,alias3")
 	var strModules = flag.String("modules", "", "views,features,admin_menu")
 	var strMakefiles = flag.String("makes", "", "/path/to/make.make,/path/to/make-other.make")
+	var strPattern = flag.String("pattern", "%v", "A pattern to cross-reference the list of aliases, where %v in this string represents the alias.")
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
 
 	var getModulesFromMake = false
 	var projects []string
 	var MakeProjects []string
+
+	if *strPattern != "" || !strings.Contains(*strPattern, "%v") {
+		log.Errorln("Invalid pattern, must contain '%v'.")
+	}
 
 	if *strMakefiles != "" {
 		MakefileNames := strings.Split(*strMakefiles, ",")
@@ -52,6 +57,7 @@ func main() {
 			thisAliasA := strings.Replace(value, "@", "", -1)
 			thisAliasA = strings.Replace(value, " ", "", -1)
 			thisAliasA = fmt.Sprintf("@%v", thisAliasA)
+			thisAliasA = strings.Replace(*strPattern, "%v", thisAliasA, -1)
 			thisAlias := alias.NewAlias("", "", thisAliasA)
 			aliasList.Add(thisAlias)
 		}

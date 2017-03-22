@@ -236,7 +236,7 @@ func DrushDownloadToPath(path, project string) {
 	if err != nil {
 		log.Warnln("Could not download module ", project, err)
 	} else {
-		log.Infoln("Downloaded module ", project, err)
+		log.Infoln("Downloaded module", project)
 	}
 }
 
@@ -248,7 +248,7 @@ func DrushDownloadToAlias(alias, project string) {
 	if err != nil {
 		log.Warnln("Could not download module ", project, err)
 	} else {
-		log.Infoln("Downloaded module ", project)
+		log.Infoln("Downloaded module", project)
 	}
 }
 
