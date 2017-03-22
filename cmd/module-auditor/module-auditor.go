@@ -2,8 +2,7 @@ package main
 
 // This command will accept any amount of Drush aliases and Drupal module names in
 // a comma separated format (ie "p1,p2,p3") and find out if the input aliases are
-// using the input modules, and it will return a count of the total of which are
-// enabled.
+// using the input modules from the specified input make files.
 
 import (
 	"flag"
@@ -19,7 +18,7 @@ import (
 func main() {
 	var strAliases = flag.String("aliases", "", "alias1,alias2,alias3")
 	var strModules = flag.String("modules", "", "views,features,admin_menu")
-	var strMakefiles = flag.String("make", "", "/path/to/make.make,/path/to/make-other.make")
+	var strMakefiles = flag.String("makes", "", "/path/to/make.make,/path/to/make-other.make")
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
 
