@@ -174,13 +174,11 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 
 	if moduleFound == false {
 		log.Infoln("Could not find", Project)
-		os.Exit(127)
 	} else {
 		path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
 		if moduleType == "contrib" {
 			command.DrushDownloadToPath(path, Project)
 		} else {
-			//git clone -b my-branch git@github.com:user/myproject.git
 			gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, path+"/"+Project)
 			_, *err = gitCmd.Output()
 			if *err == nil {
