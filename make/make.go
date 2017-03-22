@@ -422,26 +422,10 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
 	drushCommand := fmt.Sprintf("make --yes %v", makeFile)
-	drushMake.Set("", drushCommand, true)
+	drushMake.Set("", drushCommand, false)
 	drushMake.SetWorkingDir(Site.Path)
-	cmd, err := drushMake.CombinedOutput()
-	if err != nil {
-		log.Warnln("Could not execute Drush make without errors.", err.Error())
-		logEntryLines := strings.SplitAfter(string(cmd), "]")
-		for _, logEntryLine := range logEntryLines {
-			if strings.Contains(logEntryLine, "[error]") {
-				logEntryLine = strings.Replace(logEntryLine, " from ", "", -1)
-				logEntryLine = strings.Replace(logEntryLine, "[error]", "", -1)
-				logEntryLine = strings.Replace(logEntryLine, "\n", " ", -1)
-				logEntryLine = strings.Replace(logEntryLine, "  ", " ", -1)
-				log.Warnln(logEntryLine)
-			}
-		}
-		return false
-	} else {
-		log.Infoln("Finished building new codebase without errors")
-		return true
-	}
+	_ = drushMake.LiveOutput()
+	return true
 }
 
 func (Site *Site) InstallSiteRef() {

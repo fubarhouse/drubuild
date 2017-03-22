@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bufio"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"os/exec"
@@ -69,6 +70,42 @@ func (drush *Command) GetVerbose() bool {
 // Changes the verbosity setting on executed Drush commands.
 func (drush *Command) SetVerbose(value bool) {
 	drush.verbose = value
+}
+
+// Returns, and prints the live output of the executing program
+// This will wait for completion before proceeding.
+func (drush *Command) LiveOutput() error {
+	if strings.Contains(drush.alias, "@") == true {
+		drush.alias = strings.Replace(drush.alias, "@", "", -1)
+	}
+	if drush.alias != "" {
+		drush.alias = fmt.Sprintf("@%v", drush.alias)
+	}
+	if drush.verbose == true {
+		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
+	}
+	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
+
+	comm := new(exec.Cmd)
+	if drush.GetWorkingDir() != "." && drush.GetWorkingDir() != "" {
+		comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args)
+	} else {
+		comm = exec.Command("sh", "-c", PATH_DRUSH+" "+args)
+	}
+	Pipe, _ := comm.StderrPipe()
+	scanner := bufio.NewScanner(Pipe)
+	go func() {
+		for scanner.Scan() {
+			if strings.Contains(scanner.Text(), "[error]") || strings.Contains(scanner.Text(), "[warning]") {
+				log.Warnf("%s", scanner.Text())
+			} else {
+				log.Infof("%s", scanner.Text())
+			}
+		}
+	}()
+	err := comm.Start()
+	err = comm.Wait()
+	return err
 }
 
 // Gets the output from a single Command object, does not support []Command items.
