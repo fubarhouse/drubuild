@@ -306,7 +306,7 @@ func (Site *Site) DatabasesGet() []string {
 	databases := strings.Split(string(values), "\n")
 	siteDbs := []string{}
 	for _, database := range databases {
-		if strings.Contains(database, Site.Name) == true {
+		if strings.HasPrefix(database, Site.Name+"_2") {
 			siteDbs = append(siteDbs, database)
 		}
 	}
