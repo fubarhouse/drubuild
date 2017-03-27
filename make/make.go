@@ -260,16 +260,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		return *err
 	})
 
-	drushMake := Site.ProcessMake(newMakeFilePath)
-	if drushMake {
-		err := os.Remove(newMakeFilePath)
-		if err != nil {
-			log.Warnln("Could not remove temporary make file", newMakeFilePath)
-		} else {
-			log.Infoln("Removed temporary make file", newMakeFilePath)
-		}
+	Site.ProcessMake(newMakeFilePath)
+	err := os.Remove(newMakeFilePath)
+	if err != nil {
+		log.Warnln("Could not remove temporary make file", newMakeFilePath)
 	} else {
-		log.Warnln("Temporary make file has not been removed due to the above notices.")
+		log.Infoln("Removed temporary make file", newMakeFilePath)
 	}
 }
 
@@ -433,7 +429,7 @@ func (Site *Site) InstallSiteRef() {
 		"Domain": Site.Domain,
 	}
 	dirPath := Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/"
-	dirErr := os.Mkdir(dirPath+Site.Name, 0755)
+	dirErr := os.MkdirAll(dirPath+Site.Name, 0755)
 	if dirErr != nil {
 		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)
 	} else {
