@@ -417,7 +417,11 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	drushMake := command.NewDrushCommand()
 	drushCommand := fmt.Sprintf("make --yes %v", makeFile)
 	drushMake.Set("", drushCommand, false)
-	drushMake.SetWorkingDir(Site.Path)
+	if Site.Timestamp == "" {
+		drushMake.SetWorkingDir(Site.Path + "/")
+	} else {
+		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp)
+	}
 	_ = drushMake.LiveOutput()
 	return true
 }
