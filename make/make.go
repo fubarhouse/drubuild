@@ -422,6 +422,12 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	} else {
 		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp)
 	}
+	mkdirErr := os.MkdirAll(drushMake.GetWorkingDir(), 0755)
+	if mkdirErr != nil {
+		log.Warnln("Could not create directory", drushMake.GetWorkingDir())
+	} else {
+		log.Infoln("Created directory", drushMake.GetWorkingDir())
+	}
 	_ = drushMake.LiveOutput()
 	return true
 }
