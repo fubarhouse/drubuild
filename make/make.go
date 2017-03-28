@@ -36,6 +36,24 @@ func (Site *Site) RestartWebServer() {
 	}
 }
 
+func (Site *Site) StartWebServer() {
+	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "start").Output()
+	if stdErr != nil {
+		log.Errorf("Could not start webserver %v. %v\n", Site.Webserver, stdErr)
+	} else {
+		log.Infof("Started webserver %v.\n", Site.Webserver)
+	}
+}
+
+func (Site *Site) StopWebServer() {
+	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "stop").Output()
+	if stdErr != nil {
+		log.Errorf("Could not stop webserver %v. %v\n", Site.Webserver, stdErr)
+	} else {
+		log.Infof("Stopped webserver %v.\n", Site.Webserver)
+	}
+}
+
 type DrupalProject struct {
 	Type   string
 	Name   string

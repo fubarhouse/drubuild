@@ -77,5 +77,6 @@ func main() {
 	x.AliasInstall()
 	command.DrushUpdateDatabase(x.Alias)
 	command.DrushRebuildRegistry(x.Alias)
-	x.RestartWebServer()
+	x.StopWebServer()
+	x.StartWebServer()
 }
