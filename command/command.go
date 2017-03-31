@@ -87,11 +87,7 @@ func (drush *Command) LiveOutput() error {
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 
 	comm := new(exec.Cmd)
-	if drush.GetWorkingDir() != "." && drush.GetWorkingDir() != "" {
-		comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args)
-	} else {
-		comm = exec.Command("sh", "-c", PATH_DRUSH+" "+args)
-	}
+	comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args)
 	Pipe, _ := comm.StderrPipe()
 	scanner := bufio.NewScanner(Pipe)
 	go func() {
