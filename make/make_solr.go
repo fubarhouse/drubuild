@@ -89,8 +89,8 @@ func verifySolrCore(SolrCore *SolrCore) bool {
 	return false
 }
 
-func NewCore(Address, Name, Template, Path string) SolrCore {
-	return SolrCore{Address, Name, Template, Path}
+func NewCore(Address, Name, Template, Path, DataPath string) SolrCore {
+	return SolrCore{Address, Name, Template, Path, DataPath}
 }
 
 func (SolrCore *SolrCore) Install() {
