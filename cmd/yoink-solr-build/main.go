@@ -14,6 +14,8 @@ func main() {
 	var Path = flag.String("path", "/var/solr", "Path to Solr data folder")
 	var Resources = flag.String("resources", "", "Path to Solr resources for new cores")
 	var DataPath = flag.String("data-path", "", "Path to data directory inside the Solr directory")
+	var ConfigFile = flag.String("config", "solrconfig.xml", "Path to data directory inside the Solr directory")
+	var SchemaFile = flag.String("schema", "schema.xml", "Path to data directory inside the Solr directory")
 
 	flag.Parse()
 
@@ -30,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	SolrCore := make.SolrCore{*Address, *Name, *Resources, *Path, *DataPath}
+	SolrCore := make.SolrCore{*Address, *Name, *Resources, *Path, *DataPath, *ConfigFile, *SchemaFile}
 	log.Infoln("Starting Solr core installation task.")
 	SolrCore.Install()
 }

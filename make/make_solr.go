@@ -8,11 +8,13 @@ import (
 )
 
 type SolrCore struct {
-	Address  string
-	Name     string
-	Template string
-	Path     string
-	DataPath string
+	Address    string
+	Name       string
+	Template   string
+	Path       string
+	DataPath   string
+	ConfigFile string
+	SchemaFile string
 }
 
 func logSolrInstall() bool {
@@ -89,8 +91,8 @@ func verifySolrCore(SolrCore *SolrCore) bool {
 	return false
 }
 
-func NewCore(Address, Name, Template, Path, DataPath string) SolrCore {
-	return SolrCore{Address, Name, Template, Path, DataPath}
+func NewCore(Address, Name, Template, Path, DataPath, ConfigFile, SchemaFile string) SolrCore {
+	return SolrCore{Address, Name, Template, Path, DataPath, ConfigFile, SchemaFile}
 }
 
 func (SolrCore *SolrCore) Install() {
@@ -114,7 +116,7 @@ func (SolrCore *SolrCore) Install() {
 			log.Errorln("Configuration could not be synced with boilerplate resources:", err.Error())
 		}
 
-		_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir=data&config=solrconfig.xml&schema=schema.xml").Output()
+		_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir="+SolrCore.DataPath+"&config="+SolrCore.ConfigFile+"&schema="+SolrCore.SchemaFile).Output()
 		if err == nil {
 			log.Infoln("Core has been successfully installed.")
 		} else {
