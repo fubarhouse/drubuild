@@ -101,7 +101,14 @@ func (SolrCore *SolrCore) Install() {
 		dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name + "/conf/"
 
 		// Create data directories
-		err := os.MkdirAll(dataDir, 0777)
+		err := os.MkdirAll(SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/", 0777)
+		if err == nil {
+			log.Infoln("Directory has been created.", SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/")
+		} else {
+			log.Errorln("Directory has not been created:", err.Error())
+		}
+
+		err = os.MkdirAll(dataDir, 0777)
 		if err == nil {
 			log.Infoln("Directory has been created.", dataDir)
 		} else {
