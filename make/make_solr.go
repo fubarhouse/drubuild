@@ -101,9 +101,23 @@ func (SolrCore *SolrCore) Install() {
 		dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name + "/conf/"
 
 		// Create data directories
-		err := os.MkdirAll(SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/", 0777)
+		err := os.MkdirAll(SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/index", 0777)
 		if err == nil {
-			log.Infoln("Directory has been created.", SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/")
+			log.Infoln("Directory has been created.", SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/index")
+		} else {
+			log.Errorln("Directory has not been created:", err.Error())
+		}
+
+		err = os.MkdirAll(SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/spellchecker", 0777)
+		if err == nil {
+			log.Infoln("Directory has been created.", SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/spellchecker")
+		} else {
+			log.Errorln("Directory has not been created:", err.Error())
+		}
+
+		err = os.MkdirAll(SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/tlog", 0777)
+		if err == nil {
+			log.Infoln("Directory has been created.", SolrCore.Path+"/"+SolrCore.DataPath+"/"+SolrCore.Name+"/data/tlog")
 		} else {
 			log.Errorln("Directory has not been created:", err.Error())
 		}
