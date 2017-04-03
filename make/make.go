@@ -62,16 +62,18 @@ type DrupalProject struct {
 }
 
 type Site struct {
-	Timestamp string
-	Path      string
-	Make      string
-	Name      string
-	Alias     string
-	Domain    string
-	database  *makeDB
-	Webserver string
-	Vhostpath string
-	Template  string
+	Timestamp                  string
+	Path                       string
+	Make                       string
+	Name                       string
+	Alias                      string
+	Domain                     string
+	database                   *makeDB
+	Webserver                  string
+	Vhostpath                  string
+	Template                   string
+	MakeFileRewriteSource      string
+	MakeFileRewriteDestination string
 }
 
 func NewSite(make, name, path, alias, webserver, domain, vhostpath, template string) *Site {
@@ -85,6 +87,8 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 	Site.Domain = domain
 	Site.Vhostpath = vhostpath
 	Site.Template = template
+	Site.MakeFileRewriteSource = ""
+	Site.MakeFileRewriteDestination = ""
 	return Site
 }
 
@@ -429,6 +433,12 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	if err != nil {
 		log.Fatalln("File not found:", err)
 		os.Exit(1)
+	}
+	if Site.MakeFileRewriteSource != "" && Site.MakeFileRewriteDestination != "" {
+		log.Printf("Applying specified rewrite string on temporary makefile: %v -> %v", Site.MakeFileRewriteSource, Site.MakeFileRewriteDestination)
+		ReplaceTextInFile(makeFile, Site.MakeFileRewriteSource, Site.MakeFileRewriteDestination)
+	} else {
+		log.Println("No rewrite string was configured, continuing without additional parsing.")
 	}
 
 	log.Infof("Building from %v...", makeFile)

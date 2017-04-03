@@ -15,6 +15,8 @@ func main() {
 	var Path = flag.String("path", "", "Path to site")
 	var Project = flag.String("project", "", "Machine name of project name")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
+	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
+	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
 
 	// Usage:
 	// -path="/path/to/site" \
@@ -41,6 +43,11 @@ func main() {
 	x.TimeStampSet("")
 	x.Name = ""
 	x.Path = *Path
+
+	if *RewriteStringSource != "" && *RewriteStringDestination != "" {
+		x.MakeFileRewriteSource = *RewriteStringSource
+		x.MakeFileRewriteDestination = *RewriteStringDestination
+	}
 
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")

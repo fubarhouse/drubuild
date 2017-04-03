@@ -20,6 +20,8 @@ func main() {
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
+	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
+	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
 
 	// Templates will replace the following strings in the provided template with the values inputted to the program.
 	// Failing to provide this file path, it will fall-back to a template stored inside the go code.
@@ -68,6 +70,10 @@ func main() {
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 
+	if *RewriteStringSource != "" && *RewriteStringDestination != "" {
+		x.MakeFileRewriteSource = *RewriteStringSource
+		x.MakeFileRewriteDestination = *RewriteStringDestination
+	}
 	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
 	x.InstallPrivateFileSystem()
