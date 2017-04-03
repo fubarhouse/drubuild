@@ -12,7 +12,7 @@ type SolrCore struct {
 	Name     string
 	Template string
 	Path     string
-	Legacy   bool
+	DataPath string
 }
 
 func logSolrInstall() bool {
@@ -90,19 +90,13 @@ func verifySolrCore(SolrCore *SolrCore) bool {
 }
 
 func NewCore(Address, Name, Template, Path string) SolrCore {
-	return SolrCore{Address, Name, Template, Path, false}
+	return SolrCore{Address, Name, Template, Path}
 }
 
 func (SolrCore *SolrCore) Install() {
 	if logSolrInstall() && logResources(SolrCore.Template) {
 		log.Infoln("All checks have passed.")
-		dataDir := ""
-		if SolrCore.Legacy {
-			log.Infoln("Installing legacy file system for Solr < 5.0")
-			dataDir = SolrCore.Path + "/" + SolrCore.Name + "/conf/"
-		} else {
-			dataDir = SolrCore.Path + "/data/" + SolrCore.Name + "/conf/"
-		}
+		dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name + "/conf/"
 
 		// Create data directories
 		err := os.MkdirAll(dataDir, 0777)
@@ -132,13 +126,7 @@ func (SolrCore *SolrCore) Install() {
 
 func (SolrCore *SolrCore) Uninstall() {
 
-	dataDir := ""
-	if SolrCore.Legacy {
-		log.Infoln("Installing legacy file system for Solr < 5.0")
-		dataDir = SolrCore.Path + "/" + SolrCore.Name
-	} else {
-		dataDir = SolrCore.Path + "/data/" + SolrCore.Name
-	}
+	dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name
 
 	_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
 	if err == nil {
