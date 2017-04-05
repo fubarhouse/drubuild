@@ -222,10 +222,13 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
+	var newMakeFilePath string
 	if Site.Timestamp == "." {
 		Site.Timestamp = ""
+		newMakeFilePath = "/tmp/drupal-" + Site.Name + Site.TimeStampGenerate() + ".make"
+	} else {
+		newMakeFilePath = "/tmp/drupal-" + Site.Name + Site.TimeStampGet() + ".make"
 	}
-	newMakeFilePath := "/tmp/drupal-" + Site.Name + Site.TimeStampGet() + ".make"
 	file, crErr := os.Create(newMakeFilePath)
 	if crErr == nil {
 		log.Infoln("Generated temporary make file...")
@@ -371,6 +374,10 @@ func (Site *Site) TimeStampSet(value string) {
 func (Site *Site) TimeStampReset() {
 	now := time.Now()
 	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
+}
+
+func (Site *Site) TimeStampGenerate() string {
+	return fmt.Sprintf(".%v", time.Now().Format("20060102150405"))
 }
 
 func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
