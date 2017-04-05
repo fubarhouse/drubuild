@@ -12,10 +12,7 @@ func main() {
 	var Address = flag.String("address", "http://localhost:8983", "http address of solr installation where solr version < 5.")
 	var Name = flag.String("name", "", "Name of core to create")
 	var Path = flag.String("path", "/var/solr", "Path to Solr data folder")
-	var Resources = flag.String("resources", "", "Path to Solr resources for new cores")
-	var DataPath = flag.String("data-path", "", "Path to data directory inside the Solr directory")
-	var ConfigFile = flag.String("config", "solrconfig.xml", "Path to data directory inside the Solr directory")
-	var SchemaFile = flag.String("schema", "schema.xml", "Path to data directory inside the Solr directory")
+	var Resources = flag.String("resources", "/opt/solr/example/files/conf", "Path to Solr resources for new cores")
 
 	flag.Parse()
 
@@ -32,7 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	SolrCore := make.SolrCore{*Address, *Name, *Resources, *Path, *DataPath, *ConfigFile, *SchemaFile}
+	SolrCore := make.SolrCore{*Address, *Name, *Resources, *Path}
 	log.Infoln("Starting Solr core installation task.")
 	SolrCore.Install()
 }

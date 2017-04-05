@@ -8,13 +8,10 @@ import (
 )
 
 type SolrCore struct {
-	Address    string
-	Name       string
-	Template   string
-	Path       string
-	DataPath   string
-	ConfigFile string
-	SchemaFile string
+	Address  string
+	Name     string
+	Template string
+	Path     string
 }
 
 func logSolrInstall() bool {
@@ -92,50 +89,54 @@ func verifySolrCore(SolrCore *SolrCore) bool {
 }
 
 func NewCore(Address, Name, Template, Path, DataPath, ConfigFile, SchemaFile string) SolrCore {
-	return SolrCore{Address, Name, Template, Path, DataPath, ConfigFile, SchemaFile}
+	return SolrCore{Address, Name, Template, Path}
 }
 
 func (SolrCore *SolrCore) Install() {
+	// TODO: Ensure Solr 3,4 work, and do not assume non-legacy.
 	if logSolrInstall() && logResources(SolrCore.Template) {
 		log.Infoln("All checks have passed.")
-		dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name
-
-		// Create data directories
-		err := os.MkdirAll(dataDir, 0777)
-		if err == nil {
-			log.Infoln("Directory has been created.", dataDir)
-		} else {
-			log.Errorln("Directory has not been created:", err.Error())
+		Directories := []string{"conf", "data", "data/index"}
+		for _, Directory := range Directories {
+			dataDir := SolrCore.Path + "/data/" + SolrCore.Name + "/" + Directory
+			err := os.MkdirAll(dataDir+"/"+Directory, 0777)
+			if err == nil {
+				log.Infof("Directory %v was created.", dataDir)
+			} else {
+				log.Errorln("Directory %v was created. %v", dataDir, err.Error())
+			}
 		}
-
-		err = os.MkdirAll(dataDir+"/"+SolrCore.DataPath, 0777)
-		if err == nil {
-			log.Infoln("Directory has been created.", dataDir)
-		} else {
-			log.Errorln("Directory has not been created:", err.Error())
-		}
-
+		dataDir := SolrCore.Path + "/data/" + SolrCore.Name
 		// Sync
-		_, err = exec.Command("rsync", "-a", SolrCore.Template+"/", dataDir).Output()
+		_, err := exec.Command("rsync", "-a", SolrCore.Template+"/", dataDir+"/conf").Output()
 		if err == nil {
 			log.Infoln("Configuration has been synced with boilerplate resources.")
 		} else {
 			log.Errorln("Configuration could not be synced with boilerplate resources:", err.Error())
 		}
 
-		_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir="+SolrCore.DataPath+"&config="+SolrCore.ConfigFile+"&schema="+SolrCore.SchemaFile).Output()
-		if err == nil {
-			log.Infoln("Core has been successfully installed.")
+		// Create
+		if _, err := os.Stat("/opt/solr/bin/solr"); err == nil {
+			log.Infoln("Found solr core creation script on version >= 5")
+			solrCreate := exec.Command("/opt/solr/bin/solr", "create", "-c", SolrCore.Name)
+			solrCreate.Output()
 		} else {
-			log.Errorln("Core could not be installed:", err)
+			log.Infoln("Could not find identifier for version 5 or later.")
 		}
+
+		//_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir="+SolrCore.DataPath+"&config="+SolrCore.ConfigFile+"&schema="+SolrCore.SchemaFile).Output()
+		//if err == nil {
+		//	log.Infoln("Core has been successfully installed.")
+		//} else {
+		//	log.Errorln("Core could not be installed:", err)
+		//}
 	}
 	verifySolrCore(SolrCore)
 }
 
 func (SolrCore *SolrCore) Uninstall() {
 
-	dataDir := SolrCore.Path + "/" + SolrCore.DataPath + "/" + SolrCore.Name
+	dataDir := SolrCore.Path + "/data/" + SolrCore.Name
 
 	_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
 	if err == nil {

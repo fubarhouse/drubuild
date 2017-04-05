@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	SolrCore := make.SolrCore{*Address, *Name, "", *Path, "data", "solrconfig.xml", "schema.xml"}
+	SolrCore := make.SolrCore{*Address, *Name, "", *Path}
 	log.Infoln("Starting Solr core uninstallation task.")
 	SolrCore.Uninstall()
 }
