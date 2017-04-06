@@ -22,6 +22,7 @@ func main() {
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
 	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
+	var WorkingCopy = flag.Bool("working-copy", false, "Apply --working-copy to to drush during any make processes.")
 
 	// Templates will replace the following strings in the provided template with the values inputted to the program.
 	// Failing to provide this file path, it will fall-back to a template stored inside the go code.
@@ -65,6 +66,9 @@ func main() {
 		x.TimeStampReset()
 	} else {
 		x.TimeStampSet(*BuildID)
+	}
+	if *WorkingCopy {
+		x.WorkingCopy = true
 	}
 
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)

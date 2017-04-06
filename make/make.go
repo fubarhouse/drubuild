@@ -74,6 +74,7 @@ type Site struct {
 	Template                   string
 	MakeFileRewriteSource      string
 	MakeFileRewriteDestination string
+	WorkingCopy                bool
 }
 
 func NewSite(make, name, path, alias, webserver, domain, vhostpath, template string) *Site {
@@ -89,6 +90,7 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 	Site.Template = template
 	Site.MakeFileRewriteSource = ""
 	Site.MakeFileRewriteDestination = ""
+	Site.WorkingCopy = false
 	return Site
 }
 
@@ -450,7 +452,12 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 
 	log.Infof("Building from %v...", makeFile)
 	drushMake := command.NewDrushCommand()
-	drushCommand := fmt.Sprintf("make --yes %v", makeFile)
+	drushCommand := ""
+	if Site.WorkingCopy {
+		drushCommand = fmt.Sprintf("make --yes --working-copy %v", makeFile)
+	} else {
+		drushCommand = fmt.Sprintf("make --yes %v", makeFile)
+	}
 	drushMake.Set("", drushCommand, false)
 	if Site.Timestamp == "" {
 		drushMake.SetWorkingDir(Site.Path + "/")

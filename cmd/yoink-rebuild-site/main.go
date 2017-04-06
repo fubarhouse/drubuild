@@ -17,6 +17,7 @@ func main() {
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
 	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
+	var WorkingCopy = flag.Bool("working-copy", false, "Apply --working-copy to to drush during any make processes.")
 
 	// Usage:
 	// -path="/path/to/site" \
@@ -47,6 +48,10 @@ func main() {
 	if *RewriteStringSource != "" && *RewriteStringDestination != "" {
 		x.MakeFileRewriteSource = *RewriteStringSource
 		x.MakeFileRewriteDestination = *RewriteStringDestination
+	}
+
+	if *WorkingCopy {
+		x.WorkingCopy = true
 	}
 
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
