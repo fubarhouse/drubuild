@@ -1,30 +1,33 @@
 package make
 
 import (
+	"fmt"
+	"net/http"
+	"io/ioutil"
 	log "github.com/Sirupsen/logrus"
+	"path/filepath"
 	"os"
 	"os/exec"
 	"strings"
 )
 
 type SolrCore struct {
-	Address  string
-	Name     string
-	Template string
-	Path     string
+	Address  	string 		// HTTP address of solr.
+	Binary		string 		// Path to solr binary.
+	Name     	string 		// Name of core as subject.
+	Template 	string 		// Directory which contains data.
+	Path     	string 		// Path of Solr.
+	SubDir	 	string 		// Subdirectory in the solr directory (Path).
+	DataDir  	string 		// Path to core data inside of solr data directory.
+	ConfigFile	string 		// Name of config file.
+	SchemaFile	string 		// Name of schema file.
+	SolrUserName 	string 		// The name of the solr user.
+	SolrUserGroup 	string 		// The name of the solr user.
+	SolrUserMode	os.FileMode   	// The mode of the solr core.
 }
 
-func logSolrInstall() bool {
-	if verifySolrInstall() {
-		log.Infoln("Found Solr installation")
-		return true
-	} else {
-		log.Errorln("Could not find Solr installation")
-		return false
-	}
-}
-func logSolrCLI() bool {
-	if verifySolrCLI() {
+func (SolrCore *SolrCore) LogCLI() bool {
+	if SolrCore.VerifyCLI() {
 		log.Infoln("Found Solr command-line tools")
 		return true
 	} else {
@@ -32,8 +35,32 @@ func logSolrCLI() bool {
 		return false
 	}
 }
-func logResources(Template string) bool {
-	if verifyResources(Template) {
+
+func (SolrCore *SolrCore) VerifyCLI() bool {
+	if SolrCore.Binary != "" {
+		_, err := os.Stat(SolrCore.Binary)
+		if err == nil {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) SolrInstallLog() bool {
+	if SolrCore.VerifyInstall() {
+		log.Infoln("Found Solr installation")
+		return true
+	} else {
+		log.Errorln("Could not find Solr installation")
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) SolrResourcesLog(Template string) bool {
+	if SolrCore.VerifyResources() {
 		log.Infoln("Found configuration folder")
 		return true
 	} else {
@@ -41,8 +68,8 @@ func logResources(Template string) bool {
 		return false
 	}
 }
-func logSolrCore(SolrCore *SolrCore) bool {
-	if verifySolrCore(SolrCore) {
+func (SolrCore *SolrCore) LogCore() bool {
+	if SolrCore.VerifyCore() {
 		log.Infoln("Solr core is installed.")
 		return true
 	} else {
@@ -50,104 +77,249 @@ func logSolrCore(SolrCore *SolrCore) bool {
 		return false
 	}
 }
-func verifySolrInstall() bool {
-	_, err := os.Stat("/opt/solr")
+func (SolrCore *SolrCore) VerifyInstall() bool {
+	_, err := os.Stat(SolrCore.Path)
 	if err == nil {
 		return true
 	} else {
 		return false
 	}
 }
-func verifySolrCLI() bool {
-	_, err := os.Stat("/opt/solr/bin/solr")
+func (SolrCore *SolrCore) VerifyResources() bool {
+	_, err := os.Stat(SolrCore.Template)
 	if err == nil {
 		return true
 	} else {
 		return false
 	}
 }
-func verifyResources(Template string) bool {
-	_, err := os.Stat(Template)
+func (SolrCore *SolrCore) VerifyCore() bool {
+
+	response, err := http.Get(SolrCore.Address+"/solr/admin/cores?action=STATUS")
+	content, err := ioutil.ReadAll(response.Body)
+	response.Body.Close()
+
 	if err == nil {
-		return true
-	} else {
-		return false
-	}
-}
-func verifySolrCore(SolrCore *SolrCore) bool {
-	curlResponse, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=STATUS").Output()
-	if err == nil {
-		if strings.Contains(string(curlResponse), `<str name="name">`+SolrCore.Name+`</str>`) == true {
+		if strings.Contains(string(content), `<int name="status">500</int>`) {
+			log.Fatalln("Verification process has returned error 500.")
+			return false
+		}
+		if strings.Contains(string(content), `<str name="name">`+SolrCore.Name+`</str>`) {
 			return true
 		} else {
 			return false
 		}
 	} else {
-		log.Errorln("Solr could not be accessed using CURL:", err.Error())
+		log.Errorln("Solr did not respond:", err.Error(), strings.Replace(string(content), "\n", "", -1))
+		return false
 	}
-	return false
 }
 
-func NewCore(Address, Name, Template, Path, DataPath, ConfigFile, SchemaFile string) SolrCore {
-	return SolrCore{Address, Name, Template, Path}
+func (SolrCore *SolrCore) _createDataDir() bool {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name, SolrCore.DataDir}
+	actualPath := strings.Join(directoryArgs,"/")
+	err := os.MkdirAll(actualPath, SolrCore.SolrUserMode)
+	if err == nil {
+		log.Infof("Data directory %v has been created.", actualPath)
+		return true
+	} else {
+		log.Errorf("Data directory %v has not been created. %v", actualPath, err.Error())
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) _createConfigDir() bool {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name, "conf"}
+	actualPath := strings.Join(directoryArgs,"/")
+	err := os.MkdirAll(actualPath, SolrCore.SolrUserMode)
+	if err == nil {
+		log.Infof("Data directory %v has been created.", actualPath)
+		return true
+	} else {
+		log.Errorf("Data directory %v has not been created. %v", actualPath, err.Error())
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) _copyTemplateData() {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name, "conf"}
+	actualPath := strings.Join(directoryArgs,"/")
+	err := new(error)
+	_ = filepath.Walk(SolrCore.Template, func(path string, FileInfo os.FileInfo, _ error) error {
+		realpath := strings.Split(string(path), "\n")
+		for _, name := range realpath {
+			if ! FileInfo.IsDir() {
+				data, err := ioutil.ReadFile(name)
+				if err != nil {
+					log.Errorf("Could not read from %v: %v", name, err.Error())
+				}
+				err = ioutil.WriteFile(actualPath+"/"+FileInfo.Name(), data, SolrCore.SolrUserMode)
+				if err == nil {
+					log.Infof("Copied %v to %v", name, actualPath+"/"+FileInfo.Name())
+				} else {
+					log.Errorf("Could not copy %v to %v: %v", name, actualPath+"/"+FileInfo.Name(), err.Error())
+				}
+			}
+		}
+		return *err
+	})
+}
+
+func (SolrCore *SolrCore) _resetModeTemplateData() bool {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name}
+	actualPath := strings.Join(directoryArgs, "/")
+	FileMode := fmt.Sprintf("%04o", SolrCore.SolrUserMode)
+	_, err := exec.Command("chmod", "-R", FileMode, actualPath).Output()
+	if err == nil {
+		log.Infof("Changed mode of %v to %v", actualPath, SolrCore.SolrUserMode)
+		return true
+	} else {
+		log.Warnf("Could not change mode of %v to %v: %v", actualPath, SolrCore.SolrUserMode, err)
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) _resetOwnerTemplateData() bool {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name}
+	actualPath := strings.Join(directoryArgs, "/")
+	_, err := exec.Command("chown", "-R", SolrCore.SolrUserName, actualPath).Output()
+	if err == nil {
+		log.Infof("Changed ownership of %v to %v", actualPath, SolrCore.SolrUserName)
+		return true
+	} else {
+		log.Warnf("Could not change ownership of %v to %v: %v", actualPath, SolrCore.SolrUserName, err)
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) _resetGroupTemplateData() bool {
+	directoryArgs := []string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name}
+	actualPath := strings.Join(directoryArgs,"/")
+	_, err := exec.Command("chgrp", "-R", SolrCore.SolrUserGroup, actualPath).Output()
+	if err == nil {
+		log.Infof("Changed group of %v to %v", actualPath, SolrCore.SolrUserGroup)
+		return true
+	} else {
+		log.Warnf("Could not change group of %v to %v: %v", actualPath, SolrCore.SolrUserGroup, err)
+		return false
+	}
+}
+
+func (SolrCore *SolrCore) _deleteTemplateData() bool {
+	dataDir := strings.Join([]string{SolrCore.Path, SolrCore.SubDir, SolrCore.Name}, "/")
+	_, err := os.Stat(dataDir)
+	if err == nil {
+		err := os.RemoveAll(dataDir)
+		if err == nil {
+			log.Infoln("Core resources have been removed.")
+			return true
+		} else {
+			log.Errorln("Core resources could not be removed:", err)
+			return false
+		}
+	} else {
+		return true
+	}
+}
+
+func (SolrCore *SolrCore) _createCore() bool {
+	if ! SolrCore.VerifyCore() {
+		if SolrCore.VerifyCLI() {
+			log.Infoln("Installing with specified Solr binary")
+			out, err := exec.Command(SolrCore.Binary, "create", "-c", SolrCore.Name).Output()
+			if err == nil {
+				log.Infoln("Creation command completed successfully.")
+			} else {
+				log.Errorln("Creation command could not complete:", err, string(out))
+			}
+			if SolrCore.VerifyCore() {
+				log.Infoln("Solr core installation succeeded.")
+				return true
+			} else {
+				log.Errorln("Solr core installation failed.")
+				return false
+			}
+		} else {
+			response, err := http.Get(SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir="+SolrCore.DataDir+"&config="+SolrCore.ConfigFile+"&schema="+SolrCore.SchemaFile)
+			_, err = ioutil.ReadAll(response.Body)
+			response.Body.Close()
+			if err == nil {
+				fmt.Sprint("Creation command completed successfully.")
+			} else {
+				fmt.Sprint("Creation command could not complete:", err)
+			}
+			if SolrCore.VerifyCore() {
+				log.Infoln("Solr core installation succeeded.")
+				return true
+			} else {
+				log.Errorln("Solr core installation failed.")
+				return false
+			}
+		}
+	} else {
+		log.Infof("Solr core %v is already created.", SolrCore.Name)
+	}
+	return SolrCore.VerifyCore()
+}
+func (SolrCore *SolrCore) _deleteCore() bool {
+	if SolrCore.VerifyCore() {
+		if SolrCore.VerifyCLI() {
+			log.Infoln("Uninstalling using specified Solr binary")
+			_, err := exec.Command(SolrCore.Binary, "delete", "-c", SolrCore.Name).Output()
+			if err == nil {
+				log.Infoln("Core has been successfully uninstalled.")
+				return true
+			} else {
+				log.Errorln("Core could not be uninstalled:", err)
+				return false
+			}
+		} else {
+			response, err := http.Get(SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name+"&deleteIndex=true&deleteDataDir=true&deleteInstanceDir=true")
+			_, err = ioutil.ReadAll(response.Body)
+			response.Body.Close()
+			if err == nil {
+				log.Infoln("Core has been successfully uninstalled.")
+				return true
+			} else {
+				log.Errorln("Core could not be uninstalled:", err)
+				return false
+			}
+		}
+	} else {
+		log.Infof("Solr core %v does not exist.", SolrCore.Name)
+		return true
+	}
 }
 
 func (SolrCore *SolrCore) Install() {
-	// TODO: Ensure Solr 3,4 work, and do not assume non-legacy.
-	if logSolrInstall() && logResources(SolrCore.Template) {
+	if SolrCore.VerifyInstall() && SolrCore.VerifyResources() {
 		log.Infoln("All checks have passed.")
-		Directories := []string{"conf", "data", "data/index"}
-		for _, Directory := range Directories {
-			dataDir := SolrCore.Path + "/data/" + SolrCore.Name + "/" + Directory
-			err := os.MkdirAll(dataDir+"/"+Directory, 0777)
-			if err == nil {
-				log.Infof("Directory %v was created.", dataDir)
-			} else {
-				log.Errorln("Directory %v was created. %v", dataDir, err.Error())
-			}
-		}
-		dataDir := SolrCore.Path + "/data/" + SolrCore.Name
-		// Sync
-		_, err := exec.Command("rsync", "-a", SolrCore.Template+"/", dataDir+"/conf").Output()
-		if err == nil {
-			log.Infoln("Configuration has been synced with boilerplate resources.")
-		} else {
-			log.Errorln("Configuration could not be synced with boilerplate resources:", err.Error())
-		}
 
-		// Create
-		if _, err := os.Stat("/opt/solr/bin/solr"); err == nil {
-			log.Infoln("Found solr core creation script on version >= 5")
-			solrCreate := exec.Command("/opt/solr/bin/solr", "create", "-c", SolrCore.Name)
-			solrCreate.Output()
-		} else {
-			log.Infoln("Could not find identifier for version 5 or later.")
-		}
+		SolrCore._deleteTemplateData()
+		SolrCore._createDataDir()
+		SolrCore._createConfigDir()
+		SolrCore._copyTemplateData()
+		SolrCore._resetModeTemplateData()
+		SolrCore._resetOwnerTemplateData()
+		SolrCore._resetGroupTemplateData()
+		SolrCore._deleteCore()
+		SolrCore._createCore()
 
-		//_, err = exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=CREATE&name="+SolrCore.Name+"&instanceDir="+SolrCore.Name+"&dataDir="+SolrCore.DataPath+"&config="+SolrCore.ConfigFile+"&schema="+SolrCore.SchemaFile).Output()
-		//if err == nil {
-		//	log.Infoln("Core has been successfully installed.")
-		//} else {
-		//	log.Errorln("Core could not be installed:", err)
-		//}
+	} else {
+		if ! SolrCore.VerifyInstall() {
+			log.Errorln("An error was found trying to verify the installation of Solr.")
+		}
+		if ! SolrCore.VerifyResources() {
+			log.Errorln("An error was found trying to find the specified templated Resources.")
+		}
 	}
-	verifySolrCore(SolrCore)
 }
 
 func (SolrCore *SolrCore) Uninstall() {
+	SolrCore._deleteCore()
+	SolrCore._deleteTemplateData()
+}
 
-	dataDir := SolrCore.Path + "/data/" + SolrCore.Name
-
-	_, err := exec.Command("curl", SolrCore.Address+"/solr/admin/cores?action=UNLOAD&core="+SolrCore.Name).Output()
-	if err == nil {
-		log.Infoln("Core has been successfully uninstalled.")
-	} else {
-		log.Errorln("Core could not be uninstalled:", err)
-	}
-	err = os.RemoveAll(dataDir)
-	if err == nil {
-		log.Infoln("Core resources have been removed.")
-	} else {
-		log.Errorln("Core resources could not be removed:", err)
-	}
+func NewCore(Address, Binary, Name, Template, Path, SubDir, DataDir, ConfigFile, SchemaFile, Subpath, Datapath, SolrUserName, SolrUserGroup string, SolrUserMode os.FileMode) SolrCore {
+	return SolrCore{Address, Binary, Name, Template, Path, SubDir, DataDir, ConfigFile, SchemaFile, SolrUserName, SolrUserGroup, SolrUserMode}
 }
