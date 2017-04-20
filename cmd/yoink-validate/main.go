@@ -47,10 +47,10 @@ func main() {
 	log.Println("Uninstalling Vhost")
 	VirtualHost.Uninstall()
 
-	log.Println("Instanciating Solr core")
-	SolrCore := make.SolrCore{"http://localhost:8983", "blah", "/acquia/scripts/conf", "/var/solr"}
-	log.Println("Installing Solr core")
-	SolrCore.Install()
-	log.Println("Uninstalling Solr core")
-	SolrCore.Uninstall()
+	//log.Println("Instanciating Solr core")
+	//SolrCore := make.SolrCore{"http://localhost:8983", "blah", "/acquia/scripts/conf", "/var/solr"}
+	//log.Println("Installing Solr core")
+	//SolrCore.Install()
+	//log.Println("Uninstalling Solr core")
+	//SolrCore.Uninstall()
 }
