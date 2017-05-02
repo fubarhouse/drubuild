@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// VirtualHost is a stuct for virtual host types.
 type VirtualHost struct {
 	serverName            string
 	serverRoot            string
@@ -16,54 +17,66 @@ type VirtualHost struct {
 	installationDirectory string
 }
 
+// NewVirtualHost instantiates a new VirtualHost struct.
 func NewVirtualHost(name, root, webserver, domain, installationDirectory string) *VirtualHost {
 	return &VirtualHost{name, root, domain, webserver, installationDirectory}
 }
 
+// SetName Sets the name field of the VirtualHost struct
 func (VirtualHost *VirtualHost) SetName(value string) {
 	VirtualHost.serverName = value
 }
 
+// GetName Gets the name field of the VirtualHost struct
 func (VirtualHost *VirtualHost) GetName() string {
 	return VirtualHost.serverName
 }
 
-func (VirtualHost *VirtualHost) SetUri(value string) {
+// SetURI Sets the uri field of the VirtualHost struct
+func (VirtualHost *VirtualHost) SetURI(value string) {
 	VirtualHost.serverRoot = value
 }
 
-func (VirtualHost *VirtualHost) GetUri() string {
+// GetURI Gets the uri field of the VirtualHost struct
+func (VirtualHost *VirtualHost) GetURI() string {
 	return VirtualHost.serverRoot
 }
 
+// SetDomain Sets the domain field of the VirtualHost struct
 func (VirtualHost *VirtualHost) SetDomain(value string) {
 	VirtualHost.serverDomain = value
 }
 
+// GetDomain Gets the domain field of the VirtualHost struct
 func (VirtualHost *VirtualHost) GetDomain() string {
 	return VirtualHost.serverDomain
 }
 
+// SetWebServer Sets the webserver field of the VirtualHost struct
 func (VirtualHost *VirtualHost) SetWebServer(value string) {
 	VirtualHost.webserver = value
 }
 
+// GetWebServer Gets the webserver field of the VirtualHost struct
 func (VirtualHost *VirtualHost) GetWebServer() string {
 	return VirtualHost.webserver
 }
 
+// SetInstallationDirectory Sets the installationDirectory field of the VirtualHost struct
 func (VirtualHost *VirtualHost) SetInstallationDirectory(value string) {
 	VirtualHost.installationDirectory = value
 }
 
+// GetInstallationDirectory Gets the installationDirectory field of the VirtualHost struct
 func (VirtualHost *VirtualHost) GetInstallationDirectory() string {
 	return VirtualHost.installationDirectory
 }
 
+// Install installs a virtual host from an optional input template file path.
 func (VirtualHost *VirtualHost) Install(Templates ...string) {
 	data := map[string]string{
 		"Domain":     VirtualHost.GetDomain(),
-		"ServerRoot": VirtualHost.GetUri(),
+		"ServerRoot": VirtualHost.GetURI(),
 	}
 	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetDomain() + ".conf"
 	buffer := []byte{}
@@ -106,6 +119,7 @@ func (VirtualHost *VirtualHost) Install(Templates ...string) {
 	}
 }
 
+// Uninstall un-installs a virtual host.
 func (VirtualHost *VirtualHost) Uninstall() {
 	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetDomain() + ".conf"
 	_, statErr := os.Stat(filename)
@@ -122,23 +136,25 @@ func (VirtualHost *VirtualHost) Uninstall() {
 
 }
 
+// Reinstall re-installs a virtual host.
 func (VirtualHost *VirtualHost) Reinstall() {
 	VirtualHost.Uninstall()
 	VirtualHost.Install()
 
 }
 
+// GetStatus returns the installation status of a virtual host
 func (VirtualHost *VirtualHost) GetStatus() bool {
-	_, err := os.Stat(VirtualHost.installationDirectory + "/" + VirtualHost.GetUri() + ".conf")
+	_, err := os.Stat(VirtualHost.installationDirectory + "/" + VirtualHost.GetURI() + ".conf")
 	if err != nil {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
+// PrintStatus Prints the installation status of a virtual host.
 func (VirtualHost *VirtualHost) PrintStatus() {
-	_, err := os.Stat(VirtualHost.installationDirectory + "/" + VirtualHost.GetUri() + ".conf")
+	_, err := os.Stat(VirtualHost.installationDirectory + "/" + VirtualHost.GetURI() + ".conf")
 	if err != nil {
 		fmt.Println("false")
 	} else {

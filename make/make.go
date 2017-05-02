@@ -6,7 +6,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// Utility function to replace all instances of a string in a file.
+// ReplaceTextInFile is a utility function to replace all instances of a string in a file.
 func ReplaceTextInFile(fullPath string, oldString string, newString string) {
 	read, err := ioutil.ReadFile(fullPath)
 	if err != nil {
@@ -28,7 +28,7 @@ func ReplaceTextInFile(fullPath string, oldString string, newString string) {
 	}
 }
 
-// Function to run a command to restart the given web service.
+// RestartWebServer is a function to run a command to restart the given web service.
 func (Site *Site) RestartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "restart").Output()
 	if stdErr != nil {
@@ -38,7 +38,7 @@ func (Site *Site) RestartWebServer() {
 	}
 }
 
-// Function to run a command to start the given web service.
+// StartWebServer is a function to run a command to start the given web service.
 func (Site *Site) StartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "start").Output()
 	if stdErr != nil {
@@ -48,7 +48,7 @@ func (Site *Site) StartWebServer() {
 	}
 }
 
-// Function to run a command to stop the given web service.
+// StopWebServer is a function to run a command to stop the given web service.
 func (Site *Site) StopWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "stop").Output()
 	if stdErr != nil {
@@ -58,7 +58,7 @@ func (Site *Site) StopWebServer() {
 	}
 }
 
-// A struct which represents a Drupal project on drupal.org
+// DrupalProject struct which represents a Drupal project on drupal.org
 type DrupalProject struct {
 	Type   string
 	Name   string
@@ -66,7 +66,7 @@ type DrupalProject struct {
 	Status bool
 }
 
-// A struct which represents a build website being used.
+// Site struct which represents a build website being used.
 type Site struct {
 	Timestamp                  string
 	Path                       string
@@ -83,7 +83,7 @@ type Site struct {
 	WorkingCopy                bool
 }
 
-// Instantiate an instance of the struct Site
+// NewSite instantiates an instance of the struct Site
 func NewSite(make, name, path, alias, webserver, domain, vhostpath, template string) *Site {
 	Site := &Site{}
 	Site.TimeStampReset()
@@ -101,7 +101,7 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 	return Site
 }
 
-// Superseded build action, requires action, documentation or removal.
+// ActionBuild is a superseded build action, requires action, documentation or removal.
 func (Site *Site) ActionBuild() {
 	// TODO: Define purpose with the existence of ProcessMake()
 	if Site.AliasExists(Site.Name) == true {
@@ -111,7 +111,7 @@ func (Site *Site) ActionBuild() {
 	}
 }
 
-// Run drush site-install on a Site struct
+// ActionInstall runs drush site-install on a Site struct
 func (Site *Site) ActionInstall() {
 	// Obtain a string value from the Port value in db config.
 	stringPort := fmt.Sprintf("%v", Site.database.getPort())
@@ -140,7 +140,7 @@ func (Site *Site) ActionInstall() {
 	}
 }
 
-// Kill will delete a single site instance.
+// ActionKill will delete a single site instance.
 func (Site *Site) ActionKill() {
 	// What to do with the default...
 	if Site.AliasExists(Site.Name) == true {
@@ -152,7 +152,7 @@ func (Site *Site) ActionKill() {
 	}
 }
 
-// Rebuild function for site structs, needs action, documentation or purging.
+// ActionRebuild rebuild site structs, needs action, documentation or purging.
 func (Site *Site) ActionRebuild() {
 	// TODO: Define purpose with the existence of ProcessMake()
 	if Site.AliasExists(Site.Name) == true {
@@ -163,8 +163,8 @@ func (Site *Site) ActionRebuild() {
 	}
 }
 
-// Purge a specific project from a specified path, and re-download it
-// Redownloading will use drush dl, or git clone depending on availability.
+// ActionRebuildProject purges a specific project from a specified path, and re-download it
+// Re-downloading will use drush dl, or git clone depending on availability.
 func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string) {
 	log.Infoln("Searching for module/theme...")
 	moduleFound := false
@@ -232,7 +232,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	}
 }
 
-// Re-run drush make on a specified path.
+// ActionRebuildCodebase re-runs drush make on a specified path.
 func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
@@ -308,7 +308,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 }
 
-// Run drush sql-dump to a specified path on a site struct.
+// ActionDatabaseDumpLocal run drush sql-dump to a specified path on a site struct.
 func (Site *Site) ActionDatabaseDumpLocal(path string) {
 	srcAlias := strings.Replace(Site.Alias, "@", "", -1)
 	x := command.NewDrushCommand()
@@ -321,7 +321,7 @@ func (Site *Site) ActionDatabaseDumpLocal(path string) {
 	}
 }
 
-// Run drush sql-dump to a specified path on a site alias.
+// ActionDatabaseDumpRemote run drush sql-dump to a specified path on a site alias.
 func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := command.NewDrushCommand()
@@ -334,12 +334,12 @@ func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
 	}
 }
 
-// Set the database field to an inputted *makeDB struct.
+// DatabaseSet sets the database field to an inputted *makeDB struct.
 func (Site *Site) DatabaseSet(database *makeDB) {
 	Site.database = database
 }
 
-// Returns a list of databases associated to local builds from the site struct
+// DatabasesGet returns a list of databases associated to local builds from the site struct
 func (Site *Site) DatabasesGet() []string {
 	values, _ := exec.Command("mysql", "--user="+Site.database.dbUser, "--password="+Site.database.dbPass, "-e", "show databases").Output()
 	databases := strings.Split(string(values), "\n")
@@ -352,7 +352,7 @@ func (Site *Site) DatabasesGet() []string {
 	return siteDbs
 }
 
-// Installs a symlink to the site directory of the site struct
+// SymInstall installs a symlink to the site directory of the site struct
 func (Site *Site) SymInstall() {
 	Target := filepath.Join(Site.Name + Site.TimeStampGet())
 	Symlink := filepath.Join(Site.Path, Site.Domain+".latest")
@@ -364,7 +364,7 @@ func (Site *Site) SymInstall() {
 	}
 }
 
-// Removes a symlink to the site directory of the site struct
+// SymUninstall removes a symlink to the site directory of the site struct
 func (Site *Site) SymUninstall() {
 	Symlink := Site.Domain + ".latest"
 	_, statErr := os.Stat(Site.Path + "/" + Symlink)
@@ -378,34 +378,34 @@ func (Site *Site) SymUninstall() {
 	}
 }
 
-// Re-installs a symlink to the site directory of the site struct
+// SymReinstall re-installs a symlink to the site directory of the site struct
 func (Site *Site) SymReinstall() {
 	Site.SymUninstall()
 	Site.SymInstall()
 }
 
-// Returns the timestamp variable for the site struct
+// TimeStampGet returns the timestamp variable for the site struct
 func (Site *Site) TimeStampGet() string {
 	return Site.Timestamp
 }
 
-// Sets the timestamp field for the site struct to a given value
+// TimeStampSet sets the timestamp field for the site struct to a given value
 func (Site *Site) TimeStampSet(value string) {
 	Site.Timestamp = fmt.Sprintf(".%v", value)
 }
 
-// Sets the timestamp field for the site struct to a new value
+// TimeStampReset sets the timestamp field for the site struct to a new value
 func (Site *Site) TimeStampReset() {
 	now := time.Now()
 	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
 }
 
-// Generates a new timestamp and returns it, does not latch to site struct
+// TimeStampGenerate generates a new timestamp and returns it, does not latch to site struct
 func (Site *Site) TimeStampGenerate() string {
 	return fmt.Sprintf(".%v", time.Now().Format("20060102150405"))
 }
 
-// Requires documentation, @TODO for revisitation.
+// VerifyProcessedMake requires documentation, @TODO for revisitation.
 func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
 	unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(makeFile)
 	Projects := make([]DrupalProject, 50)
@@ -458,7 +458,7 @@ func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
 	return Projects
 }
 
-// Processes a make file at a particular path.
+// ProcessMake processes a make file at a particular path.
 func (Site *Site) ProcessMake(makeFile string) bool {
 
 	// Test the make file exists
@@ -499,7 +499,7 @@ func (Site *Site) ProcessMake(makeFile string) bool {
 	return true
 }
 
-// Installs the Drupal multisite sites.php file for the site struct.
+// InstallSiteRef installs the Drupal multisite sites.php file for the site struct.
 func (Site *Site) InstallSiteRef() {
 
 	data := map[string]string{
@@ -541,7 +541,7 @@ func (Site *Site) InstallSiteRef() {
 	defer nf.Close()
 }
 
-// Installs a basic private file system for the site struct.
+// InstallPrivateFileSystem installs a basic private file system for the site struct.
 func (Site *Site) InstallPrivateFileSystem() {
 	// Test the file system, create it if it doesn't exist!
 	dirPath := fmt.Sprintf("%v/%v%v/sites/%v/private", Site.Path, Site.Name, Site.Timestamp, Site.Name)
@@ -576,8 +576,8 @@ func (Site *Site) InstallPrivateFileSystem() {
 	}
 }
 
-// Reinstall and verify the ctools cache folder for the site struct.
-func (Site *Site) ReInstallCToolsCache() {
+// ReplaceTextInFile reinstalls and verifies the ctools cache folder for the site struct.
+func (Site *Site) ReplaceTextInFile() {
 	// We need to remove and re-add the ctools cache directory as 0777.
 	cToolsDir := fmt.Sprintf("%v/%v%v/sites/%v/files/ctools", Site.Path, Site.Name, Site.Timestamp, Site.Name)
 	// Remove the directory!
