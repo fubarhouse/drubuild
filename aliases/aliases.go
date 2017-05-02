@@ -12,7 +12,7 @@ type AliasList struct {
 	value []*alias.Alias
 }
 
-// Instantiate AliasList struct
+// NewAliasList will instantiate an AliasList struct
 func NewAliasList() *AliasList {
 	return &AliasList{}
 }
@@ -51,7 +51,7 @@ func (list *AliasList) Filter(key string) {
 	*list = *newList
 }
 
-// Return how many aliases are in the AliasList
+// Count will return how many aliases are in the AliasList
 func (list *AliasList) Count() int {
 	count := 0
 	for _, thisAlias := range list.value {
@@ -61,7 +61,7 @@ func (list *AliasList) Count() int {
 	return count
 }
 
-// Get a list of alias names from the AliasList items
+// GetNames gets a list of alias names from the AliasList items
 func (list *AliasList) GetNames() []string {
 	returnVals := []string{}
 	for _, val := range list.value {
@@ -70,7 +70,7 @@ func (list *AliasList) GetNames() []string {
 	return returnVals
 }
 
-// Get alias uri fields from AliasList items
+// GetAliasNames gets alias uri fields from AliasList items
 func (list *AliasList) GetAliasNames() []string {
 	returnVals := []string{}
 	for _, val := range list.value {
@@ -79,7 +79,7 @@ func (list *AliasList) GetAliasNames() []string {
 	return returnVals
 }
 
-// Get value field from AliasList items
+// GetAliases gets value field from AliasList items
 func (list *AliasList) GetAliases() *AliasList {
 	returnVals := NewAliasList()
 	for _, val := range list.value {

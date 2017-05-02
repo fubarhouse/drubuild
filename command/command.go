@@ -9,22 +9,22 @@ import (
 	"strings"
 )
 
+// Command is our structured data/object for Command
 type Command struct {
-	// Our structured data/object for Command
 	alias      string
 	command    string
 	verbose    bool
 	workingdir string
 }
 
-const PATH_DRUSH = "/usr/local/bin/drush"
+const pathDrush = "/usr/local/bin/drush"
 
-// Creates a new container for []Command objects
+// NewDrushCommand creates a new container for []Command objects
 func NewDrushCommand() *Command {
 	return &Command{}
 }
 
-// Changes all given values for a Drush command object.
+// Set changes all given values for a Drush command object.
 func (drush *Command) Set(alias string, command string, verbose bool) {
 	drush.alias = alias
 	drush.command = command
@@ -32,47 +32,47 @@ func (drush *Command) Set(alias string, command string, verbose bool) {
 	drush.workingdir = "."
 }
 
-// Returns the specified working directory used with executed Drush commands.
+// GetWorkingDir returns the specified working directory used with executed Drush commands.
 func (drush *Command) GetWorkingDir() string {
 	return drush.workingdir
 }
 
-// Sets the specified working directory used with executed Drush commands.
+// SetWorkingDir sets the specified working directory used with executed Drush commands.
 func (drush *Command) SetWorkingDir(value string) {
 	drush.workingdir = value
 }
 
-// Returns the alias used to executed Drush commands.
+// GetAlias returns the alias used to executed Drush commands.
 func (drush *Command) GetAlias() string {
 	return drush.alias
 }
 
-// Changes the alias used to executed Drush commands.
+// SetAlias changes the alias used to executed Drush commands.
 func (drush *Command) SetAlias(value string) {
 	drush.alias = value
 }
 
-// Returns the command string on executed Drush commands.
+// GetCommand returns the command string on executed Drush commands.
 func (drush *Command) GetCommand() string {
 	return drush.command
 }
 
-// Changes the command string on executed Drush commands.
+// SetCommand changes the command string on executed Drush commands.
 func (drush *Command) SetCommand(value string) {
 	drush.command = value
 }
 
-// Returns the verbosity setting on executed Drush commands.
+// GetVerbose returns the verbosity setting on executed Drush commands.
 func (drush *Command) GetVerbose() bool {
 	return drush.verbose
 }
 
-// Changes the verbosity setting on executed Drush commands.
+// SetVerbose changes the verbosity setting on executed Drush commands.
 func (drush *Command) SetVerbose(value bool) {
 	drush.verbose = value
 }
 
-// Returns, and prints the live output of the executing program
+// LiveOutput returns, and prints the live output of the executing program
 // This will wait for completion before proceeding.
 func (drush *Command) LiveOutput() error {
 	if strings.Contains(drush.alias, "@") == true {
@@ -87,7 +87,7 @@ func (drush *Command) LiveOutput() error {
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 
 	comm := new(exec.Cmd)
-	comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args)
+	comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+pathDrush+" "+args)
 	Pipe, _ := comm.StderrPipe()
 	scanner := bufio.NewScanner(Pipe)
 	go func() {
@@ -104,13 +104,14 @@ func (drush *Command) LiveOutput() error {
 	return err
 }
 
-// Gets the output from a single Command object, does not support []Command items.
+// Output gets the output from a single Command object, does not support []Command items.
 func (drush *Command) Output() ([]string, error) {
 	comm, err := drush.Run()
 	response := filepath.SplitList(string(comm))
 	return response, err
 }
 
+// CombinedOutput will return the CombinedOutput of a command.
 func (drush *Command) CombinedOutput() ([]byte, error) {
 	if strings.Contains(drush.alias, "@") == true {
 		drush.alias = strings.Replace(drush.alias, "@", "", -1)
@@ -123,15 +124,14 @@ func (drush *Command) CombinedOutput() ([]byte, error) {
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 	if drush.GetWorkingDir() != "." {
-		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args).CombinedOutput()
-		return comm, err
-	} else {
-		comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
+		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+pathDrush+" "+args).CombinedOutput()
 		return comm, err
 	}
+	comm, err := exec.Command("sh", "-c", pathDrush+" "+args).CombinedOutput()
+	return comm, err
 }
 
-// Run an individual Command object, does not support []Command items.
+// Run runs an individual Command object, does not support []Command items.
 func (drush *Command) Run() ([]byte, error) {
 	if strings.Contains(drush.alias, "@") == true {
 		drush.alias = strings.Replace(drush.alias, "@", "", -1)
@@ -144,15 +144,14 @@ func (drush *Command) Run() ([]byte, error) {
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 	if drush.GetWorkingDir() != "." {
-		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+PATH_DRUSH+" "+args).CombinedOutput()
-		return comm, err
-	} else {
-		comm, err := exec.Command("sh", "-c", PATH_DRUSH+" "+args).CombinedOutput()
+		comm, err := exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+pathDrush+" "+args).CombinedOutput()
 		return comm, err
 	}
+	comm, err := exec.Command("sh", "-c", pathDrush+" "+args).CombinedOutput()
+	return comm, err
 }
 
-// Executes a database synchronisation task from a source to destination with the use of Drush.
+// DrushDatabaseSync executes a database synchronisation task from a source to destination with the use of Drush.
 func DrushDatabaseSync(srcAlias, destAlias string) {
 	/* So our binary and this function combined support two-way traffic...  */
 	x := NewDrushCommand()
@@ -167,7 +166,7 @@ func DrushDatabaseSync(srcAlias, destAlias string) {
 	}
 }
 
-// Executes a file synchronisation task from a source to destination with the use of Drush.
+// DrushFilesSync executes a file synchronisation task from a source to destination with the use of Drush.
 func DrushFilesSync(srcAlias, destAlias string) {
 	x := NewDrushCommand()
 	srcAlias = strings.Replace(srcAlias, "@", "", -1)
@@ -188,7 +187,7 @@ func DrushFilesSync(srcAlias, destAlias string) {
 	}
 }
 
-// Performs a cache clear task on an input site alias with the use of Drush.
+// DrushClearCache performs a cache clear task on an input site alias with the use of Drush.
 func DrushClearCache(alias string) {
 	drushCommand := NewDrushCommand()
 	drushCommand.Set(alias, "cc all", false)
@@ -200,7 +199,7 @@ func DrushClearCache(alias string) {
 	}
 }
 
-// Performs a registry rebuild task on an input site alias with the use of Drush.
+// DrushRebuildRegistry performs a registry rebuild task on an input site alias with the use of Drush.
 func DrushRebuildRegistry(alias string) {
 	drushCommand := NewDrushCommand()
 	drushCommand.Set(alias, "rr", false)
@@ -212,7 +211,7 @@ func DrushRebuildRegistry(alias string) {
 	}
 }
 
-// Performs a database update task on an input site alias with the use of Drush.
+// DrushUpdateDatabase performs a database update task on an input site alias with the use of Drush.
 func DrushUpdateDatabase(alias string) {
 	drushCommand := NewDrushCommand()
 	drushCommand.Set(alias, "updb -y", false)
@@ -224,7 +223,7 @@ func DrushUpdateDatabase(alias string) {
 	}
 }
 
-// Performs a database update task on an input site alias with the use of Drush.
+// DrushDownloadToPath performs a database update task on an input site alias with the use of Drush.
 func DrushDownloadToPath(path, project string) {
 	drushCommand := NewDrushCommand()
 	drushCommand.Set("", "pm-download --yes "+project+" --destination="+path, false)
@@ -236,7 +235,7 @@ func DrushDownloadToPath(path, project string) {
 	}
 }
 
-// Performs a database update task on an input site alias with the use of Drush.
+// DrushDownloadToAlias performs a database update task on an input site alias with the use of Drush.
 func DrushDownloadToAlias(alias, project string) {
 	drushCommand := NewDrushCommand()
 	drushCommand.Set(alias, "pm-download --yes "+project, false)

@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-// Destroy all databases associated to the site struct.
+// ActionDestroyDatabases will destroy all databases associated to the site struct.
 func (Site *Site) ActionDestroyDatabases() {
 	var dbDeleteCount int
 	for _, database := range Site.DatabasesGet() {
@@ -30,17 +30,17 @@ func (Site *Site) ActionDestroyDatabases() {
 	}
 }
 
-// API call for alias un-installation.
+// ActionDestroyAlias is an API call for alias un-installation.
 func (Site *Site) ActionDestroyAlias() {
 	Site.AliasUninstall()
 }
 
-// API call for virtual-host un-installation.
+// ActionDestroyVhost is an API call for virtual-host un-installation.
 func (Site *Site) ActionDestroyVhost() {
 	Site.VhostUninstall()
 }
 
-// API call for site file system un-installation.
+// ActionDestroyPermissions is an API call for site file system un-installation.
 func (Site *Site) ActionDestroyPermissions() {
 	privateFilesPath := Site.Path
 	_, statErr := os.Stat(privateFilesPath)
@@ -60,12 +60,12 @@ func (Site *Site) ActionDestroyPermissions() {
 	}
 }
 
-// API call for symlink un-installation.
+// ActionDestroySym is an API call for symlink un-installation.
 func (Site *Site) ActionDestroySym() {
 	Site.SymUninstall()
 }
 
-// API call for file system removal.
+// ActionDestroyFiles is an API call for file system removal.
 func (Site *Site) ActionDestroyFiles() {
 	_, statErr := os.Stat(Site.Path)
 	if statErr == nil {
@@ -80,7 +80,7 @@ func (Site *Site) ActionDestroyFiles() {
 	}
 }
 
-// API call for site removal.
+// ActionDestroy is an API call for site removal.
 func (Site *Site) ActionDestroy() {
 	// Destroy will remove all traces of said site.
 	Site.ActionDestroyDatabases()
