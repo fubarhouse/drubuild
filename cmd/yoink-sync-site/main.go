@@ -13,8 +13,8 @@ func main() {
 	var SourceAlias = flag.String("source-alias", "", "Alias of source site")
 	var DestAlias = flag.String("dest-alias", "", "Alias of destination site")
 	var Forbidden = flag.String("forbid", "", "For automation/security purposes, do not allow destination aliases to contain this string.")
-	var SyncDB = flag.Bool("db", false, "Mark database for syncronization")
-	var SyncFiles = flag.Bool("files", false, "Mark files for syncronization")
+	var SyncDB = flag.Bool("db", false, "Mark database for synchronization")
+	var SyncFiles = flag.Bool("files", false, "Mark files for synchronization")
 
 	// Usage:
 	// -local-alias="mysite.dev" \

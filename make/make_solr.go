@@ -265,9 +265,9 @@ func (SolrCore *SolrCore) _createCore() bool {
 			_, err = ioutil.ReadAll(response.Body)
 			response.Body.Close()
 			if err == nil {
-				fmt.Sprint("Creation command completed successfully.")
+				log.Infoln("Creation command completed successfully.")
 			} else {
-				fmt.Sprint("Creation command could not complete:", err)
+				log.Errorln("Creation command could not complete:", err)
 			}
 			if SolrCore.VerifyCore() {
 				log.Infoln("Solr core installation succeeded.")

@@ -282,7 +282,6 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		err := new(error)
 		for _, name := range realpath {
 			if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
-				fmt.Sprintf(name)
 				if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
 					os.Chmod(path, 0777)
 					delErr := os.RemoveAll(path)

@@ -50,9 +50,7 @@ func (list *SiteList) Remove(remove string) {
 	aliasesFiltered := aliases.NewAliasList()
 	for _, thisAlias := range list.GetList() {
 		//alias = strings.Replace(alias,deleteString, "", -1)
-		if strings.Contains(thisAlias, remove) {
-			fmt.Sprint("Not adding", thisAlias)
-		} else {
+		if !strings.Contains(thisAlias, remove) {
 			newAlias := alias.NewAlias(thisAlias, "", thisAlias)
 			aliasesFiltered.Add(newAlias)
 		}
@@ -70,8 +68,6 @@ func (list *SiteList) FilterBy(filter string) {
 		if strings.Contains(thisAlias, filter) {
 			newAlias := alias.NewAlias(thisAlias, "", thisAlias)
 			aliasesFiltered.Add(newAlias)
-		} else {
-			fmt.Sprint("Not adding", thisAlias)
 		}
 	}
 	list.value = aliasesFiltered.GetNames()
