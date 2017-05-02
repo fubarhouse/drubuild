@@ -1,5 +1,7 @@
 # Drush
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/golang-drush)](https://goreportcard.com/report/github.com/fubarhouse/golang-drush)
+
 A wide array of tools designed for system and drush specific use during scripting and dev-ops.
 
 **Package rundown**:

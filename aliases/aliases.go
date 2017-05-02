@@ -7,23 +7,23 @@ import (
 	"strings"
 )
 
+// AliasList struct to contain a slice of Alias structs
 type AliasList struct {
-	// A simple Alias List for attaching methods.
 	value []*alias.Alias
 }
 
+// Instantiate AliasList struct
 func NewAliasList() *AliasList {
-	// Create a new but empty Alias List
 	return &AliasList{}
 }
 
+// Add an alias to an AliasList
 func (list *AliasList) Add(item *alias.Alias) {
-	// Add an alias to the alias list.
 	list.value = append(list.value, item)
 }
 
+// Generate an AliasList from a given key from all available aliases
 func (list *AliasList) Generate(key string) {
-	// Add a set of aliases to an Alias List based of a string value.
 	sites := command.NewDrushCommand()
 	sites.Set("", "sa", false)
 	values, _ := sites.Output()
@@ -36,8 +36,8 @@ func (list *AliasList) Generate(key string) {
 	}
 }
 
+// Filter an AliasList by a given key.
 func (list *AliasList) Filter(key string) {
-	// Filter an existing list with a key string
 	values := list.GetNames()
 	newList := NewAliasList()
 	for _, currAlias := range values {
@@ -51,6 +51,7 @@ func (list *AliasList) Filter(key string) {
 	*list = *newList
 }
 
+// Return how many aliases are in the AliasList
 func (list *AliasList) Count() int {
 	count := 0
 	for _, thisAlias := range list.value {
@@ -60,8 +61,8 @@ func (list *AliasList) Count() int {
 	return count
 }
 
+// Get a list of alias names from the AliasList items
 func (list *AliasList) GetNames() []string {
-	// Return values from the Alias List object
 	returnVals := []string{}
 	for _, val := range list.value {
 		returnVals = append(returnVals, val.GetName())
@@ -69,8 +70,8 @@ func (list *AliasList) GetNames() []string {
 	return returnVals
 }
 
+// Get alias uri fields from AliasList items
 func (list *AliasList) GetAliasNames() []string {
-	// Return values from the Alias List object
 	returnVals := []string{}
 	for _, val := range list.value {
 		returnVals = append(returnVals, val.GetUri())
@@ -78,8 +79,8 @@ func (list *AliasList) GetAliasNames() []string {
 	return returnVals
 }
 
+// Get value field from AliasList items
 func (list *AliasList) GetAliases() *AliasList {
-	// Return values from the Alias List object
 	returnVals := NewAliasList()
 	for _, val := range list.value {
 		returnVals.value = append(returnVals.value, val)

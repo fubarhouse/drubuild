@@ -8,40 +8,49 @@ import (
 	"strings"
 )
 
+// A struct for managing a single Drush Alias
 type Alias struct {
 	name string
 	path string
 	uri  string
 }
 
+// Instantiate an Alias struct
 func NewAlias(name, path, alias string) *Alias {
 	return &Alias{name, path, alias}
 }
 
+// Set the name field for an alias struct
 func (Alias *Alias) SetName(value string) {
 	Alias.name = value
 }
 
+// Get the name field for an alias struct
 func (Alias *Alias) GetName() string {
 	return Alias.name
 }
 
+// Set the uri field for an alias struct
 func (Alias *Alias) SetUri(value string) {
 	Alias.uri = value
 }
 
+// Get the uri field for an alias struct
 func (Alias *Alias) GetUri() string {
 	return Alias.uri
 }
 
+// Set the path field for an alias struct
 func (Alias *Alias) SetPath(value string) {
 	Alias.path = value
 }
 
+// Get the path field for an alias struct
 func (Alias *Alias) GetPath() string {
 	return Alias.path
 }
 
+// Install an alias from an alias struct
 func (Alias *Alias) Install() {
 	Root := Alias.GetPath()
 	if strings.HasSuffix(Root, "latest") == true {
@@ -91,6 +100,7 @@ func (Alias *Alias) Install() {
 	}
 }
 
+// Un-install an alias from an alias struct
 func (Alias *Alias) Uninstall() {
 	usr, _ := user.Current()
 	filedir := usr.HomeDir + "/.drush"
@@ -110,12 +120,14 @@ func (Alias *Alias) Uninstall() {
 
 }
 
+// Re-install an alias from an alias struct
 func (Alias *Alias) Reinstall() {
 	Alias.Uninstall()
 	Alias.Install()
 
 }
 
+// Return the installation status of an alias struct
 func (Alias *Alias) GetStatus() bool {
 	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
 	if err != nil {
@@ -125,6 +137,7 @@ func (Alias *Alias) GetStatus() bool {
 	}
 }
 
+// Print the installation status of an alias struct
 func (Alias *Alias) PrintStatus() {
 	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
 	if err != nil {
@@ -134,6 +147,8 @@ func (Alias *Alias) PrintStatus() {
 	}
 }
 
+// Local function to return the user home directory.
+// Performs some validation in the process.
 func getHome() string {
 	usr, err := user.Current()
 	if err != nil {
