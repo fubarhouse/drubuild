@@ -15,7 +15,7 @@ func TestCreateAlias(t *testing.T) {
 	if y.GetPath() != "/usr/local/bin/Test" {
 		t.Error("Test failed")
 	}
-	if y.GetUri() != "TestAlias.dev" {
+	if y.GetURI() != "TestAlias.dev" {
 		t.Error("Test failed")
 	}
 }
@@ -25,14 +25,14 @@ func TestCreateAliasSetters(t *testing.T) {
 	y := NewAlias("Test", "/usr/local/bin/Test", "TestAlias.dev")
 	y.SetName("Test")
 	y.SetPath("/usr/local/bin/Test")
-	y.SetUri("TestAlias.dev")
+	y.SetURI("TestAlias.dev")
 	if y.GetName() != "Test" {
 		t.Error("Test failed")
 	}
 	if y.GetPath() != "/usr/local/bin/Test" {
 		t.Error("Test failed")
 	}
-	if y.GetUri() != "TestAlias.dev" {
+	if y.GetURI() != "TestAlias.dev" {
 		t.Error("Test failed")
 	}
 }

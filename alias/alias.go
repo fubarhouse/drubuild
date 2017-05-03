@@ -62,17 +62,17 @@ func (Alias *Alias) Install() {
 	if strings.HasSuffix(Root, "_") == true {
 		Root = strings.TrimSuffix(Root, "_")
 	}
-	Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetUri())
+	Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetURI())
 
 	data := map[string]string{
 		"Name":   Alias.GetName(),
 		"Root":   Root,
-		"Alias":  Alias.GetUri(),
-		"Domain": Alias.GetUri(),
+		"Alias":  Alias.GetURI(),
+		"Domain": Alias.GetURI(),
 	}
 	usr, _ := user.Current()
 	filedir := usr.HomeDir + "/.drush"
-	filename := Alias.GetUri() + ".alias.drushrc.php"
+	filename := Alias.GetURI() + ".alias.drushrc.php"
 	fullpath := filedir + "/" + filename
 
 	buffer := []byte{60, 63, 112, 104, 112, 10, 36, 97, 108, 105, 97, 115, 101, 115, 91, 39, 65, 76, 73, 65, 83, 39, 93, 32, 61, 32, 97, 114, 114, 97, 121, 40, 10, 32, 32, 39, 114, 111, 111, 116, 39, 32, 61, 62, 32, 39, 82, 79, 79, 84, 39, 44, 10, 32, 32, 39, 117, 114, 105, 39, 32, 61, 62, 32, 39, 68, 79, 77, 65, 73, 78, 39, 44, 10, 32, 32, 39, 112, 97, 116, 104, 45, 97, 108, 105, 97, 115, 101, 115, 39, 32, 61, 62, 32, 97, 114, 114, 97, 121, 40, 10, 32, 32, 32, 32, 39, 37, 102, 105, 108, 101, 115, 39, 32, 61, 62, 32, 39, 115, 105, 116, 101, 115, 47, 78, 65, 77, 69, 47, 102, 105, 108, 101, 115, 39, 44, 10, 32, 32, 32, 32, 39, 37, 112, 114, 105, 118, 97, 116, 101, 39, 32, 61, 62, 32, 39, 115, 105, 116, 101, 115, 47, 78, 65, 77, 69, 47, 112, 114, 105, 118, 97, 116, 101, 39, 44, 10, 32, 32, 41, 44, 10, 41, 59, 10, 63, 62}
@@ -104,7 +104,7 @@ func (Alias *Alias) Install() {
 func (Alias *Alias) Uninstall() {
 	usr, _ := user.Current()
 	filedir := usr.HomeDir + "/.drush"
-	filename := Alias.GetUri() + ".alias.drushrc.php"
+	filename := Alias.GetURI() + ".alias.drushrc.php"
 	fullpath := filedir + "/" + filename
 	_, statErr := os.Stat(fullpath)
 	if statErr == nil {
@@ -129,7 +129,7 @@ func (Alias *Alias) Reinstall() {
 
 // GetStatus returns the installation status of an alias struct
 func (Alias *Alias) GetStatus() bool {
-	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
+	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
 	if err != nil {
 		return false
 	}
@@ -138,7 +138,7 @@ func (Alias *Alias) GetStatus() bool {
 
 // PrintStatus prints the installation status of an alias struct
 func (Alias *Alias) PrintStatus() {
-	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetUri() + ".alias.drushrc.php")
+	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
 	if err != nil {
 		fmt.Println("false")
 	} else {

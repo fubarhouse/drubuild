@@ -74,7 +74,7 @@ func (list *AliasList) GetNames() []string {
 func (list *AliasList) GetAliasNames() []string {
 	returnVals := []string{}
 	for _, val := range list.value {
-		returnVals = append(returnVals, val.GetUri())
+		returnVals = append(returnVals, val.GetURI())
 	}
 	return returnVals
 }
