@@ -174,6 +174,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	_ = filepath.Walk(Site.Path, func(path string, _ os.FileInfo, _ error) error {
 		realpath := strings.Split(string(path), "\n")
 		for _, name := range realpath {
+			fmt.Sprintln(name)
 			if strings.Contains(name, "/contrib/"+Project+"/") || strings.Contains(name, "/custom/"+Project+"/") {
 				if strings.Contains(name, "/contrib/"+Project+"/") {
 					moduleType = "contrib"
