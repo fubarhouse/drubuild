@@ -1,7 +1,6 @@
 package sites
 
 import (
-	"fmt"
 	"github.com/fubarhouse/golang-drush/alias"
 	"github.com/fubarhouse/golang-drush/aliases"
 	"strings"
