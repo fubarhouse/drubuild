@@ -333,8 +333,8 @@ func (SolrCore *SolrCore) Install() {
 	}
 }
 
-// NewCore is an API call to un-install a solr core.
-func (SolrCore *SolrCore) NewCore() {
+// Uninstall is an API call to un-install a solr core.
+func (SolrCore *SolrCore) Uninstall() {
 	SolrCore._deleteCore()
 	SolrCore._deleteTemplateData()
 }
