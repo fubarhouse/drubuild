@@ -20,6 +20,8 @@ func main() {
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
+	var FilepathPrivate = flag.String("private-files", "files/private", "Path under site directory to create private files directory.")
+	var FilepathTemporary = flag.String("temp-files", "files/private/temp", "Path under site directory to create temporary files directory.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
 	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
 	var WorkingCopy = flag.Bool("working-copy", false, "Apply --working-copy to to drush during any make processes.")
@@ -70,6 +72,9 @@ func main() {
 	if *WorkingCopy {
 		x.WorkingCopy = true
 	}
+
+	Site.FilePathPrivate = *FilepathPrivate
+	Site.FilePathTemp = *FilepathTemporary
 
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
