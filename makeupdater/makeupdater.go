@@ -31,6 +31,17 @@ func removeChar(input string, chars ...string) string {
 	return input
 }
 
+// inArray will return the quanity of specific input values in the input slice.
+func inArray(input []string, subject string) int {
+	counter := 0
+	for _, value := range input {
+		if value == subject {
+			counter++
+		}
+	}
+	return counter
+}
+
 // UpdateMake will update the version numbers in a specified make file
 func UpdateMake(fullpath string) {
 	_, err := os.Stat(fullpath)
@@ -39,6 +50,7 @@ func UpdateMake(fullpath string) {
 	}
 	projects := GetProjectsFromMake(fullpath)
 	count := 0
+	allProjects := []string{}
 	for _, project := range projects {
 		if project != "" {
 			catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
@@ -55,6 +67,10 @@ func UpdateMake(fullpath string) {
 						count++
 					}
 				}
+			}
+			allProjects = append(allProjects, project)
+			if inArray(allProjects, project) > 1 {
+				fmt.Printf("Project %v has been detected %v times.\n", project, inArray(allProjects, project))
 			}
 		}
 	}
