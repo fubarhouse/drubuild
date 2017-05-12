@@ -69,8 +69,9 @@ func UpdateMake(fullpath string) {
 				}
 			}
 			allProjects = append(allProjects, project)
-			if inArray(allProjects, project) > 1 {
-				fmt.Printf("Project %v has been detected %v times.\n", project, inArray(allProjects, project))
+			projectCounter := inArray(allProjects, project)
+			if projectCounter > 1 {
+				fmt.Printf("Project %v has been detected %v times.\n", project, projectCounter)
 			}
 		}
 	}
