@@ -188,7 +188,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 				moduleFound = true
 			}
 		}
-		return *err
+		return nil
 	})
 
 	if moduleFound {
