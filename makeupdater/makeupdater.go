@@ -43,13 +43,18 @@ func UpdateMake(fullpath string) {
 		if project != "" {
 			catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
 			z, _ := exec.Command("sh", "-c", catCmd).Output()
-			versionOld := removeChar(string(z), " ", "\"", "\n")
-			x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+project+" | grep Recommended | cut -d',' -f2").Output()
-			versionNew := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
-			if versionOld != versionNew && versionOld != "" && versionNew != "" {
-				fmt.Printf("Replacing %v v%v with v%v\n", project, versionOld, versionNew)
-				count++
-				replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionOld), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
+			for _, stream := range strings.Split(string(z), "\n") {
+				stream = strings.Replace(stream, " ", "", -1)
+				stream = strings.Replace(stream, "\"", "", -1)
+				if stream != "" {
+					x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+project+" | grep Recommended | cut -d',' -f2").Output()
+					versionNew := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
+					if !strings.Contains(stream, versionNew) {
+						fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
+						replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
+						count++
+					}
+				}
 			}
 		}
 	}
