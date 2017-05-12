@@ -80,6 +80,9 @@ type Site struct {
 	Template                   string
 	MakeFileRewriteSource      string
 	MakeFileRewriteDestination string
+	FilePathPrivate            string
+	FilePathPublic             string // For later implementation...
+	FilePathTemp               string
 	WorkingCopy                bool
 }
 
@@ -95,6 +98,9 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 	Site.Domain = domain
 	Site.Vhostpath = vhostpath
 	Site.Template = template
+	Site.FilePathPrivate = "files/private"
+	Site.FilePathPublic = "" // For later implementation
+	Site.FilePathTemp = "files/private/temp"
 	Site.MakeFileRewriteSource = ""
 	Site.MakeFileRewriteDestination = ""
 	Site.WorkingCopy = false
@@ -555,24 +561,24 @@ func (Site *Site) InstallPrivateFileSystem() {
 			log.Infoln("Created", dirPath)
 		}
 	}
-	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/private/files", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathPrivate)
 	_, err = os.Stat(dirPath + "/" + dirPath)
 	if err != nil {
 		dirErr := os.MkdirAll(dirPath, 0755)
 		if dirErr != nil {
-			log.Errorln("Couldn't create", dirPath, dirErr)
+			log.Errorln("Couldn't create private file system at", dirPath, dirErr)
 		} else {
-			log.Infoln("Created", dirPath)
+			log.Infoln("Created private file system at", dirPath)
 		}
 	}
-	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/private/temp", Site.Path, Site.Name, Site.Timestamp, Site.Name)
+	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathTemp)
 	_, err = os.Stat(dirPath + "/" + dirPath)
 	if err != nil {
 		dirErr := os.MkdirAll(dirPath, 0755)
 		if dirErr != nil {
-			log.Errorln("Couldn't create", dirPath, dirErr)
+			log.Errorln("Couldn't create temporary file system at", dirPath, dirErr)
 		} else {
-			log.Infoln("Created", dirPath)
+			log.Infoln("Created temporary file system at", dirPath)
 		}
 	}
 }
