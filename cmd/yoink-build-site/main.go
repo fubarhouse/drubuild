@@ -73,8 +73,8 @@ func main() {
 		x.WorkingCopy = true
 	}
 
-	Site.FilePathPrivate = *FilepathPrivate
-	Site.FilePathTemp = *FilepathTemporary
+	x.FilePathPrivate = *FilepathPrivate
+	x.FilePathTemp = *FilepathTemporary
 
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
