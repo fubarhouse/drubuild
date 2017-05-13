@@ -551,8 +551,8 @@ func (Site *Site) InstallSiteRef() {
 // InstallPrivateFileSystem installs a basic private file system for the site struct.
 func (Site *Site) InstallPrivateFileSystem() {
 	// Test the file system, create it if it doesn't exist!
-	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathPrivate)
-	_, err = os.Stat(dirPath + "/" + dirPath)
+	dirPath := fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathPrivate)
+	_, err := os.Stat(dirPath + "/" + dirPath)
 	if err != nil {
 		dirErr := os.MkdirAll(dirPath, 0755)
 		if dirErr != nil {
