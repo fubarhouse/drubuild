@@ -86,6 +86,7 @@ func main() {
 	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
 	x.InstallPrivateFileSystem()
+	x.InstallPrivateFileDrush()
 	x.ActionInstall()
 	x.SymReinstall()
 	x.VhostInstall()
