@@ -577,7 +577,7 @@ func (Site *Site) InstallPrivateFileSystem() {
 func (Site *Site) InstallPrivateFileDrush() {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := command.NewDrushCommand()
-	x.Set(srcAlias, fmt.Printf("vset file_private_path %v", Site.FilePathPrivate), true)
+	x.Set(srcAlias, fmt.Sprintf("vset file_private_path %v", Site.FilePathPrivate), true)
 	_, err := x.Output()
 	if err == nil {
 		log.Infoln("Succesfully set private files path via Drush")
