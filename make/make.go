@@ -573,6 +573,19 @@ func (Site *Site) InstallPrivateFileSystem() {
 	}
 }
 
+// InstallPrivateFileDrush Runs drush commands to set path variables.
+func (Site *Site) InstallPrivateFileDrush() {
+	srcAlias := strings.Replace(alias, "@", "", -1)
+	x := command.NewDrushCommand()
+	x.Set(srcAlias, fmt.Printf("vset file_private_path %v", Site.FilePathPrivate), true)
+	_, err := x.Output()
+	if err == nil {
+		log.Infoln("Succesfully set private files path via Drush")
+	} else {
+		log.Errorln("Could not set private files path via Drush")
+	}
+}
+
 // ReplaceTextInFile reinstalls and verifies the ctools cache folder for the site struct.
 func (Site *Site) ReplaceTextInFile() {
 	// We need to remove and re-add the ctools cache directory as 0777.
