@@ -215,25 +215,25 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	}
 
 	if moduleFound == false {
-		log.Infoln("Could not find", Project)
+		log.Infof("Could not find project %v in %v", Project, Site.Path)
+	}
+
+	path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
+	if moduleType == "contrib" {
+		command.DrushDownloadToPath(path, Project)
 	} else {
-		path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
-		if moduleType == "contrib" {
-			command.DrushDownloadToPath(path, Project)
-		} else {
-			gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, path+"/"+Project)
-			_, *err = gitCmd.Output()
+		gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, path+"/"+Project)
+		_, *err = gitCmd.Output()
+		if *err == nil {
+			log.Infof("Downloaded package %v from %v to %v", Project, GitPath, path+"/"+Project)
+			*err = os.RemoveAll(path + "/" + Project + "/.git")
 			if *err == nil {
-				log.Infof("Downloaded package %v from %v to %v", Project, GitPath, path+"/"+Project)
-				*err = os.RemoveAll(path + "/" + Project + "/.git")
-				if *err == nil {
-					log.Infoln("Removed .git folder from file system.")
-				} else {
-					log.Warnln("Unable to remove .git folder from file system.")
-				}
+				log.Infoln("Removed .git folder from file system.")
 			} else {
-				log.Errorf("Could not clone %v from %v: %v\n", Project, GitPath, *err)
+				log.Warnln("Unable to remove .git folder from file system.")
 			}
+		} else {
+			log.Errorf("Could not clone %v from %v: %v\n", Project, GitPath, *err)
 		}
 	}
 }
