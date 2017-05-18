@@ -217,7 +217,30 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	if moduleFound == false {
 		log.Infof("Could not find project %v in %v", Project, Site.Path)
 	}
-
+	if moduleCat == "" {
+		// By this point, we should fall back to the input make file.
+		for _, val := range Makefiles {
+			unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(val)
+			if unprocessedMakeErr != nil {
+				log.Warnf("Could not read from %v: %v", val, unprocessedMakeErr)
+			}
+			Projects := strings.Split(string(unprocessedMakes), "\n")
+			for _, ThisProject := range Projects {
+				if strings.Contains(ThisProject, "projects["+Project+"][subdir]") {
+					moduleCat = strings.Replace(ThisProject, "projects["+Project+"][subdir] = ", "", -1)
+					moduleCat = strings.Replace(ThisProject, "\"", "", -1)
+					moduleCat = strings.Replace(ThisProject, " ", "", -1)
+				}
+			}
+		}
+		if moduleCat == "" {
+			log.Warnln("Project type could not be detected.")
+		}
+	}
+	if moduleType == "" {
+		// By this point we should assume the new repository is custom.
+		moduleType = "custom"
+	}
 	path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
 	if moduleType == "contrib" {
 		command.DrushDownloadToPath(path, Project)
