@@ -259,12 +259,13 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	if moduleType == "contrib" {
 		command.DrushDownloadToPath(path, Project)
 	} else {
-		gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, path+"/"+Project)
+		clonePath := strings.Replace(path+"/"+Project, "//", "/", -1)
+		gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, clonePath)
 		_, *err = gitCmd.Output()
 		if *err == nil {
-			log.Infof("Downloaded package %v from %v to %v", Project, GitPath, path+"/"+Project)
+			log.Infof("Downloaded package %v from %v to %v", Project, GitPath, clonePath)
 			if RemoveGit {
-				*err = os.RemoveAll(path + "/" + Project + "/.git")
+				*err = os.RemoveAll(clonePath + "/.git")
 				if *err == nil {
 					log.Infoln("Removed .git folder from file system.")
 				} else {
