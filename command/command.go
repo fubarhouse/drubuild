@@ -251,16 +251,16 @@ func DrushDownloadToAlias(alias, project string) {
 func DrushVariableSet(alias, variable_name, variable_value string) {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), true)
+	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), false)
 	drushOut, err := x.Output()
 	if err == nil {
-		log.Infof("Succesfully set %v to %v via Drush\n", variable_name, variable_value)
+		log.Infof("Succesfully set %v to %v via Drush", variable_name, variable_value)
 	} else {
-		log.Errorf("Could not set %v to %v via Drush: %v\n", variable_name, variable_value, drushOut)
+		log.Errorf("Could not set %v to %v via Drush: %v", variable_name, variable_value, drushOut)
 	}
 }
 
-// DrushVariableGet Runs drush vset with a given variable name and value.
+// DrushVariableGet Runs drush vget with an exact variable name from the alias.
 func DrushVariableGet(alias, variable_name string) string {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := NewDrushCommand()
@@ -270,13 +270,13 @@ func DrushVariableGet(alias, variable_name string) string {
 	if strings.Contains(drushOutString, "No matching variable found") {
 		log.Warnf("Variable %v was not found", variable_name)
 	} else if err == nil {
-		log.Infof("Succesfully retreived %v via Drush\n", variable_name)
+		log.Infof("Succesfully retreived %v via Drush", variable_name)
 		drushOutString = strings.Replace(drushOutString, "[", "", -1)
 		drushOutString = strings.Replace(drushOutString, "]", "", -1)
 		drushOutString = strings.Replace(drushOutString, "\n", "", -1)
 		return drushOutString
 	} else {
-		log.Errorf("Could not retreived %v via Drush: %v\n", variable_name, drushOut)
+		log.Errorf("Could not retreived %v via Drush: %v", variable_name, drushOut)
 	}
 	return ""
 }
