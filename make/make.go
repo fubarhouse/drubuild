@@ -227,6 +227,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 			Projects := strings.Split(string(unprocessedMakes), "\n")
 			for _, ThisProject := range Projects {
 				if strings.Contains(ThisProject, "projects["+Project+"][subdir]") {
+					log.Infoln("This project is", ThisProject)
 					moduleCat = strings.Replace(ThisProject, "projects["+Project+"][subdir] = ", "", -1)
 					moduleCat = strings.Replace(ThisProject, "\"", "", -1)
 					moduleCat = strings.Replace(ThisProject, " ", "", -1)
@@ -235,6 +236,8 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 		}
 		if moduleCat == "" {
 			log.Warnln("Project type could not be detected.")
+		} else {
+			log.Infoln("Project category was found to be", moduleCat)
 		}
 	}
 	if moduleType == "" {
