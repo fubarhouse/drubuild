@@ -15,6 +15,7 @@ func main() {
 	var Path = flag.String("path", "", "Path to site")
 	var Project = flag.String("project", "", "Machine name of project name")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
+	var RemoveGit = flag.Bool("working-copy", true, "Remove the .git folder after this process for custom individual projects.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
 	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
 	var WorkingCopy = flag.Bool("working-copy", false, "Apply --working-copy to to drush during any make processes.")
@@ -58,7 +59,7 @@ func main() {
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 
 	if *Project != "" {
-		x.ActionRebuildProject(MakeFiles, *Project, *GitPath, *Branch)
+		x.ActionRebuildProject(MakeFiles, *Project, *GitPath, *Branch, *RemoveGit)
 	} else {
 		x.ActionRebuildCodebase(MakeFiles)
 	}
