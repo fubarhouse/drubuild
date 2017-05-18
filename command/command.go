@@ -259,3 +259,24 @@ func DrushVariableSet(alias, variable_name, variable_value string) {
 		log.Errorf("Could not set %v to %v via Drush: %v\n", variable_name, variable_value, drushOut)
 	}
 }
+
+// DrushVariableGet Runs drush vset with a given variable name and value.
+func DrushVariableGet(alias, variable_name string) string {
+	srcAlias := strings.Replace(alias, "@", "", -1)
+	x := NewDrushCommand()
+	x.Set(srcAlias, fmt.Sprintf("vget --exact %v", variable_name), false)
+	drushOut, err := x.Output()
+	drushOutString := fmt.Sprintf("%s", drushOut)
+	if strings.Contains(drushOutString, "No matching variable found") {
+		log.Warnf("Variable %v was not found", variable_name)
+	} else if err == nil {
+		log.Infof("Succesfully retreived %v via Drush\n", variable_name)
+		drushOutString = strings.Replace(drushOutString, "[", "", -1)
+		drushOutString = strings.Replace(drushOutString, "]", "", -1)
+		drushOutString = strings.Replace(drushOutString, "\n", "", -1)
+		return drushOutString
+	} else {
+		log.Errorf("Could not retreived %v via Drush: %v\n", variable_name, drushOut)
+	}
+	return ""
+}
