@@ -63,9 +63,41 @@ func main() {
 		}
 	}
 	if *FilepathVerification {
-		command.DrushVariableSet(*DestAlias, "file_public_path", *FilepathPublic)
-		command.DrushVariableSet(*DestAlias, "file_private_path", *FilepathPrivate)
-		command.DrushVariableSet(*DestAlias, "file_temporary_path", *FilepathTemporary)
+
+		// Go and find the path to prepend to paths...
+
+		y := command.NewDrushCommand()
+		y.Set("ssc.ace.education.dev", "status --format=var_export", false)
+		z, _ := y.Output()
+		var output string
+		for _, w := range z {
+			output += w
+		}
+		query := "'site' => '"
+		var actualResult string
+		outputLines := strings.Split(output, "\n")
+		for _, d := range outputLines {
+			if strings.Contains(d, query) {
+				d = strings.Replace(d, query, "", -1)
+				d = strings.Replace(d, ",", "", -1)
+				d = strings.Replace(d, "'", "", -1)
+				d = strings.Replace(d, " ", "", -1)
+				actualResult = d
+			}
+		}
+
+		public_path := command.DrushVariableGet(*DestAlias, "file_public_path")
+		private_path := command.DrushVariableGet(*DestAlias, "file_public_path")
+		temporary_path := command.DrushVariableGet(*DestAlias, "file_public_path")
+		if public_path != actualResult + "/" + *FilepathPublic {
+			command.DrushVariableSet(*DestAlias, "file_public_path", actualResult + "/" + *FilepathPublic)
+		}
+		if private_path != actualResult + "/" + *FilepathPrivate {
+			command.DrushVariableSet(*DestAlias, "file_private_path", actualResult + "/" + *FilepathPrivate)
+		}
+		if temporary_path != actualResult + "/" + *FilepathTemporary {
+			command.DrushVariableSet(*DestAlias, "file_temporary_path", actualResult + "/" + *FilepathTemporary)
+		}
 	}
 	if *SyncDB || *SyncFiles {
 		log.Infoln("Attempting to rebuild registries...")
