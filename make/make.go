@@ -171,7 +171,7 @@ func (Site *Site) ActionRebuild() {
 
 // ActionRebuildProject purges a specific project from a specified path, and re-download it
 // Re-downloading will use drush dl, or git clone depending on availability.
-func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string) {
+func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string, RemoveGit bool) {
 	log.Infoln("Searching for module/theme...")
 	moduleFound := false
 	var moduleType string
@@ -226,11 +226,13 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 		_, *err = gitCmd.Output()
 		if *err == nil {
 			log.Infof("Downloaded package %v from %v to %v", Project, GitPath, path+"/"+Project)
-			*err = os.RemoveAll(path + "/" + Project + "/.git")
-			if *err == nil {
-				log.Infoln("Removed .git folder from file system.")
-			} else {
-				log.Warnln("Unable to remove .git folder from file system.")
+			if RemoveGit {
+				*err = os.RemoveAll(path + "/" + Project + "/.git")
+				if *err == nil {
+					log.Infoln("Removed .git folder from file system.")
+				} else {
+					log.Warnln("Unable to remove .git folder from file system.")
+				}
 			}
 		} else {
 			log.Errorf("Could not clone %v from %v: %v\n", Project, GitPath, *err)
