@@ -19,7 +19,7 @@ func main() {
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
-	var FilepathPublic = flag.String("private-files", "files/private", "Path under site directory to create public files directory.")
+	var FilepathPublic = flag.String("public-files", "files/private", "Path under site directory to create public files directory.")
 	var FilepathPrivate = flag.String("private-files", "files/private", "Path under site directory to create private files directory.")
 	var FilepathTemporary = flag.String("temp-files", "files/private/temp", "Path under site directory to create temporary files directory.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
