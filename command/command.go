@@ -254,8 +254,8 @@ func DrushVariableSet(alias, variable_name, variable_value string) {
 	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), true)
 	drushOut, err := x.Output()
 	if err == nil {
-		log.Infof("Succesfully set files path %v to %v via Drush\n")
+		log.Infof("Succesfully set %v to %v via Drush\n", variable_name, variable_value)
 	} else {
-		log.Errorf("Could not set files path %v to %v via Drush %v\n", variable_value, drushOut)
+		log.Errorf("Could not set %v to %v via Drush: %v\n", variable_name, variable_value, drushOut)
 	}
 }
