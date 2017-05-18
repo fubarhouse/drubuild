@@ -217,7 +217,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	if moduleFound == false {
 		log.Infof("Could not find project %v in %v", Project, Site.Path)
 	}
-	if moduleCat == "" {
+	if moduleCat == "" || moduleType == "" {
 		// By this point, we should fall back to the input make file.
 		for _, val := range Makefiles {
 			unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(val)
@@ -227,22 +227,27 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 			Projects := strings.Split(string(unprocessedMakes), "\n")
 			for _, ThisProject := range Projects {
 				if strings.Contains(ThisProject, "projects["+Project+"][subdir] = ") {
-					log.Infoln("This project is", ThisProject)
-					moduleCat = strings.Replace(ThisProject, "projects["+Project+"][subdir] = ", "", -1)
+					moduleType = strings.Replace(ThisProject, "projects["+Project+"][subdir] = ", "", -1)
+					moduleType = strings.Replace(moduleType, "\"", "", -1)
+					moduleType = strings.Replace(moduleType, " ", "", -1)
+				}
+				if strings.Contains(ThisProject, "projects["+Project+"][type] = ") {
+					moduleCat = strings.Replace(ThisProject, "projects["+Project+"][type] = ", "", -1)
 					moduleCat = strings.Replace(moduleCat, "\"", "", -1)
 					moduleCat = strings.Replace(moduleCat, " ", "", -1)
 				}
 			}
 		}
 		if moduleCat == "" {
-			log.Warnln("Project type could not be detected.")
+			log.Warnln("Project category could not be detected.")
 		} else {
 			log.Infoln("Project category was found to be", moduleCat)
 		}
-	}
-	if moduleType == "" {
-		// By this point we should assume the new repository is custom.
-		moduleType = "custom"
+		if moduleType == "" {
+			log.Warnln("Project type could not be detected.")
+		} else {
+			log.Infoln("Project type was found to be", moduleCat)
+		}
 	}
 	path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
 	if moduleType == "contrib" {
