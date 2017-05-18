@@ -242,11 +242,17 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 			log.Warnln("Project category could not be detected.")
 		} else {
 			log.Infoln("Project category was found to be", moduleCat)
+			if moduleCat == "module" {
+				moduleCat = "modules"
+			}
+			if moduleCat == "theme" {
+				moduleCat = "themes"
+			}
 		}
 		if moduleType == "" {
 			log.Warnln("Project type could not be detected.")
 		} else {
-			log.Infoln("Project type was found to be", moduleCat)
+			log.Infoln("Project type was found to be", moduleType)
 		}
 	}
 	path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
