@@ -251,7 +251,7 @@ func DrushDownloadToAlias(alias, project string) {
 func DrushVariableSet(alias, variable_name, variable_value string) {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("vset " + variable_name + " %v", variable_value), true)
+	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), true)
 	drushOut, err := x.Output()
 	if err == nil {
 		log.Infof("Succesfully set files path %v to %v via Drush\n")
