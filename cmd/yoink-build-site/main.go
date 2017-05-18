@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
@@ -20,6 +19,7 @@ func main() {
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
+	var FilepathPublic = flag.String("private-files", "files/private", "Path under site directory to create public files directory.")
 	var FilepathPrivate = flag.String("private-files", "files/private", "Path under site directory to create private files directory.")
 	var FilepathTemporary = flag.String("temp-files", "files/private/temp", "Path under site directory to create temporary files directory.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
@@ -73,9 +73,6 @@ func main() {
 		x.WorkingCopy = true
 	}
 
-	x.FilePathPrivate = *FilepathPrivate
-	x.FilePathTemp = *FilepathTemporary
-
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 
@@ -85,14 +82,13 @@ func main() {
 	}
 	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
-	x.InstallPrivateFileSystem()
-	x.InstallPrivateFileDrush()
+	x.InstallFileSystem(*FilepathPublic)
+	x.InstallFileSystem(*FilepathPrivate)
+	x.InstallFileSystem(*FilepathTemporary)
 	x.ActionInstall()
 	x.SymReinstall()
 	x.VhostInstall()
 	x.AliasInstall()
-	command.DrushUpdateDatabase(x.Alias)
-	command.DrushRebuildRegistry(x.Alias)
 	x.StopWebServer()
 	x.StartWebServer()
 }
