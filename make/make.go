@@ -81,7 +81,7 @@ type Site struct {
 	MakeFileRewriteSource      string
 	MakeFileRewriteDestination string
 	FilePathPrivate            string
-	FilePathPublic             string // For later implementation...
+	FilePathPublic             string
 	FilePathTemp               string
 	WorkingCopy                bool
 }
@@ -546,44 +546,6 @@ func (Site *Site) InstallSiteRef() {
 		log.Infoln("Added", filename)
 	}
 	defer nf.Close()
-}
-
-// InstallPrivateFileSystem installs a basic private file system for the site struct.
-func (Site *Site) InstallPrivateFileSystem() {
-	// Test the file system, create it if it doesn't exist!
-	dirPath := fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathPrivate)
-	_, err := os.Stat(dirPath + "/" + dirPath)
-	if err != nil {
-		dirErr := os.MkdirAll(dirPath, 0755)
-		if dirErr != nil {
-			log.Errorln("Couldn't create private file system at", dirPath, dirErr)
-		} else {
-			log.Infoln("Created private file system at", dirPath)
-		}
-	}
-	dirPath = fmt.Sprintf("%v/%v%v/sites/%v/%v", Site.Path, Site.Name, Site.Timestamp, Site.Name, Site.FilePathTemp)
-	_, err = os.Stat(dirPath + "/" + dirPath)
-	if err != nil {
-		dirErr := os.MkdirAll(dirPath, 0755)
-		if dirErr != nil {
-			log.Errorln("Couldn't create temporary file system at", dirPath, dirErr)
-		} else {
-			log.Infoln("Created temporary file system at", dirPath)
-		}
-	}
-}
-
-// InstallPrivateFileDrush Runs drush commands to set path variables.
-func (Site *Site) InstallPrivateFileDrush() {
-	srcAlias := strings.Replace(Site.Alias, "@", "", -1)
-	x := command.NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("vset file_private_path %v", Site.FilePathPrivate), true)
-	drushOut, err := x.Output()
-	if err == nil {
-		log.Infoln("Succesfully set private files path via Drush")
-	} else {
-		log.Errorln("Could not set private files path via Drush", drushOut)
-	}
 }
 
 // ReplaceTextInFile reinstalls and verifies the ctools cache folder for the site struct.
