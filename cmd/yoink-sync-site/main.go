@@ -16,7 +16,7 @@ func main() {
 	var SyncDB = flag.Bool("db", false, "Mark database for synchronization")
 	var SyncFiles = flag.Bool("files", false, "Mark files for synchronization")
 	var FilepathVerification = flag.Bool("verify-files", false, "Boolean which tells yoink-sync-site to run drush vsets for file system variables, as a verification step.")
-	var FilepathPublic = flag.String("private-files", "files/private", "Path under site directory to create public files directory.")
+	var FilepathPublic = flag.String("public-files", "files/private", "Path under site directory to create public files directory.")
 	var FilepathPrivate = flag.String("private-files", "files/private", "Path under site directory to create private files directory.")
 	var FilepathTemporary = flag.String("temp-files", "files/private/temp", "Path under site directory to create temporary files directory.")
 
