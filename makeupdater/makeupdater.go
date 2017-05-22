@@ -70,7 +70,9 @@ func UpdateMake(fullpath string) {
 		}
 	}
 	if count == 0 {
-		fmt.Printf("%v is already up to date.", fullpath)
+		fmt.Printf("%v is already up to date.\n", fullpath)
+	} else {
+		fmt.Printf("Updated %v projects in %v.\n", count, fullpath)
 	}
 }
 
