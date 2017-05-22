@@ -50,7 +50,6 @@ func UpdateMake(fullpath string) {
 	}
 	projects := GetProjectsFromMake(fullpath)
 	count := 0
-	allProjects := []string{}
 	for _, project := range projects {
 		if project != "" {
 			catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
@@ -67,11 +66,6 @@ func UpdateMake(fullpath string) {
 						count++
 					}
 				}
-			}
-			allProjects = append(allProjects, project)
-			projectCounter := inArray(allProjects, project)
-			if projectCounter > 1 {
-				fmt.Printf("Project %v has been detected %v times.\n", project, projectCounter)
 			}
 		}
 	}
