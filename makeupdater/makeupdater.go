@@ -74,6 +74,26 @@ func UpdateMake(fullpath string) {
 		fmt.Printf("%v is already up to date.", fullpath)
 	}
 }
+
+// FindDuplicatesInMake will find and report Duplicate projects in Drupal make files.
+// It will not return a value.
+func FindDuplicatesInMake(makefile string) {
+	projects := GetProjectsFromMake(makefile)
+	// Run a short report containing information on all duplicates.
+	for _, project := range projects {
+		projectCounter := 0
+		if project != "" {
+			catCmd := "cat " + makefile + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
+			z, _ := exec.Command("sh", "-c", catCmd).Output()
+			for _, stream := range strings.Split(string(z), "\n") {
+				if stream != "" {
+					projectCounter ++
+				}
+			}
+			if projectCounter > 1 {
+				fmt.Printf("Found %v instances of project %v\n", projectCounter, project)
+			}
+		}
 	}
 }
 
