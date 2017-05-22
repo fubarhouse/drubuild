@@ -14,6 +14,7 @@ func main() {
 		Makes := strings.Split(*strMake, ",")
 		for _, Makefile := range Makes {
 			makeupdater.UpdateMake(Makefile)
+			makeupdater.FindDuplicatesInMake(Makefile)
 		}
 	} else {
 		log.Infoln("Invalid make file input")
