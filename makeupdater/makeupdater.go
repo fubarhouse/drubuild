@@ -89,7 +89,9 @@ func GetProjectsFromMake(fullpath string) []string {
 	for _, project := range rawProjects {
 		project = strings.Replace(project, " ", "", -1)
 		if project != "" && project != "projects" {
-			Projects = append(Projects, project)
+			if inArray(Projects, project) == 0 {
+				Projects = append(Projects, project)
+			}
 		}
 	}
 	return Projects
