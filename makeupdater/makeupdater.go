@@ -69,7 +69,6 @@ func UpdateMake(fullpath string) {
 			}
 		}
 	}
-	FindDuplicatesInMake(fullpath)
 	if count == 0 {
 		fmt.Printf("%v is already up to date.", fullpath)
 	}
