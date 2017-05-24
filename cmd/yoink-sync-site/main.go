@@ -67,7 +67,7 @@ func main() {
 		// Go and find the path to prepend to paths...
 
 		y := command.NewDrushCommand()
-		y.Set("ssc.ace.education.dev", "status --format=var_export", false)
+		y.Set(*DestAlias, "status --format=var_export", false)
 		z, _ := y.Output()
 		var output string
 		for _, w := range z {
