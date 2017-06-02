@@ -82,9 +82,9 @@ func main() {
 	}
 	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
-	x.InstallFileSystem(x.Domain + ".latest" + "/sites/" + x.Name + "/" + *FilepathPublic)
-	x.InstallFileSystem(x.Domain + ".latest" + "/sites/" + x.Name + "/" + *FilepathPrivate)
-	x.InstallFileSystem(x.Domain + ".latest" + "/sites/" + x.Name + "/" + *FilepathTemporary)
+	x.InstallFileSystem(*FilepathPublic)
+	x.InstallFileSystem(*FilepathPrivate)
+	x.InstallFileSystem(*FilepathTemporary)
 	x.ActionInstall()
 	x.SymReinstall()
 	x.VhostInstall()

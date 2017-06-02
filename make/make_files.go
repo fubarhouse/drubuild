@@ -5,12 +5,13 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"os"
 	"strings"
+	"time"
 )
 
 // InstallFileSystem installs a basic private file system for any given input.
 func (Site *Site) InstallFileSystem(DirectoryPath string) {
 	// Test the file system, create it if it doesn't exist!
-	dirPath := fmt.Sprintf(strings.Join([]string{Site.Path, DirectoryPath}, "/"))
+	dirPath := fmt.Sprintf(strings.Join([]string{Site.Path, Site.Domain + ".latest", "sites", Site.Name, DirectoryPath}, "/"))
 	_, err := os.Stat(dirPath + "/" + dirPath)
 	if err != nil {
 		dirErr := os.MkdirAll(dirPath, 0755)
@@ -18,6 +19,7 @@ func (Site *Site) InstallFileSystem(DirectoryPath string) {
 			log.Errorln("Couldn't create file system at", dirPath, dirErr)
 		} else {
 			log.Infoln("Created file system at", dirPath)
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
