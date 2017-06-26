@@ -15,7 +15,7 @@ import (
 func main() {
 	var strAliases = flag.String("aliases", "", "comma-separated list of aliases for action")
 	var strPattern = flag.String("pattern", "%v", "A modifier which allows rewriting of aliases replacing '%v' in the pattern with the alias.")
-	var strUser = flag.String("users", "", "User name for validation, example 'Firstname Sirname'")
+	var strUser = flag.String("user", "", "User name for validation, example 'Firstname Sirname'")
 	var strRole = flag.String("role", "", "The role name to add to the user, if the user isn't a part of that role.")
 	var strPassword = flag.String("password", "", "Password to reset to - what the password for each account should be.")
 	var strEmail = flag.String("email", "", "Email to reset to - what the email for each account should be.")
