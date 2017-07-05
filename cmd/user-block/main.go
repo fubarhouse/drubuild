@@ -42,11 +42,15 @@ func main() {
 			UserGroup := user.NewDrupalUserGroup()
 			UserGroup.Populate(Alias)
 			User := UserGroup.GetUser(*strUser)
-			if User.State == 1 {
-				User.State = 0
-				User.StateChange()
+			if User.Name == *strUser {
+				if User.State == 1 {
+					User.State = 0
+					User.StateChange()
+				} else {
+					log.Infof("User '%v' is already blocked on %v", User.Name, Alias)
+				}
 			} else {
-				log.Infof("User '%v' is already blocked on %v", User.Name, Alias)
+				log.Infof("User '%v' was not found on %v", User.Name, Alias)
 			}
 		}
 	} else {
