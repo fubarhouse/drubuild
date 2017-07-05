@@ -107,6 +107,20 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 	return Site
 }
 
+// ActionBackup performs a Drush archive-dump command.
+func (Site *Site) ActionBackup(destination string) {
+	if Site.AliasExists(Site.Name) == true {
+		x := command.NewDrushCommand()
+		x.Set(Site.Alias, fmt.Sprintf("archive-dump --destination='%v'", destination), true)
+		_, err := x.Output()
+		if err == nil {
+			log.Infof("Successfully backed up site %v to %v", Site.Alias, destination)
+		} else {
+			log.Infof("Could not back up site %v to %v: %v", Site.Alias, destination, err.Error())
+		}
+	}
+}
+
 // ActionBuild is a superseded build action, requires action, documentation or removal.
 func (Site *Site) ActionBuild() {
 	// TODO: Define purpose with the existence of ProcessMake()
