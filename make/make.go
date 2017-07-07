@@ -292,6 +292,31 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	}
 }
 
+func (Site *Site) CleanCodebase() {
+	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
+		realpath := strings.Split(Site.Path, "\n")
+		err := new(error)
+		for _, name := range realpath {
+			fmt.Sprintln(name)
+			if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
+				if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
+					os.Chmod(path, 0777)
+					delErr := os.RemoveAll(path)
+					if delErr != nil {
+						log.Warnln("Could not remove", path)
+					}
+				} else if !Info.IsDir() {
+					delErr := os.Remove(path)
+					if delErr != nil {
+						log.Warnln("Could not remove", path)
+					}
+				}
+			}
+		}
+		return *err
+	})
+}
+
 // ActionRebuildCodebase re-runs drush make on a specified path.
 func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
@@ -329,37 +354,13 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 
 	writer.Flush()
-
 	chmodErr := os.Chmod(Site.Path, 0777)
 	if chmodErr != nil {
 		log.Warnln("Could not change permissions on codebase directory")
 	} else {
 		log.Infoln("Changed docroot permissions to 0777 for file removal.")
 	}
-
-	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
-		realpath := strings.Split(Site.Path, "\n")
-		err := new(error)
-		for _, name := range realpath {
-			fmt.Sprintln(name)
-			if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
-				if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
-					os.Chmod(path, 0777)
-					delErr := os.RemoveAll(path)
-					if delErr != nil {
-						log.Warnln("Could not remove", path)
-					}
-				} else if !Info.IsDir() {
-					delErr := os.Remove(path)
-					if delErr != nil {
-						log.Warnln("Could not remove", path)
-					}
-				}
-			}
-		}
-		return *err
-	})
-
+	Site.CleanCodebase()
 	Site.ProcessMake(newMakeFilePath)
 	err := os.Remove(newMakeFilePath)
 	if err != nil {
