@@ -61,10 +61,10 @@ func UpdateMake(fullpath string) {
 				for _, stream := range strings.Split(string(z), "\n") {
 					stream = strings.Replace(stream, "\"", "", -1)
 					stream = strings.Replace(stream, " ", "", -1)
-					if stream != "" {
+					if fmt.Sprintf("%v", stream) != "" {
 						x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+project+" | grep Recommended | cut -d',' -f2").Output()
 						versionNew := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
-						if stream != versionNew {
+						if fmt.Sprintf("%v", versionNew) != "" && stream != versionNew {
 							fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
 							replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
 							count++
@@ -95,7 +95,7 @@ func FindDuplicatesInMake(makefile string) {
 			z, _ := exec.Command("sh", "-c", catCmd).Output()
 			for _, stream := range strings.Split(string(z), "\n") {
 				if stream != "" {
-					projectCounter ++
+					projectCounter++
 				}
 			}
 			if projectCounter > 1 {
