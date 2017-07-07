@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 // replaceTextInFile will replace a string of test in a file.
@@ -50,25 +51,31 @@ func UpdateMake(fullpath string) {
 	}
 	projects := GetProjectsFromMake(fullpath)
 	count := 0
+	wg := sync.WaitGroup{}
 	for _, project := range projects {
-		if project != "" {
-			catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
-			z, _ := exec.Command("sh", "-c", catCmd).Output()
-			for _, stream := range strings.Split(string(z), "\n") {
-				stream = strings.Replace(stream, " ", "", -1)
-				stream = strings.Replace(stream, "\"", "", -1)
-				if stream != "" {
-					x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+project+" | grep Recommended | cut -d',' -f2").Output()
-					versionNew := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
-					if !strings.Contains(stream, versionNew) {
-						fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
-						replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
-						count++
+		go func(project string) {
+			wg.Add(1)
+			if project != "" {
+				catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
+				z, _ := exec.Command("sh", "-c", catCmd).Output()
+				for _, stream := range strings.Split(string(z), "\n") {
+					stream = strings.Replace(stream, " ", "", -1)
+					stream = strings.Replace(stream, "\"", "", -1)
+					if stream != "" {
+						x, _ := exec.Command("sh", "-c", "drush pm-releases --pipe "+project+" | grep Recommended | cut -d',' -f2").Output()
+						versionNew := removeChar(string(x), " ", "7.x-", "\"", "\n", "[", "]")
+						if !strings.Contains(stream, versionNew) {
+							fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
+							replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
+							count++
+						}
 					}
 				}
 			}
-		}
+			wg.Done()
+		}(project)
 	}
+	wg.Wait()
 	if count == 0 {
 		fmt.Printf("%v is already up to date.\n", fullpath)
 	} else {
