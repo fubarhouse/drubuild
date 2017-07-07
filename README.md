@@ -10,7 +10,6 @@ Golang-Drush is a suite of tools designed for use behind the terminal via script
 
 History proves that not all developers are comfortable or fo not completely embrace command-line tools and these non-interactive tools allow use in many different configurations and platforms. 
 
-
 ## Package rundown
 
 * alias:
@@ -98,6 +97,12 @@ $ go get github.com/fubarhouse/golang-drush/cmd/yoink-sync-remote-site
 $ go get github.com/fubarhouse/golang-drush/cmd/yoink-sync-site
 $ go get github.com/fubarhouse/golang-drush/cmd/yoink-validate
 ```
+
+## Author Information
+
+This product was originally created in 2016 by [Karl Hepworth](https://twitter.com/fubarhouse).
+
+Image of Go's mascot was created by [Takuya Ueda](https://twitter.com/tenntenn). Licenced under the Creative Commons 3.0 Attributions license. This image has been resized for purpose, but is otherwise unchanged.
 
 ## License
 
