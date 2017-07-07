@@ -6,6 +6,7 @@ import (
 	"github.com/fubarhouse/golang-drush/command"
 	"os"
 	"strings"
+	"sync"
 )
 
 func main() {
@@ -86,17 +87,37 @@ func main() {
 			}
 		}
 
-		public_path := command.DrushVariableGet(*DestAlias, "file_public_path")
-		private_path := command.DrushVariableGet(*DestAlias, "file_public_path")
-		temporary_path := command.DrushVariableGet(*DestAlias, "file_public_path")
-		if public_path != actualResult + "/" + *FilepathPublic {
-			command.DrushVariableSet(*DestAlias, "file_public_path", actualResult + "/" + *FilepathPublic)
-		}
-		if private_path != actualResult + "/" + *FilepathPrivate {
-			command.DrushVariableSet(*DestAlias, "file_private_path", actualResult + "/" + *FilepathPrivate)
-		}
-		if temporary_path != actualResult + "/" + *FilepathTemporary {
-			command.DrushVariableSet(*DestAlias, "file_temporary_path", actualResult + "/" + *FilepathTemporary)
+		FileSystemVars := []string{"file_public_path", "file_private_path", "file_temporary_path"}
+		wg := sync.WaitGroup{}
+		for _, FileSystemVar := range FileSystemVars {
+			go func(FileSystemVar string) {
+				value := command.DrushVariableGet(*DestAlias, FileSystemVar)
+				switch FileSystemVar {
+				case "file_public_path":
+					wg.Add(1)
+					if value != actualResult + "/" + *FilepathPublic {
+						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathPublic)
+					}
+					wg.Done()
+					break
+				case "file_private_path":
+					wg.Add(1)
+					if value != actualResult + "/" + *FilepathPrivate {
+						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathPrivate)
+					}
+					wg.Done()
+					break
+				case "file_temporary_path":
+					wg.Add(1)
+					if value != actualResult + "/" + *FilepathTemporary {
+						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathTemporary)
+					}
+					wg.Done()
+					break
+
+				}
+			}(FileSystemVar)
+			wg.Wait()
 		}
 	}
 	if *SyncDB || *SyncFiles {
