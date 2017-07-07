@@ -92,9 +92,9 @@ func main() {
 			value string
 		}
 		FileSystemVars := []FSPath{
-			FSPath{"file_public_path", actualResult + "/" + *FilepathPublic},
-			FSPath{"file_private_path", actualResult + "/" + *FilepathPrivate},
-			FSPath{"file_temporary_path", actualResult + "/" + *FilepathTemporary},
+			{"file_public_path", actualResult + "/" + *FilepathPublic},
+			{"file_private_path", actualResult + "/" + *FilepathPrivate},
+			{"file_temporary_path", actualResult + "/" + *FilepathTemporary},
 		}
 		wg := sync.WaitGroup{}
 		for _, FileSystemVar := range FileSystemVars {

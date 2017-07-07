@@ -75,7 +75,7 @@ func main() {
 			User.EmailChange()
 
 			if !User.HasRole(*strRole) {
-				 User.Roles = append(User.Roles, *strRole)
+				User.Roles = append(User.Roles, *strRole)
 			}
 
 			User.RolesAdd()

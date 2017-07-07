@@ -37,7 +37,7 @@ func (DrupalUserList *DrupalUserList) FindUser(query string) bool {
 }
 
 // GetUser returns a full user object from a NewDrupalUserGroup object including the Roles field filled in.
-func (DrupalUserList *DrupalUserList) GetUser(query string) (DrupalUser) {
+func (DrupalUserList *DrupalUserList) GetUser(query string) DrupalUser {
 	for _, User := range *DrupalUserList {
 		// Search by User Name
 		if User.Name == query {
