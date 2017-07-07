@@ -15,6 +15,55 @@ import (
 	"strings"
 )
 
+func processModules(modules []string, aliasList aliases.AliasList, boolVerbose bool) {
+	for _, module := range modules {
+		count := 0
+		thisModule := strings.Replace(module, " ", "", -1)
+		for _, value := range aliasList.GetAliasNames() {
+			cmd := command.NewDrushCommand()
+			cmd.SetAlias(value)
+			cmd.SetCommand("pm-info " + thisModule + " --fields=status")
+			output, outputErr := cmd.Run()
+			if outputErr != nil {
+				fmt.Printf("Error: (%v) %v\n", cmd.GetAlias(), outputErr)
+			}
+			if strings.Contains(string(output), "enabled") {
+				if boolVerbose {
+					log.Printf("%v installed on %v\n", thisModule, cmd.GetAlias())
+				}
+				count++
+			} else if strings.Contains(string(output), "was not found") {
+				cmdQ := command.NewDrushCommand()
+				cmdQ.SetAlias(value)
+				cmdQ.SetCommand("sql-query \"SELECT name from system where name = " + thisModule + "\"")
+				outputQ, _ := cmdQ.Run()
+				if strings.Contains(string(outputQ), thisModule) == true {
+					if boolVerbose {
+						log.Printf("Error: %v is installed and missing on %v", thisModule, cmd.GetAlias())
+					} else {
+						log.Printf("Error: %v is installed and missing on %v", thisModule, cmd.GetAlias())
+					}
+				} else {
+					if boolVerbose {
+						log.Printf("%v is not installed and missing from %v", thisModule, cmd.GetAlias())
+					}
+				}
+			} else {
+				if boolVerbose {
+					log.Printf("%v not installed on %v\n", thisModule, cmd.GetAlias())
+				}
+			}
+		}
+		if boolVerbose {
+			log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
+		} else {
+			if count >= 0 {
+				log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
+			}
+		}
+	}
+}
+
 func main() {
 	var strAliases = flag.String("aliases", "", "alias1,alias2,alias3")
 	var strModules = flag.String("modules", "", "views,features,admin_menu")
@@ -61,52 +110,7 @@ func main() {
 			thisAlias := alias.NewAlias("", "", thisAliasA)
 			aliasList.Add(thisAlias)
 		}
-		for _, module := range modules {
-			count := 0
-			thisModule := strings.Replace(module, " ", "", -1)
-			for _, value := range aliasList.GetAliasNames() {
-				cmd := command.NewDrushCommand()
-				cmd.SetAlias(value)
-				cmd.SetCommand("pm-info " + thisModule + " --fields=status")
-				output, outputErr := cmd.Run()
-				if outputErr != nil {
-					fmt.Printf("Error: (%v) %v\n", cmd.GetAlias(), outputErr)
-				}
-				if strings.Contains(string(output), "enabled") {
-					if *boolVerbose {
-						log.Printf("%v installed on %v\n", thisModule, cmd.GetAlias())
-					}
-					count++
-				} else if strings.Contains(string(output), "was not found") {
-					cmdQ := command.NewDrushCommand()
-					cmdQ.SetAlias(value)
-					cmdQ.SetCommand("sql-query \"SELECT name from system where name = " + thisModule + "\"")
-					outputQ, _ := cmdQ.Run()
-					if strings.Contains(string(outputQ), thisModule) == true {
-						if *boolVerbose {
-							log.Printf("Error: %v is installed and missing on %v", thisModule, cmd.GetAlias())
-						} else {
-							log.Printf("Error: %v is installed and missing on %v", thisModule, cmd.GetAlias())
-						}
-					} else {
-						if *boolVerbose {
-							log.Printf("%v is not installed and missing from %v", thisModule, cmd.GetAlias())
-						}
-					}
-				} else {
-					if *boolVerbose {
-						log.Printf("%v not installed on %v\n", thisModule, cmd.GetAlias())
-					}
-				}
-			}
-			if *boolVerbose {
-				log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
-			} else {
-				if count >= 0 {
-					log.Printf("%v/%v: %v\n", count, aliasList.Count(), thisModule)
-				}
-			}
-		}
+		processModules(modules, *aliasList, *boolVerbose)
 	} else {
 		flag.Usage()
 	}
