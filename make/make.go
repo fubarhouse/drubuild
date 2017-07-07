@@ -292,6 +292,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	}
 }
 
+// CleanCodebase will remove all data from the site path other than the /sites folder and contents.
 func (Site *Site) CleanCodebase() {
 	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
 		realpath := strings.Split(Site.Path, "\n")
