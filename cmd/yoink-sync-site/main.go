@@ -87,35 +87,24 @@ func main() {
 			}
 		}
 
-		FileSystemVars := []string{"file_public_path", "file_private_path", "file_temporary_path"}
+		type FSPath struct {
+			name  string
+			value string
+		}
+		FileSystemVars := []FSPath{
+			FSPath{"file_public_path", actualResult + "/" + *FilepathPublic },
+			FSPath{"file_private_path", actualResult + "/" + *FilepathPrivate },
+			FSPath{"file_temporary_path", actualResult + "/" + *FilepathTemporary },
+		}
 		wg := sync.WaitGroup{}
 		for _, FileSystemVar := range FileSystemVars {
-			go func(FileSystemVar string) {
-				value := command.DrushVariableGet(*DestAlias, FileSystemVar)
-				switch FileSystemVar {
-				case "file_public_path":
-					wg.Add(1)
-					if value != actualResult + "/" + *FilepathPublic {
-						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathPublic)
-					}
-					wg.Done()
-					break
-				case "file_private_path":
-					wg.Add(1)
-					if value != actualResult + "/" + *FilepathPrivate {
-						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathPrivate)
-					}
-					wg.Done()
-					break
-				case "file_temporary_path":
-					wg.Add(1)
-					if value != actualResult + "/" + *FilepathTemporary {
-						command.DrushVariableSet(*DestAlias, FileSystemVar, actualResult + "/" + *FilepathTemporary)
-					}
-					wg.Done()
-					break
-
+			go func(FileSystemVar FSPath) {
+				wg.Add(1)
+				value := command.DrushVariableGet(*DestAlias, FileSystemVar.name)
+				if value != FileSystemVar.value {
+					command.DrushVariableSet(*DestAlias, FileSystemVar.name, FileSystemVar.value)
 				}
+				wg.Done()
 			}(FileSystemVar)
 			wg.Wait()
 		}
