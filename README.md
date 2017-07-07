@@ -12,62 +12,62 @@ History proves that not all developers are comfortable or fo not completely embr
 
 ## Package rundown
 
-* alias:
+* alias:  
   Provides types and functions associated to managing a single Drush alias.
-* aliases
+* aliases:  
   Provides types and functions associated to grouping a collection of Drush aliases.
-* command
+* command:  
   Provides types and functions associated to execution of a Drush command, in a range of ways including live pipelines.
-* commandlist
+* commandlist:  
   Provides types and functions for grouping a list/group of Drush commands for execution.
-* make
+* make:  
   Provides many types and functions associated to the creation and removal of many aspects of Drupal sites via Drush.
-* makeupdater
+* makeupdater:  
   Provides types and functions associated to updating make files, including make file creation, recreation and generation.
-* sites
+* sites:  
   Provides types and functions for a collection of sites, such as finding an available site via `drush sa`
-* user
+* user:  
   Provides types and functions for user management, including creating, blocking and verification.
-* vhost
+* vhost:  
   Provides types and functions for creating and removing virtual hosts.
 
 ## Included binaries
 
 All of the following binaries should be used with the -h flag to invoke the usage. Usage will not be supplied here explicitly as there are a lot of binaries and a lot of potential parameters for them.
 
-* module-auditor  
+* module-auditor:  
   Uses Drush to run run a report against make files and Drush aliases.
-* rewrite-make  
+* rewrite-make:  
   Completely rewrites a make file - supports contributed make files only.
-* site-checker  
+* site-checker:  
   Binary name needs to be rewritten, but it will run a series of commands on a series of aliases matching a specified pattern and report results and verbose output if desired.
-* update-make  
+* update-make:  
   Runs through a make file with pm-info and updates version numbers to the latest available recommended version for each project.
-* user-block  
+* user-block:  
   Performs a set of actions to block a given user on aliases matching a specific pattern.
-* user-create  
+* user-create:  
   Performs a set of actions to create a given user on aliases matching a specific pattern.
-* user-unblock  
+* user-unblock:  
   Performs a set of actions to unblock a given user on aliases matching a specific pattern.
-* user-verify  
+* user-verify:  
   Performs a set of actions to validate and change the information on a given user on aliases matching a specific pattern.
-* yoink-backup-site  
+* yoink-backup-site:  
   Performs a Drush archive-dump command on an alias to a given destination
-* yoink-build-site  
+* yoink-build-site:  
   Builds a Drupal website based upon MySQL with a drush alias, virtualhosts from specified make files, and supports infinite amount of builds per site.
-* yoink-destroy-site  
+* yoink-destroy-site:  
   Removes everything put in place by the build program. 
-* yoink-rebuild-site  
+* yoink-rebuild-site:  
   Rebuilds a site without virtual hosts, aliases or anything, it will build a site at a specific location with given make files.
-* yoink-solr-build  
+* yoink-solr-build:  
   Installs a solr core with provided resource files.
-* yoink-solr-destroy  
+* yoink-solr-destroy:  
   Removes a solr core installed by the solr build program.
-* yoink-sync-remote-site  
+* yoink-sync-remote-site:  
   Syncs files and/or database between a source and destination alias.
-* yoink-sync-site  
+* yoink-sync-site:  
   Syncs files and/or database between a source and destination alias, which performs basic checks on the destination upon completion.
-* yoink-validate  
+* yoink-validate:  
   Runs some basic system tests to ensure funtionality will execute.
 
 ## Install
