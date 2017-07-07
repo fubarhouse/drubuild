@@ -254,7 +254,7 @@ func DrushVariableSet(alias, variable_name, variable_value string) {
 	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), false)
 	drushOut, err := x.Output()
 	if err == nil {
-		log.Infof("Succesfully set %v to %v via Drush", variable_name, variable_value)
+		log.Infof("Successfully set %v to %v via Drush", variable_name, variable_value)
 	} else {
 		log.Errorf("Could not set %v to %v via Drush: %v", variable_name, variable_value, drushOut)
 	}
@@ -270,7 +270,7 @@ func DrushVariableGet(alias, variable_name string) string {
 	if strings.Contains(drushOutString, "No matching variable found") {
 		log.Warnf("Variable %v was not found", variable_name)
 	} else if err == nil {
-		log.Infof("Succesfully retreived %v via Drush", variable_name)
+		log.Infof("Successfully retreived %v via Drush", variable_name)
 		drushOutString = strings.Replace(drushOutString, "[", "", -1)
 		drushOutString = strings.Replace(drushOutString, "]", "", -1)
 		drushOutString = strings.Replace(drushOutString, "\n", "", -1)
