@@ -248,35 +248,35 @@ func DrushDownloadToAlias(alias, project string) {
 }
 
 // DrushVariableSet Runs drush vset with a given variable name and value.
-func DrushVariableSet(alias, variable_name, variable_value string) {
+func DrushVariableSet(alias, variableName, variableValue string) {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variable_name, variable_value), false)
+	x.Set(srcAlias, fmt.Sprintf("vset %v %v", variableName, variableValue), false)
 	drushOut, err := x.Output()
 	if err == nil {
-		log.Infof("Successfully set %v to %v via Drush", variable_name, variable_value)
+		log.Infof("Successfully set %v to %v via Drush", variableName, variableValue)
 	} else {
-		log.Errorf("Could not set %v to %v via Drush: %v", variable_name, variable_value, drushOut)
+		log.Errorf("Could not set %v to %v via Drush: %v", variableName, variableValue, drushOut)
 	}
 }
 
 // DrushVariableGet Runs drush vget with an exact variable name from the alias.
-func DrushVariableGet(alias, variable_name string) string {
+func DrushVariableGet(alias, variableName string) string {
 	srcAlias := strings.Replace(alias, "@", "", -1)
 	x := NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("vget --exact %v", variable_name), false)
+	x.Set(srcAlias, fmt.Sprintf("vget --exact %v", variableName), false)
 	drushOut, err := x.Output()
 	drushOutString := fmt.Sprintf("%s", drushOut)
 	if strings.Contains(drushOutString, "No matching variable found") {
-		log.Warnf("Variable %v was not found", variable_name)
+		log.Warnf("Variable %v was not found", variableName)
 	} else if err == nil {
-		log.Infof("Successfully retreived %v via Drush", variable_name)
+		log.Infof("Successfully retreived %v via Drush", variableName)
 		drushOutString = strings.Replace(drushOutString, "[", "", -1)
 		drushOutString = strings.Replace(drushOutString, "]", "", -1)
 		drushOutString = strings.Replace(drushOutString, "\n", "", -1)
 		return drushOutString
 	} else {
-		log.Errorf("Could not retreived %v via Drush: %v", variable_name, drushOut)
+		log.Errorf("Could not retreived %v via Drush: %v", variableName, drushOut)
 	}
 	return ""
 }

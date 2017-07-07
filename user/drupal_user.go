@@ -9,12 +9,12 @@ import (
 
 // DrupalUser represents fields from Drupals user table, as well as roles.
 type DrupalUser struct {
-	Alias 	string
-	UID 	int
-	Name	string
-	Email	string
-	State	int
-	Roles	[]string
+	Alias string
+	UID   int
+	Name  string
+	Email string
+	State int
+	Roles []string
 }
 
 // NewDrupalUser generates a new DrupalUser object.
@@ -24,7 +24,7 @@ func NewDrupalUser() DrupalUser {
 
 // SetRoles will allocate a valid and accurate value to the Roles field in a given DrupalUser object.
 func (DrupalUser *DrupalUser) SetRoles() {
-	var RolesCommand= fmt.Sprintf("user-information '%v' --fields=roles | cut -d: -f2", DrupalUser.Name)
+	var RolesCommand = fmt.Sprintf("user-information '%v' --fields=roles | cut -d: -f2", DrupalUser.Name)
 	cmd := command.NewDrushCommand()
 	cmd.Set(DrupalUser.Alias, RolesCommand, false)
 	cmdRolesOut, cmdRolesErr := cmd.CombinedOutput()
@@ -89,7 +89,7 @@ func (DrupalUser *DrupalUser) StateChange() {
 			State = "user-unblock"
 		}
 		cmd := command.NewDrushCommand()
-		var Command= fmt.Sprintf("%v '%v'", State, DrupalUser.Name)
+		var Command = fmt.Sprintf("%v '%v'", State, DrupalUser.Name)
 		cmd.Set(DrupalUser.Alias, Command, false)
 		_, cmdErr := cmd.CombinedOutput()
 		if cmdErr != nil {
@@ -121,7 +121,7 @@ func (DrupalUser *DrupalUser) EmailChange() {
 	UserGroup.Populate(DrupalUser.Alias)
 	User := UserGroup.GetUser(DrupalUser.Name)
 	if User.Email != DrupalUser.Email && UserGroup.FindUser(DrupalUser.Name) {
-		var Command= "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + DrupalUser.Email + "' WHERE name='" + DrupalUser.Name + "';\""
+		var Command = "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + DrupalUser.Email + "' WHERE name='" + DrupalUser.Name + "';\""
 		cmd := command.NewDrushCommand()
 		cmd.Set(DrupalUser.Alias, Command, false)
 		_, cmdErr := cmd.CombinedOutput()
@@ -133,6 +133,7 @@ func (DrupalUser *DrupalUser) EmailChange() {
 	}
 }
 
+// HasRole will determine if the user has a given String in the list of roles, which will return as a Boolean.
 func (DrupalUser *DrupalUser) HasRole(Role string) bool {
 	for _, value := range DrupalUser.Roles {
 		if value == Role {
@@ -166,7 +167,7 @@ func (DrupalUser *DrupalUser) RolesAdd() {
 	}
 }
 
-// RolesAdd will remove all associated roles to the target user,
+// RolesRemove will remove all associated roles to the target user,
 // when present in the DrupalUser object.
 func (DrupalUser *DrupalUser) RolesRemove() {
 	// if not "authenticated user" {
