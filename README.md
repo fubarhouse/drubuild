@@ -26,6 +26,8 @@ History proves that not all developers are comfortable or fo not completely embr
   Provides types and functions associated to updating make files, including make file creation, recreation and generation.
 * sites:  
   Provides types and functions for a collection of sites, such as finding an available site via `drush sa`
+* solr:  
+  Provides a way to manage solr cores for installation, removal and verification.
 * user:  
   Provides types and functions for user management, including creating, blocking and verification.
 * vhost:  
@@ -74,28 +76,28 @@ All of the following binaries should be used with the -h flag to invoke the usag
 
 ### Install the entire package
 ```console
-$ go get github.com/fubarhouse/golang-drush/...
+$ go get -u github.com/fubarhouse/golang-drush/...
 ```
 
 ### Installing individual binaries
 ```console
-$ go get github.com/fubarhouse/golang-drush/cmd/module-auditor
-$ go get github.com/fubarhouse/golang-drush/cmd/rewrite-make
-$ go get github.com/fubarhouse/golang-drush/cmd/site-checker
-$ go get github.com/fubarhouse/golang-drush/cmd/update-make
-$ go get github.com/fubarhouse/golang-drush/cmd/user-block
-$ go get github.com/fubarhouse/golang-drush/cmd/user-create
-$ go get github.com/fubarhouse/golang-drush/cmd/user-unblock
-$ go get github.com/fubarhouse/golang-drush/cmd/user-verify
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-backup-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-build-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-destroy-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-rebuild-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-solr-build
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-solr-destroy
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-sync-remote-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-sync-site
-$ go get github.com/fubarhouse/golang-drush/cmd/yoink-validate
+$ go get -u github.com/fubarhouse/golang-drush/cmd/module-auditor
+$ go get -u github.com/fubarhouse/golang-drush/cmd/rewrite-make
+$ go get -u github.com/fubarhouse/golang-drush/cmd/site-checker
+$ go get -u github.com/fubarhouse/golang-drush/cmd/update-make
+$ go get -u github.com/fubarhouse/golang-drush/cmd/user-block
+$ go get -u github.com/fubarhouse/golang-drush/cmd/user-create
+$ go get -u github.com/fubarhouse/golang-drush/cmd/user-unblock
+$ go get -u github.com/fubarhouse/golang-drush/cmd/user-verify
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-backup-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-build-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-destroy-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-rebuild-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-solr-build
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-solr-destroy
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-sync-remote-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-sync-site
+$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-validate
 ```
 
 ## Author Information

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/make"
+	"github.com/fubarhouse/golang-drush/solr"
 	"os"
 )
 
@@ -38,7 +38,7 @@ func main() {
 	// Convert file mode input uint to FileMode
 	SolrUserFileMode := os.FileMode(*SolrUserMode)
 
-	SolrCore := make.SolrCore{*Address, *Binary, *Name, *Template, *Path, *SubDir, *DataDir, *ConfigFile, *SchemaFile, *SolrUserName, *SolrUserGroup, SolrUserFileMode}
+	SolrCore := solr.SolrCore{*Address, *Binary, *Name, *Template, *Path, *SubDir, *DataDir, *ConfigFile, *SchemaFile, *SolrUserName, *SolrUserGroup, SolrUserFileMode}
 	log.Infoln("Starting Solr core uninstallation task.")
 	SolrCore.Uninstall()
 }
