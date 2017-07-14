@@ -24,7 +24,7 @@ func main() {
 	flag.Parse()
 
 	// Trim each comma-separated entry.
-	*strAliases = strings.Replace(*strAliases, "  ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
 	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
 	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
 

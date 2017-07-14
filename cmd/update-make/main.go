@@ -12,7 +12,7 @@ func main() {
 	flag.Parse()
 
 	// Trim each comma-separated entry.
-	*strMake = strings.Replace(*strMake, "  ", ",",-1)
+	*strMake = strings.Replace(*strMake, "  ", " ",-1)
 	*strMake = strings.Replace(*strMake, ", ", ",",-1)
 	*strMake = strings.Replace(*strMake, " ,", ",",0)
 

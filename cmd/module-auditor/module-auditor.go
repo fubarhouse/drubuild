@@ -73,14 +73,17 @@ func main() {
 	flag.Parse()
 
 	// Trim each comma-separated entry.
+	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
 	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
 
+	*strModules = strings.Replace(*strModules, "  ", " ",-1)
 	*strModules = strings.Replace(*strModules, ", ", ",",-1)
-	*strModules = strings.Replace(*strModules, " ,", ",",0)
+	*strModules = strings.Replace(*strModules, " ,", ",",-1)
 
+	*strMakefiles = strings.Replace(*strMakefiles, "  ", " ",-1)
 	*strMakefiles = strings.Replace(*strMakefiles, ", ", ",",-1)
-	*strMakefiles = strings.Replace(*strMakefiles, " ,", ",",0)
+	*strMakefiles = strings.Replace(*strMakefiles, " ,", ",",-1)
 
 
 	var getModulesFromMake = false

@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	// Trim each comma-separated entry.
-	*strUser = strings.Replace(*strUser, "  ", ",",-1)
+	*strUser = strings.Replace(*strUser, "  ", " ",-1)
 	*strUser = strings.Replace(*strUser, ", ", ",",-1)
 	*strUser = strings.Replace(*strUser, " ,", ",",-1)
 
