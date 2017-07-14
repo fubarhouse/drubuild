@@ -72,19 +72,10 @@ func main() {
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
 
-	// Trim each comma-separated entry.
-	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
-	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
-
-	*strModules = strings.Replace(*strModules, "  ", " ",-1)
-	*strModules = strings.Replace(*strModules, ", ", ",",-1)
-	*strModules = strings.Replace(*strModules, " ,", ",",-1)
-
-	*strMakefiles = strings.Replace(*strMakefiles, "  ", " ",-1)
-	*strMakefiles = strings.Replace(*strMakefiles, ", ", ",",-1)
-	*strMakefiles = strings.Replace(*strMakefiles, " ,", ",",-1)
-
+	// Remove double spaces.
+	*strAliases = strings.Replace(*strAliases, "  ", " ", -1)
+	*strModules = strings.Replace(*strModules, "  ", " ", -1)
+	*strMakefiles = strings.Replace(*strMakefiles, "  ", " ", -1)
 
 	var getModulesFromMake = false
 	var projects []string
@@ -97,10 +88,12 @@ func main() {
 	if *strMakefiles != "" {
 		MakefileNames := strings.Split(*strMakefiles, ",")
 		for _, Makefile := range MakefileNames {
+			Makefile = strings.Trim(Makefile, " ")
 			catCmd := "cat " + Makefile + " | grep projects | cut -d'[' -f2 | cut -d']' -f1 | uniq | sort"
 			y, _ := exec.Command("sh", "-c", catCmd).Output()
 			projects = strings.Split(string(y), "\n")
 			for _, Project := range projects {
+				Project = strings.Trim(Project, " ")
 				MakeProjects = append(MakeProjects, Project)
 			}
 		}
@@ -109,7 +102,7 @@ func main() {
 		}
 	}
 
-	if (*strAliases != "" && *strModules != "") || (*strAliases != "" && getModulesFromMake == true) {
+	if (*strAliases != "" && *strModules != "") || (*strAliases != "" && getModulesFromMake) {
 		aliasList := aliases.NewAliasList()
 		aliases := strings.Split(*strAliases, ",")
 		modules := strings.Split(*strModules, ",")
@@ -117,6 +110,7 @@ func main() {
 			modules = MakeProjects
 		}
 		for _, value := range aliases {
+			value = strings.Trim(value, " ")
 			thisAliasA := strings.Replace(value, "@", "", -1)
 			thisAliasA = strings.Replace(value, " ", "", -1)
 			thisAliasA = fmt.Sprintf("@%v", thisAliasA)

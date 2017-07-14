@@ -17,10 +17,8 @@ func main() {
 	var strUser = flag.String("user", "", "User name for blocking, example 'Firstname Sirname'")
 	flag.Parse()
 
-	// Trim each comma-separated entry.
-	*strUser = strings.Replace(*strUser, "  ", " ",-1)
-	*strUser = strings.Replace(*strUser, ", ", ",",-1)
-	*strUser = strings.Replace(*strUser, " ,", ",",-1)
+	// Remove double spaces.
+	*strUser = strings.Replace(*strUser, "  ", " ", -1)
 
 	if !strings.Contains(*strPattern, "%v") {
 		log.Errorln("Specified pattern does not include alias modifier.")
@@ -43,6 +41,7 @@ func main() {
 
 	if *strAliases != "" && *strUser != "" {
 		for _, Alias := range strings.Split(*strAliases, ",") {
+			Alias = strings.Trim(Alias, " ")
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
 			UserGroup := user.NewDrupalUserGroup()
 			UserGroup.Populate(Alias)

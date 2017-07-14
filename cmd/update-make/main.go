@@ -11,14 +11,13 @@ func main() {
 	var strMake = flag.String("makes", "", "Comma-separated list of absolute paths to make files to update.")
 	flag.Parse()
 
-	// Trim each comma-separated entry.
-	*strMake = strings.Replace(*strMake, "  ", " ",-1)
-	*strMake = strings.Replace(*strMake, ", ", ",",-1)
-	*strMake = strings.Replace(*strMake, " ,", ",",-1)
+	// Remove double spaces.
+	*strMake = strings.Replace(*strMake, "  ", " ", -1)
 
 	if *strMake != "" {
 		Makes := strings.Split(*strMake, ",")
 		for _, Makefile := range Makes {
+			Makefile = strings.Trim(Makefile, " ")
 			makeupdater.UpdateMake(Makefile)
 			makeupdater.FindDuplicatesInMake(Makefile)
 		}

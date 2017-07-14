@@ -19,14 +19,9 @@ func main() {
 	var boolVerbose = flag.Bool("verbose", false, "adds raw output to end of program.")
 	flag.Parse()
 
-	// Trim each comma-separated entry.
-	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
-	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
-
-	*strCommands = strings.Replace(*strCommands, "  ", " ",-1)
-	*strCommands = strings.Replace(*strCommands, ", ", ",",-1)
-	*strCommands = strings.Replace(*strCommands, " ,", ",",-1)
+	// Remove double spaces.
+	*strAliases = strings.Replace(*strAliases, "  ", " ", -1)
+	*strCommands = strings.Replace(*strCommands, "  ", " ", -1)
 
 	var FinalOutput []string
 
@@ -46,30 +41,38 @@ func main() {
 	if *strAliases != "" && *strCommands != "" {
 		for _, Alias := range strings.Split(*strAliases, ",") {
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
+			Alias = strings.Trim(Alias, " ")
 			for _, Command := range strings.Split(*strCommands, ",") {
-				FinalOutput = append(FinalOutput, fmt.Sprintf("\n\ndrush @%v %v\n", Alias, Command))
+				Command = strings.Trim(Command, " ")
+				FinalOutput = append(FinalOutput, fmt.Sprintf("drush @%v '%v'\n", Alias, Command))
 				DrushCommand := command.NewDrushCommand()
 				DrushCommand.SetAlias(Alias)
 				DrushCommand.SetCommand(Command)
-				DrushCommandOut, DrushCommandError := DrushCommand.Output()
-				if DrushCommandError != nil {
-					log.Warnf("%v, %v, unsuccessful.", DrushCommand.GetAlias(), DrushCommand.GetCommand())
-					StdOutLines := DrushCommandOut
-					for _, StdOutLine := range StdOutLines {
-						FinalOutput = append(FinalOutput, StdOutLine)
-					}
-				} else {
-					log.Infof("%v, %v, successful.", DrushCommand.GetAlias(), DrushCommand.GetCommand())
-					StdOutLines := DrushCommandOut
-					for _, StdOutLine := range StdOutLines {
-						FinalOutput = append(FinalOutput, StdOutLine)
+				if Command != "" {
+					DrushCommandOut, DrushCommandError := DrushCommand.Output()
+					if DrushCommandError != nil {
+						log.Warnf("drush %v '%v' was unsuccessful.", DrushCommand.GetAlias(), DrushCommand.GetCommand())
+						if *boolVerbose {
+							StdOutLines := DrushCommandOut
+							for _, StdOutLine := range StdOutLines {
+								FinalOutput = append(FinalOutput, StdOutLine)
+							}
+						}
+					} else {
+						log.Infof("drush %v '%v' was successful.", DrushCommand.GetAlias(), DrushCommand.GetCommand())
+						if *boolVerbose {
+							StdOutLines := DrushCommandOut
+							for _, StdOutLine := range StdOutLines {
+								FinalOutput = append(FinalOutput, StdOutLine)
+							}
+						}
 					}
 				}
 			}
 		}
 		if *boolVerbose {
 			for _, value := range FinalOutput {
-				log.Println(value)
+				fmt.Sprintln(value)
 			}
 		}
 	} else {

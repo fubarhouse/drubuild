@@ -23,10 +23,8 @@ func main() {
 	var boolCreate = flag.Bool("create-user", false, "If required, create the user if it doesn't exist on each alias.")
 	flag.Parse()
 
-	// Trim each comma-separated entry.
-	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
-	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
+	// Remove double spaces.
+	*strAliases = strings.Replace(*strAliases, "  ", " ", -1)
 
 	if !strings.Contains(*strPattern, "%v") {
 		log.Errorln("Specified pattern does not include alias modifier.")
@@ -55,6 +53,7 @@ func main() {
 
 	if *strAliases != "" && *strUser != "" {
 		for _, Alias := range strings.Split(*strAliases, ",") {
+			Alias = strings.Trim(Alias, " ")
 			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
 			UserGroup := user.NewDrupalUserGroup()
 			UserGroup.Populate(Alias)
