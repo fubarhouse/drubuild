@@ -72,7 +72,15 @@ func main() {
 		}
 		if *boolVerbose {
 			for _, value := range FinalOutput {
-				fmt.Sprintln(value)
+				value = strings.Replace(value, "\n", "", -1)
+				value = strings.Replace(value, "\t", "", -1)
+				value = strings.Replace(value, "\r", "", -1)
+				value = fmt.Sprint(value)
+				if value == "Permission denied (publickey)." {
+					log.Warnln(value)
+				} else {
+					log.Infoln(value)
+				}
 			}
 		}
 	} else {
