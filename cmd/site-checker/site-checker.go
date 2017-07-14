@@ -22,11 +22,11 @@ func main() {
 	// Trim each comma-separated entry.
 	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
 	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
 
 	*strCommands = strings.Replace(*strCommands, "  ", " ",-1)
 	*strCommands = strings.Replace(*strCommands, ", ", ",",-1)
-	*strCommands = strings.Replace(*strCommands, " ,", ",",0)
+	*strCommands = strings.Replace(*strCommands, " ,", ",",-1)
 
 	var FinalOutput []string
 

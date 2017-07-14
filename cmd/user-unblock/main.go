@@ -20,7 +20,7 @@ func main() {
 	// Trim each comma-separated entry.
 	*strAliases = strings.Replace(*strAliases, "  ", " ",-1)
 	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
-	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",-1)
 
 	if !strings.Contains(*strPattern, "%v") {
 		log.Errorln("Specified pattern does not include alias modifier.")

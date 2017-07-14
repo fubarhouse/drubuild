@@ -43,7 +43,7 @@ func main() {
 	// Trim each comma-separated entry.
 	*Makes = strings.Replace(*Makes, "  ", " ",-1)
 	*Makes = strings.Replace(*Makes, ", ", ",",-1)
-	*Makes = strings.Replace(*Makes, " ,", ",",0)
+	*Makes = strings.Replace(*Makes, " ,", ",",-1)
 
 	if *Site == "" {
 		log.Infoln("Site input is empty")

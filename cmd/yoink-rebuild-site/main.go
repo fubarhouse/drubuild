@@ -32,7 +32,7 @@ func main() {
 	// Trim each comma-separated entry.
 	*Makes = strings.Replace(*Makes, "  ", " ",-1)
 	*Makes = strings.Replace(*Makes, ", ", ",",-1)
-	*Makes = strings.Replace(*Makes, " ,", ",",0)
+	*Makes = strings.Replace(*Makes, " ,", ",",-1)
 
 	if *Makes == "" {
 		log.Infoln("Makes input is empty")

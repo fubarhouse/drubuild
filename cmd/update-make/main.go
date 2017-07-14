@@ -14,7 +14,7 @@ func main() {
 	// Trim each comma-separated entry.
 	*strMake = strings.Replace(*strMake, "  ", " ",-1)
 	*strMake = strings.Replace(*strMake, ", ", ",",-1)
-	*strMake = strings.Replace(*strMake, " ,", ",",0)
+	*strMake = strings.Replace(*strMake, " ,", ",",-1)
 
 	if *strMake != "" {
 		Makes := strings.Split(*strMake, ",")
