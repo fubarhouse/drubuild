@@ -17,6 +17,11 @@ func main() {
 	var strUser = flag.String("user", "", "User name for blocking, example 'Firstname Sirname'")
 	flag.Parse()
 
+	// Trim each comma-separated entry.
+	*strUser = strings.Replace(*strUser, "  ", ",",-1)
+	*strUser = strings.Replace(*strUser, ", ", ",",-1)
+	*strUser = strings.Replace(*strUser, " ,", ",",-1)
+
 	if !strings.Contains(*strPattern, "%v") {
 		log.Errorln("Specified pattern does not include alias modifier.")
 		flag.Usage()

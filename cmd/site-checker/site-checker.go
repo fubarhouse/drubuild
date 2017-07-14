@@ -19,6 +19,15 @@ func main() {
 	var boolVerbose = flag.Bool("verbose", false, "adds raw output to end of program.")
 	flag.Parse()
 
+	// Trim each comma-separated entry.
+	*strAliases = strings.Replace(*strAliases, "  ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+
+	*strCommands = strings.Replace(*strCommands, "  ", ",",-1)
+	*strCommands = strings.Replace(*strAliases, ", ", ",",-1)
+	*strCommands = strings.Replace(*strAliases, " ,", ",",0)
+
 	var FinalOutput []string
 
 	if !strings.Contains(*strPattern, "%v") {

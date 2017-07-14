@@ -23,6 +23,11 @@ func main() {
 	var boolCreate = flag.Bool("create-user", true, "If required, create the user if it doesn't exist on each alias.")
 	flag.Parse()
 
+	// Trim each comma-separated entry.
+	*strAliases = strings.Replace(*strAliases, "  ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+
 	if !strings.Contains(*strPattern, "%v") {
 		log.Errorln("Specified pattern does not include alias modifier.")
 		flag.Usage()

@@ -72,6 +72,17 @@ func main() {
 	var boolVerbose = flag.Bool("verbose", false, "false")
 	flag.Parse()
 
+	// Trim each comma-separated entry.
+	*strAliases = strings.Replace(*strAliases, ", ", ",",-1)
+	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
+
+	*strModules = strings.Replace(*strModules, ", ", ",",-1)
+	*strModules = strings.Replace(*strModules, " ,", ",",0)
+
+	*strMakefiles = strings.Replace(*strMakefiles, ", ", ",",-1)
+	*strMakefiles = strings.Replace(*strMakefiles, " ,", ",",0)
+
+
 	var getModulesFromMake = false
 	var projects []string
 	var MakeProjects []string
