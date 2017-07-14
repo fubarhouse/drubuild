@@ -25,8 +25,8 @@ func main() {
 	*strAliases = strings.Replace(*strAliases, " ,", ",",0)
 
 	*strCommands = strings.Replace(*strCommands, "  ", ",",-1)
-	*strCommands = strings.Replace(*strAliases, ", ", ",",-1)
-	*strCommands = strings.Replace(*strAliases, " ,", ",",0)
+	*strCommands = strings.Replace(*strCommands, ", ", ",",-1)
+	*strCommands = strings.Replace(*strCommands, " ,", ",",0)
 
 	var FinalOutput []string
 
