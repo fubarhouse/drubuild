@@ -68,7 +68,7 @@ func (DrupalUser *DrupalUser) Create(Password string) {
 		cmd.Set(DrupalUser.Alias, Command, false)
 		cmdOut, cmdErr := cmd.CombinedOutput()
 		if cmdErr != nil {
-			log.Warnf("Could not create user %v on site %v: %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), cmdOut)
+			log.Warnf("Could not create user %v on site %v: %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), string(cmdOut))
 		} else {
 			log.Infof("Created user %v on site %v.", DrupalUser.Name, DrupalUser.Alias)
 		}
