@@ -61,6 +61,9 @@ func main() {
 			if Alias.GetStatus() {
 				UserGroup.Populate(Alias.GetName())
 				User := UserGroup.GetUser(*strUser)
+				if User.Name == "" {
+					User.Name = *strUser
+				}
 				User.Email = Email.Address
 
 				if *boolCreate {
