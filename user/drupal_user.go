@@ -66,9 +66,9 @@ func (DrupalUser *DrupalUser) Create(Password string) {
 		var Command = fmt.Sprintf("user-create '%v' --mail='%v' --password='%v'", DrupalUser.Name, DrupalUser.Email, Password)
 		cmd := command.NewDrushCommand()
 		cmd.Set(DrupalUser.Alias, Command, false)
-		_, cmdErr := cmd.CombinedOutput()
+		cmdOut, cmdErr := cmd.CombinedOutput()
 		if cmdErr != nil {
-			log.Warnf("Could not create user %v on site %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
+			log.Warnf("Could not create user %v on site %v: %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), cmdOut)
 		} else {
 			log.Infof("Created user %v on site %v.", DrupalUser.Name, DrupalUser.Alias)
 		}
