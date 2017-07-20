@@ -57,7 +57,7 @@ func (DrupalUserList *DrupalUserList) Populate(Alias string) {
 	cmd.Set(Alias, Command, false)
 	cmdOut, cmdErr := cmd.CombinedOutput()
 	if cmdErr != nil {
-		log.Errorln("Could not execute Drush sql-query:", cmdErr.Error())
+		log.Warnln("Could not execute Drush sql-query:", cmdErr.Error())
 	}
 	for _, UserID := range strings.Split(string(cmdOut), "\n") {
 		UserInfo := strings.Split(UserID, "\t")
