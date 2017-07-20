@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"strings"
+	"os/exec"
 )
 
 // Alias is a struct for managing a single Drush Alias
@@ -17,7 +18,15 @@ type Alias struct {
 
 // NewAlias instantiates an Alias struct
 func NewAlias(name, path, alias string) *Alias {
-	return &Alias{name, path, alias}
+	alias = strings.Replace(alias, "@", "", -1)
+	Command := exec.Command("drush", "sa", "@" + alias)
+	CommandOut, _ := Command.CombinedOutput()
+	if strings.Contains(string(CommandOut), "Could not find the alias") {
+		log.Warnln(string(CommandOut))
+		return &Alias{}
+	} else {
+		return &Alias{name, path, alias}
+	}
 }
 
 // SetName sets the name field for an alias struct
