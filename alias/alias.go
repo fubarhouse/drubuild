@@ -140,7 +140,13 @@ func (Alias *Alias) Reinstall() {
 func (Alias *Alias) GetStatus() bool {
 	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
 	if err != nil {
-		return false
+		Command := exec.Command("drush", "sa")
+		CommandOut, _ := Command.CombinedOutput()
+		if strings.Contains(string(CommandOut), Alias.GetName()) {
+			return true
+		} else {
+			return false
+		}
 	}
 	return true
 }
