@@ -58,23 +58,24 @@ func (DrupalUserList *DrupalUserList) Populate(Alias string) {
 	cmdOut, cmdErr := cmd.CombinedOutput()
 	if cmdErr != nil {
 		log.Warnln("Could not execute Drush sql-query:", cmdErr.Error())
-	}
-	for _, UserID := range strings.Split(string(cmdOut), "\n") {
-		UserInfo := strings.Split(UserID, "\t")
-		if UserInfo[0] != "" && UserInfo[1] != "" {
-			UserState := 0
-			if UserInfo[3] == "1" {
-				UserState = 1
+	} else {
+		for _, UserID := range strings.Split(string(cmdOut), "\n") {
+			UserInfo := strings.Split(UserID, "\t")
+			if UserInfo[0] != "" && UserInfo[1] != "" {
+				UserState := 0
+				if UserInfo[3] == "1" {
+					UserState = 1
+				}
+				UserID, _ := strconv.Atoi(UserInfo[0])
+				DrupalUser := DrupalUser{
+					Alias, UserID, UserInfo[1], UserInfo[2], UserState, []string{},
+				}
+				DrupalUsers = append(DrupalUsers, DrupalUser)
 			}
-			UserID, _ := strconv.Atoi(UserInfo[0])
-			DrupalUser := DrupalUser{
-				Alias, UserID, UserInfo[1], UserInfo[2], UserState, []string{},
-			}
-			DrupalUsers = append(DrupalUsers, DrupalUser)
 		}
-	}
-	// Ensure previously inputted values do not get overridden.
-	for _, DrupalUser := range DrupalUsers {
-		*DrupalUserList = append(*DrupalUserList, DrupalUser)
+		// Ensure previously inputted values do not get overridden.
+		for _, DrupalUser := range DrupalUsers {
+			*DrupalUserList = append(*DrupalUserList, DrupalUser)
+		}
 	}
 }
