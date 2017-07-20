@@ -10,6 +10,7 @@ import (
 	"net/mail"
 	"os"
 	"strings"
+	"github.com/fubarhouse/golang-drush/alias"
 )
 
 func main() {
@@ -52,37 +53,42 @@ func main() {
 	}
 
 	if *strAliases != "" && *strUser != "" {
-		for _, Alias := range strings.Split(*strAliases, ",") {
-			Alias = strings.Trim(Alias, " ")
-			Alias = strings.Replace(*strPattern, "%v", Alias, 1)
+		for _, ThisAlias := range strings.Split(*strAliases, ",") {
+			ThisAlias = strings.Trim(ThisAlias, " ")
+			ThisAlias = strings.Replace(*strPattern, "%v", ThisAlias, 1)
 			UserGroup := user.NewDrupalUserGroup()
-			UserGroup.Populate(Alias)
-			User := UserGroup.GetUser(*strUser)
-			User.Email = Email.Address
+			Alias := alias.NewAlias(ThisAlias, "", ThisAlias)
+			if Alias.GetStatus() {
+				UserGroup.Populate(Alias.GetName())
+				User := UserGroup.GetUser(*strUser)
+				User.Email = Email.Address
 
-			if *boolCreate {
-				User.Create(*strPassword)
-			}
+				if *boolCreate {
+					User.Create(*strPassword)
+				}
 
-			if *strState {
-				User.State = 1
-				User.StateChange()
+				if *strState {
+					User.State = 1
+					User.StateChange()
+				} else {
+					User.State = 0
+					User.StateChange()
+				}
+
+				if *strPassword != "" {
+					User.SetPassword(*strPassword)
+				}
+
+				User.EmailChange()
+
+				if !User.HasRole(*strRole) {
+					User.Roles = append(User.Roles, *strRole)
+				}
+
+				User.RolesAdd()
 			} else {
-				User.State = 0
-				User.StateChange()
+				log.Warnf("Could not find alias %v", Alias.GetName())
 			}
-
-			if *strPassword != "" {
-				User.SetPassword(*strPassword)
-			}
-
-			User.EmailChange()
-
-			if !User.HasRole(*strRole) {
-				User.Roles = append(User.Roles, *strRole)
-			}
-
-			User.RolesAdd()
 		}
 	} else {
 		flag.Usage()
