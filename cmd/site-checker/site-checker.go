@@ -36,6 +36,8 @@ func main() {
 	if *strAliases == "" {
 		flag.Usage()
 		log.Errorln("Aliases are not specified.")
+	} else {
+		*strAliases = strings.Replace(*strAliases, " ", "", -1)
 	}
 
 	if *strAliases != "" && *strCommands != "" {
