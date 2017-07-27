@@ -74,7 +74,6 @@ func main() {
 		}
 		if *boolVerbose {
 			for _, value := range FinalOutput {
-				value = strings.Replace(value, "\n", "", -1)
 				value = strings.Replace(value, "\t", "", -1)
 				value = strings.Replace(value, "\r", "", -1)
 				value = fmt.Sprint(value)
