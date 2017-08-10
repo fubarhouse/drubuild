@@ -365,16 +365,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 					log.Warnln("Could not determine Drupal version, using 7 as default.", ParseErr)
 					MajorVersion = 7
 				}
-				if ParseVal == 7 {
-					log.Infof("Detected Drupal %v make file.", ParseVal)
-					MajorVersion = 7
-				} else if ParseVal == 8 {
-					log.Infof("Detected Drupal %v make file.", ParseVal)
-					MajorVersion = 7
-				} else {
-					log.Infof("Detected Drupal '%v' make file.", ParseVal)
-					MajorVersion = 0
-				}
+				MajorVersion = ParseVal
 			}
 		}
 	}
