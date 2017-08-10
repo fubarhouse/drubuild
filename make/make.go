@@ -360,7 +360,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 				Version = strings.Replace(Version, " ", "", -1)
 				Version = strings.Replace(Version, "=", "", -1)
 				Version = strings.Replace(Version, ".x", "", -1)
-				ParseVal, ParsseErr := strconv.ParseInt(Version, 64, 64)
+				ParseVal, ParsseErr := strconv.ParseInt(Version, 0, 0)
 				if ParsseErr != nil {
 					log.Warnln("Could not determine Drupal version, using 7 as default.", ParsseErr)
 					MajorVersion = 7
