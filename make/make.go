@@ -396,12 +396,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 	Site.CleanCodebase()
 	Site.ProcessMake(MakeFile)
-	err := os.Remove(MakeFile.Path)
-	if err != nil {
-		log.Warnln("Could not remove temporary make file", MakeFile.Path)
-	} else {
-		log.Infoln("Removed temporary make file", MakeFile.Path)
-	}
+	//err := os.Remove(MakeFile.Path)
+	//if err != nil {
+	//	log.Warnln("Could not remove temporary make file", MakeFile.Path)
+	//} else {
+	//	log.Infoln("Removed temporary make file", MakeFile.Path)
+	//}
 }
 
 // ActionDatabaseDumpLocal run drush sql-dump to a specified path on a site struct.
