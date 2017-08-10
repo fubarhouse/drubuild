@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -61,9 +62,17 @@ func (Site *Site) StopWebServer() {
 // DrupalProject struct which represents a Drupal project on drupal.org
 type DrupalProject struct {
 	Type   string
-	Name   string
-	Subdir string
+	Name   string `json:"name"`
+	Subdir string `json:"subdir"`
 	Status bool
+}
+
+// DrupalLibrary houses a single Drupal Library
+type DrupalLibrary struct {
+	Name          string `json:"name"`
+	DownloadType  string `json:"download-type"`
+	DownloadURL   string `json:"download-url"`
+	DirectoryName string `json:"directory-name"`
 }
 
 // Site struct which represents a build website being used.
@@ -234,9 +243,10 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	if moduleCat == "" || moduleType == "" {
 		// By this point, we should fall back to the input make file.
 		for _, val := range Makefiles {
-			unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(val)
+			MakeFile := Make{val}
+			unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(MakeFile.Path)
 			if unprocessedMakeErr != nil {
-				log.Warnf("Could not read from %v: %v", val, unprocessedMakeErr)
+				log.Warnf("Could not read from %v: %v", MakeFile.Path, unprocessedMakeErr)
 			}
 			Projects := strings.Split(string(unprocessedMakes), "\n")
 			for _, ThisProject := range Projects {
@@ -323,23 +333,46 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
 	// directory for Release management type work.
-	var newMakeFilePath string
+	MakeFile := Make{""}
 	if Site.Timestamp == "." {
 		Site.Timestamp = ""
-		newMakeFilePath = "/tmp/drupal-" + Site.Name + Site.TimeStampGenerate() + ".make"
+		MakeFile.Path = "/tmp/drupal-" + Site.Name + Site.TimeStampGenerate() + ".make"
 	} else {
-		newMakeFilePath = "/tmp/drupal-" + Site.Name + Site.TimeStampGet() + ".make"
+		MakeFile.Path = "/tmp/drupal-" + Site.Name + Site.TimeStampGet() + ".make"
 	}
-	file, crErr := os.Create(newMakeFilePath)
+	file, crErr := os.Create(MakeFile.Path)
 	if crErr == nil {
 		log.Infoln("Generated temporary make file...")
 	} else {
-		log.Errorln("Error creating "+newMakeFilePath+":", crErr)
+		log.Errorln("Error creating "+MakeFile.Path+":", crErr)
 	}
 	writer := bufio.NewWriter(file)
 	defer file.Close()
 
-	fmt.Fprintln(writer, "core = 7.x")
+	// We need to determine the Drupal major version.
+	var MajorVersion int64
+	for _, Makefile := range Makefiles {
+		cmdOut, _ := exec.Command("cat", Makefile).Output()
+		output := strings.Split(string(cmdOut), "\n")
+		for _, line := range output {
+			if strings.HasPrefix(line, "core") {
+				Version := strings.Replace(line, "core", "", -1)
+				Version = strings.Replace(Version, " ", "", -1)
+				Version = strings.Replace(Version, "=", "", -1)
+				Version = strings.Replace(Version, ".x", "", -1)
+				ParseVal, ParsseErr := strconv.ParseInt(Version, 64, 64)
+				if ParsseErr != nil {
+					log.Warnln("Could not determine Drupal version, using 7 as default.", ParsseErr)
+					MajorVersion = 7
+				} else {
+					MajorVersion = ParseVal
+				}
+			}
+		}
+	}
+
+	fmt.Fprintf(writer, "core = %v.x", MajorVersion)
+
 	fmt.Fprintln(writer, "api = 2")
 
 	for _, Makefile := range Makefiles {
@@ -362,12 +395,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		log.Infoln("Changed docroot permissions to 0777 for file removal.")
 	}
 	Site.CleanCodebase()
-	Site.ProcessMake(newMakeFilePath)
-	err := os.Remove(newMakeFilePath)
+	Site.ProcessMake(MakeFile)
+	err := os.Remove(MakeFile.Path)
 	if err != nil {
-		log.Warnln("Could not remove temporary make file", newMakeFilePath)
+		log.Warnln("Could not remove temporary make file", MakeFile.Path)
 	} else {
-		log.Infoln("Removed temporary make file", newMakeFilePath)
+		log.Infoln("Removed temporary make file", MakeFile.Path)
 	}
 }
 
@@ -522,29 +555,28 @@ func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
 }
 
 // ProcessMake processes a make file at a particular path.
-func (Site *Site) ProcessMake(makeFile string) bool {
+func (Site *Site) ProcessMake(Make Make) bool {
 
 	// Test the make file exists
-	fullPath := makeFile
-	_, err := os.Stat(fullPath)
+	_, err := os.Stat(Make.Path)
 	if err != nil {
 		log.Fatalln("File not found:", err)
 		os.Exit(1)
 	}
 	if Site.MakeFileRewriteSource != "" && Site.MakeFileRewriteDestination != "" {
 		log.Printf("Applying specified rewrite string on temporary makefile: %v -> %v", Site.MakeFileRewriteSource, Site.MakeFileRewriteDestination)
-		ReplaceTextInFile(makeFile, Site.MakeFileRewriteSource, Site.MakeFileRewriteDestination)
+		ReplaceTextInFile(Make.Path, Site.MakeFileRewriteSource, Site.MakeFileRewriteDestination)
 	} else {
 		log.Println("No rewrite string was configured, continuing without additional parsing.")
 	}
 
-	log.Infof("Building from %v...", makeFile)
+	log.Infof("Building from %v...", Make.Path)
 	drushMake := command.NewDrushCommand()
 	drushCommand := ""
 	if Site.WorkingCopy {
-		drushCommand = fmt.Sprintf("make --yes --working-copy %v", makeFile)
+		drushCommand = fmt.Sprintf("make --yes --working-copy %v", Make.Path)
 	} else {
-		drushCommand = fmt.Sprintf("make --yes %v", makeFile)
+		drushCommand = fmt.Sprintf("make --yes %v", Make.Path)
 	}
 	drushMake.Set("", drushCommand, false)
 	if Site.Timestamp == "" {
