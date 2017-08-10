@@ -360,12 +360,20 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 				Version = strings.Replace(Version, " ", "", -1)
 				Version = strings.Replace(Version, "=", "", -1)
 				Version = strings.Replace(Version, ".x", "", -1)
-				ParseVal, ParsseErr := strconv.ParseInt(Version, 0, 0)
-				if ParsseErr != nil {
-					log.Warnln("Could not determine Drupal version, using 7 as default.", ParsseErr)
+				ParseVal, ParseErr := strconv.ParseInt(Version, 0, 0)
+				if ParseErr != nil {
+					log.Warnln("Could not determine Drupal version, using 7 as default.", ParseErr)
+					MajorVersion = 7
+				}
+				if ParseVal == 7 {
+					log.Infof("Detected Drupal %v make file.", ParseVal)
+					MajorVersion = 7
+				} else if ParseVal == 8 {
+					log.Infof("Detected Drupal %v make file.", ParseVal)
 					MajorVersion = 7
 				} else {
-					MajorVersion = ParseVal
+					log.Infof("Detected Drupal '%v' make file.", ParseVal)
+					MajorVersion = 0
 				}
 			}
 		}
