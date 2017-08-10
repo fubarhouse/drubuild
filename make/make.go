@@ -371,7 +371,7 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		}
 	}
 
-	fmt.Fprintf(writer, "core = %v.x", MajorVersion)
+	fmt.Fprintf(writer, "core = %v.x\n", MajorVersion)
 
 	fmt.Fprintln(writer, "api = 2")
 
