@@ -159,13 +159,12 @@ func (Site *Site) ActionInstall() {
 		panic(dbErr)
 	}
 	// Drush site-install
-	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v install_configure_form.update_status_module='array(FALSE,FALSE)'", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
+	thisCmd := fmt.Sprintf("-y site-install --concurrency --force-complete standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	_, installErr := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd).Output()
 	if installErr != nil {
-		log.Warnln("Unable to install Drupal.")
-		log.Debugln("drush", thisCmd)
+		log.Warnln("Unable to install Drupal:", installErr)
 	} else {
-		log.Infof("Installed Drupal.")
+		log.Infoln("Installed Drupal.")
 	}
 }
 
@@ -395,12 +394,12 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	}
 	Site.CleanCodebase()
 	Site.ProcessMake(MakeFile)
-	//err := os.Remove(MakeFile.Path)
-	//if err != nil {
-	//	log.Warnln("Could not remove temporary make file", MakeFile.Path)
-	//} else {
-	//	log.Infoln("Removed temporary make file", MakeFile.Path)
-	//}
+	err := os.Remove(MakeFile.Path)
+	if err != nil {
+		log.Warnln("Could not remove temporary make file", MakeFile.Path)
+	} else {
+		log.Infoln("Removed temporary make file", MakeFile.Path)
+	}
 }
 
 // ActionDatabaseDumpLocal run drush sql-dump to a specified path on a site struct.
@@ -590,6 +589,12 @@ func (Site *Site) ProcessMake(Make Make) bool {
 		log.Infoln("Created directory", drushMake.GetWorkingDir())
 	}
 	_ = drushMake.LiveOutput()
+
+	if _, err := os.Stat(Site.Path+"/"+Site.Name+Site.Timestamp+"/README.txt"); os.IsNotExist(err) {
+		log.Errorln("Drush failed to copy the file system into place.")
+		os.Exit(1)
+	}
+
 	return true
 }
 
