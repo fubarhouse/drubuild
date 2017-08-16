@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"github.com/fubarhouse/golang-drush/makeupdater"
 )
 
 // ReplaceTextInFile is a utility function to replace all instances of a string in a file.
@@ -194,6 +195,15 @@ func (Site *Site) ActionRebuild() {
 // ActionRebuildProject purges a specific project from a specified path, and re-download it
 // Re-downloading will use drush dl, or git clone depending on availability.
 func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string, RemoveGit bool) {
+
+	var MajorVersion int64
+	for _, Makefile := range Makefiles {
+		mv, mve := makeupdater.GetCoreFromMake(Makefile)
+		if mve == nil {
+			MajorVersion = mv
+		}
+	}
+
 	log.Infoln("Searching for module/theme...")
 	moduleFound := false
 	var moduleType string
@@ -278,7 +288,14 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 			log.Infoln("Project type was found to be", moduleType)
 		}
 	}
-	path := Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
+	var path string
+	if MajorVersion == 7 {
+		path = Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
+	} else if MajorVersion == 8 {
+		path = Site.Path + "/" + moduleCat + "/" + moduleType + "/"
+	} else {
+		path = Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
+	}
 	if moduleType == "contrib" {
 		command.DrushDownloadToPath(path, Project)
 	} else {
