@@ -6,6 +6,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/golang-drush/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
 	"os"
@@ -14,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/fubarhouse/golang-drush/makeupdater"
 )
 
 // ReplaceTextInFile is a utility function to replace all instances of a string in a file.
@@ -589,9 +589,9 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	drushMake := command.NewDrushCommand()
 	drushCommand := ""
 	if Site.WorkingCopy {
-		drushCommand = fmt.Sprintf("make --yes --working-copy %v", Make.Path)
+		drushCommand = fmt.Sprintf("make --yes --concurrency --force-complete --working-copy %v", Make.Path)
 	} else {
-		drushCommand = fmt.Sprintf("make --yes %v", Make.Path)
+		drushCommand = fmt.Sprintf("make --yes --concurrency --force-complete %v", Make.Path)
 	}
 	drushMake.Set("", drushCommand, false)
 	if Site.Timestamp == "" {
@@ -607,7 +607,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	}
 	_ = drushMake.LiveOutput()
 
-	if _, err := os.Stat(Site.Path+"/"+Site.Name+Site.Timestamp+"/README.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/README.txt"); os.IsNotExist(err) {
 		log.Errorln("Drush failed to copy the file system into place.")
 		os.Exit(1)
 	}
