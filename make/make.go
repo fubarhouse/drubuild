@@ -297,7 +297,7 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 		path = Site.Path + "/" + "/sites/all/" + moduleCat + "/" + moduleType + "/"
 	}
 	if moduleType == "contrib" {
-		command.DrushDownloadToPath(path, Project)
+		command.DrushDownloadToPath(path, Project, MajorVersion)
 	} else {
 		clonePath := strings.Replace(path+"/"+Project, "//", "/", -1)
 		gitCmd := exec.Command("git", "clone", "-b", Branch, GitPath, clonePath)

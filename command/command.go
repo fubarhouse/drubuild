@@ -224,9 +224,10 @@ func DrushUpdateDatabase(alias string) {
 }
 
 // DrushDownloadToPath performs a database update task on an input site alias with the use of Drush.
-func DrushDownloadToPath(path, project string) {
+func DrushDownloadToPath(path, project string, version int64) {
+	majorversion := fmt.Sprintf("%v", version)
 	drushCommand := NewDrushCommand()
-	drushCommand.Set("", "pm-download --yes "+project+" --destination="+path, false)
+	drushCommand.Set("", "pm-download --yes "+project+" --default-major="+majorversion+" --destination="+path, false)
 	_, err := drushCommand.Output()
 	if err != nil {
 		log.Warnln("Could not download module ", project, err)
