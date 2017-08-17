@@ -6,6 +6,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/golang-drush/composer"
 	"github.com/fubarhouse/golang-drush/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
@@ -316,6 +317,14 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 			log.Errorf("Could not clone %v from %v: %v\n", Project, GitPath, *err)
 		}
 	}
+
+	// Composer tasks when working with Drupal 8
+	if MajorVersion == 8 {
+		//log.Println("Drupal 8 dependencies are being processed...")
+		//Projects := composer.GetProjects(Makefiles)
+		//composer.InstallProjects(Projects, Site.Path)
+	}
+
 }
 
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.
@@ -610,6 +619,13 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/README.txt"); os.IsNotExist(err) {
 		log.Errorln("Drush failed to copy the file system into place.")
 		os.Exit(1)
+	}
+
+	// Composer tasks when working with Drupal 8
+	if major, _ := makeupdater.GetCoreFromMake(Make.Path); major == 8 {
+		log.Println("Drupal 8 dependencies are being processed...")
+		Projects := composer.GetProjects(Make.Path)
+		composer.InstallProjects(Projects, drushMake.GetWorkingDir())
 	}
 
 	return true
