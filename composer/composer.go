@@ -46,7 +46,6 @@ func GetProjects(fullpath string) []DrupalProject {
 		if Project != "drupal" {
 			DrupalProject.Project = Project
 			Projects = append(Projects, DrupalProject)
-			fmt.Println(Projects)
 		}
 	}
 	return Projects
