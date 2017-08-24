@@ -90,19 +90,32 @@ func UpdateMake(fullpath string) {
 				catCmd := "cat " + fullpath + " | grep \"projects\\[" + project + "\\]\" | grep version | cut -d '=' -f2"
 				z, _ := exec.Command("sh", "-c", catCmd).Output()
 				for _, stream := range strings.Split(string(z), "\n") {
+					if !strings.Contains(stream, "x-dev") {
 					stream = strings.Replace(stream, "\"", "", -1)
 					stream = strings.Replace(stream, " ", "", -1)
 					if stream != "" {
-						command := "drush pm-releases --default-major=" + majorVersionString + " --pipe " + project + " | grep Recommended | cut -d',' -f2"
+						command := "drush pm-releases --default-major=" + majorVersionString + " --pipe " + project + " | grep .x- | grep Recommended | cut -d',' -f2"
 						x, _ := exec.Command("sh", "-c", command).CombinedOutput()
-						versionNew := removeChar(string(x), " ", "5.x-", "6.x-", "7.x-", "8.x-", "\"", "\n", "\t", "[", "]")
-						if fmt.Sprintf("%v", versionNew) != "" && stream != versionNew {
-							fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
-							replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
-							count++
+						for _, Line := range strings.Split(string(x), "\n") {
+							if strings.Contains(Line, ".x-") {
+								versionNew := removeChar(string(x), " ", "5.x-", "6.x-", "7.x-", "8.x-", "\"", "\n", "\t", "[", "]")
+								if len(versionNew) < 15 {
+									if fmt.Sprintf("%v", versionNew) != "" && stream != versionNew {
+										fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
+										replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
+										count++
+									}
+								} else {
+									fmt.Printf("There was an error in checking version numbers for %v, please check it manually.\n", project)
+								}
+							}
 						}
 					}
+				} else {
+						fmt.Printf("Project %v is using development version, do not use in production!\n", project)
+					}
 				}
+
 			}
 			wg.Done()
 		}(project)
