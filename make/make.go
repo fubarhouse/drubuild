@@ -235,7 +235,12 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 	}
 
 	if moduleType != "" && moduleCat != "" {
-		ProjectDir := Site.Path + "/sites/all/" + moduleCat + "/" + moduleType + "/" + Project + "/"
+		var ProjectDir string
+		if MajorVersion < 8 {
+			ProjectDir = Site.Path + "/sites/all/" + moduleCat + "/" + moduleType + "/" + Project + "/"
+		} else {
+			ProjectDir = Site.Path + "/" + moduleCat + "/" + moduleType + "/" + Project + "/"
+		}
 		_, errMod := os.Stat(ProjectDir)
 		if errMod == nil {
 			*err = os.RemoveAll(ProjectDir)
