@@ -10,6 +10,7 @@ import (
 	"github.com/fubarhouse/golang-drush/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -522,12 +523,14 @@ func (Site *Site) TimeStampSet(value string) {
 // TimeStampReset sets the timestamp field for the site struct to a new value
 func (Site *Site) TimeStampReset() {
 	now := time.Now()
-	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"))
+	r := rand.Intn(100) * rand.Intn(100)
+	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"), r)
 }
 
 // TimeStampGenerate generates a new timestamp and returns it, does not latch to site struct
 func (Site *Site) TimeStampGenerate() string {
-	return fmt.Sprintf(".%v", time.Now().Format("20060102150405"))
+	r := rand.Intn(100) * rand.Intn(100)
+	return fmt.Sprintf(".%v_%v", time.Now().Format("20060102150405"), r)
 }
 
 // VerifyProcessedMake requires documentation, @TODO for revisitation.
