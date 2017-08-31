@@ -103,7 +103,7 @@ func UpdateMake(fullpath string) {
 										if fmt.Sprintf("%v", versionNew) != "" && stream != versionNew {
 											fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
 											replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
-											replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = %v\n", project, stream), fmt.Sprintf("projects[%v][version] = %v\n", project, versionNew))
+											replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = %v\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
 											count++
 										}
 									} else {
