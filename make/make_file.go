@@ -2,7 +2,7 @@ package make
 
 import (
 	"bytes"
-	"github.com/ghodss/yaml"
+	//"github.com/ghodss/yaml"
 	"io/ioutil"
 	"os/exec"
 	"reflect"
@@ -86,7 +86,6 @@ func (Make *Make) parseINF() ([]string, error) {
 			Line = strings.Replace(Line, "\"", " ", -1)
 			Line = strings.Replace(Line, "  ", " ", -1)
 			Line = strings.Replace(Line, "  ", " ", -1)
-			Line = strings.Replace(Line, "  ", " ", -1)
 		}
 	}
 
@@ -109,6 +108,7 @@ func (Make *Make) ParseYML() ([]byte, error) {
 	if err != nil {
 		panic(err)
 	}
-	parse_data, parse_error := yaml.YAMLToJSON(data)
-	return parse_data, parse_error
+	return data, err
+	//parse_data, parse_error := yaml.YAMLToJSON(data)
+	//return parse_data, parse_error
 }
