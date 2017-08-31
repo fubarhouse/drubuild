@@ -103,6 +103,7 @@ func UpdateMake(fullpath string) {
 										if fmt.Sprintf("%v", versionNew) != "" && stream != versionNew {
 											fmt.Printf("Replacing %v v%v with v%v\n", project, stream, versionNew)
 											replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, stream), fmt.Sprintf("projects[%v][version] = \"%v\"\n", project, versionNew))
+											replaceTextInFile(fullpath, fmt.Sprintf("projects[%v][version] = %v\n", project, stream), fmt.Sprintf("projects[%v][version] = %v\n", project, versionNew))
 											count++
 										}
 									} else {
@@ -185,19 +186,15 @@ func GenerateMake(Projects []string, File string) {
 	// Rewrite core, if core is in the original Projects list.
 
 	for _, Project := range Projects {
-		coreAppended := 0
 		if Project == "drupal" {
-			if coreAppended == 0 {
-				headerLines = append(headerLines, "; core")
-				x, _ := exec.Command("sh", "-c", "drush pm-releases --default-major="+majorVersionString+" --pipe drupal | grep Recommended | cut -d',' -f2").Output()
-				ProjectVersion := removeChar(string(x), " ", "5.x-", "6.x-", "7.x-", "8.x-", "\"", "\n", "[", "]")
-				headerLines = append(headerLines, "projects[drupal][type] = \"core\"")
-				headerLines = append(headerLines, fmt.Sprintf("projects[drupal][version] = \"%v\"", ProjectVersion))
-				headerLines = append(headerLines, "projects[drupal][download][type] = \"get\"")
-				headerLines = append(headerLines, fmt.Sprintf("projects[drupal][download][url] = \"https://ftp.drupal.org/files/projects/drupal-%v.tar.gz\"", ProjectVersion))
-				headerLines = append(headerLines, "")
-				coreAppended++
-			}
+			headerLines = append(headerLines, "; core")
+			x, _ := exec.Command("sh", "-c", "drush pm-releases --default-major="+majorVersionString+" --pipe drupal | grep Recommended | cut -d',' -f2").Output()
+			ProjectVersion := removeChar(string(x), " ", "5.x-", "6.x-", "7.x-", "8.x-", "\"", "\n", "[", "]")
+			headerLines = append(headerLines, "projects[drupal][type] = \"core\"")
+			headerLines = append(headerLines, fmt.Sprintf("projects[drupal][version] = \"%v\"", ProjectVersion))
+			headerLines = append(headerLines, "projects[drupal][download][type] = \"get\"")
+			headerLines = append(headerLines, fmt.Sprintf("projects[drupal][download][url] = \"https://ftp.drupal.org/files/projects/drupal-%v.tar.gz\"", ProjectVersion))
+			headerLines = append(headerLines, "")
 		}
 	}
 
