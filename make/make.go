@@ -524,7 +524,7 @@ func (Site *Site) TimeStampSet(value string) {
 func (Site *Site) TimeStampReset() {
 	now := time.Now()
 	r := rand.Intn(100) * rand.Intn(100)
-	Site.Timestamp = fmt.Sprintf(".%v", now.Format("20060102150405"), r)
+	Site.Timestamp = fmt.Sprintf(".%v_%v", now.Format("20060102150405"), r)
 }
 
 // TimeStampGenerate generates a new timestamp and returns it, does not latch to site struct
