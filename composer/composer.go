@@ -7,6 +7,8 @@ import (
 	"github.com/fubarhouse/golang-drush/makeupdater"
 	"os/exec"
 	"strings"
+	"path/filepath"
+	"os"
 )
 
 // DrupalProject is a type to provide both name and verison of a given Drupal project.
@@ -51,6 +53,8 @@ func GetProjects(fullpath string) []DrupalProject {
 	return Projects
 }
 
+// InstallProjects will install drupal composer projects via composer.
+// It will do this for every project in the make file, or as a []DrupalProject input.
 func InstallProjects(Projects []DrupalProject, Path string) {
 	for _, Project := range Projects {
 		log.Infof("Processing drupal/%v:%v:", Project.Project, Project.Version)
@@ -59,6 +63,42 @@ func InstallProjects(Projects []DrupalProject, Path string) {
 		_, cpErr := cpCmd.CombinedOutput()
 		if cpErr != nil {
 			log.Errorln("Could not complete:", cpErr)
+		}
+	}
+}
+
+// FindComposerJSONFiles will find all the composer.json files inside custom modules/themes
+// in a Drupal 8 (or even 7) file system. It will return the paths  in a []string
+// which can be iterated over for processing.
+func FindComposerJSONFiles(Path string) []string {
+	fileList := []string{}
+	fmt.Println(len(fileList))
+	filepath.Walk(Path, func(path string, f os.FileInfo, err error) error {
+		fileList = append(fileList, path)
+		return nil
+	})
+
+	results := []string{}
+	for _, file := range fileList {
+		if strings.Contains(file, "/custom/") && strings.HasSuffix(file, "composer.json") {
+			results = append(results, file)
+		}
+	}
+
+	return results
+}
+
+// InstallComposerJSONFiles will accept a []string of paths
+// and run a composer install over each of the files found.
+func InstallComposerJSONFiles(Paths []string) {
+	for _, v := range Paths {
+		v = strings.Replace(v, "composer.json", "", -1)
+		cpCmd := exec.Command("composer", "install", "--prefer-dist", "--working-dir=" + v)
+		cpOut, cpErr := cpCmd.CombinedOutput()
+		if cpErr != nil {
+			log.Errorln("Could not complete:", string(cpOut), cpErr)
+		} else {
+			log.Println(string(cpOut))
 		}
 	}
 }

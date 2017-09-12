@@ -634,6 +634,12 @@ func (Site *Site) ProcessMake(Make Make) bool {
 		log.Println("Drupal 8 dependencies are being processed...")
 		Projects := composer.GetProjects(Make.Path)
 		composer.InstallProjects(Projects, drushMake.GetWorkingDir())
+		log.Println("Looking for composer.json files...")
+		composerFiles := composer.FindComposerJSONFiles(Site.Path)
+		if len(composerFiles) != 0 {
+			log.Printf("Installing dependencies for %v custom project(s).\n", len(composerFiles))
+			composer.InstallComposerJSONFiles(composerFiles)
+		}
 	}
 
 	return true
