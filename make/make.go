@@ -339,18 +339,20 @@ func (Site *Site) CleanCodebase() {
 		realpath := strings.Split(Site.Path, "\n")
 		err := new(error)
 		for _, name := range realpath {
-			fmt.Sprintln(name)
-			if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
-				if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
-					os.Chmod(path, 0777)
-					delErr := os.RemoveAll(path)
-					if delErr != nil {
-						log.Warnln("Could not remove", path)
-					}
-				} else if !Info.IsDir() {
-					delErr := os.Remove(path)
-					if delErr != nil {
-						log.Warnln("Could not remove", path)
+			if strings.Contains(path, Site.TimeStampGet()) {
+				fmt.Sprintln(name)
+				if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
+					if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
+						os.Chmod(path, 0777)
+						delErr := os.RemoveAll(path)
+						if delErr != nil {
+							log.Warnln("Could not remove", path)
+						}
+					} else if !Info.IsDir() {
+						delErr := os.Remove(path)
+						if delErr != nil {
+							log.Warnln("Could not remove", path)
+						}
 					}
 				}
 			}
