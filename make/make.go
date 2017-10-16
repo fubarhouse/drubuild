@@ -336,22 +336,23 @@ func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPa
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.
 func (Site *Site) CleanCodebase() {
 	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
+
 		realpath := strings.Split(Site.Path, "\n")
 		err := new(error)
 		for _, name := range realpath {
 			if strings.Contains(path, Site.TimeStampGet()) {
-				fmt.Sprintln(name)
 				if !strings.Contains(path, "/sites") || strings.Contains(path, "/sites/all") {
-					if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
-						os.Chmod(path, 0777)
-						delErr := os.RemoveAll(path)
-						if delErr != nil {
-							log.Warnln("Could not remove", path)
-						}
-					} else if !Info.IsDir() {
-						delErr := os.Remove(path)
-						if delErr != nil {
-							log.Warnln("Could not remove", path)
+					//return nil
+					if path != Site.Path {
+						if Info.IsDir() && !strings.HasSuffix(path, Site.Path) {
+							fmt.Sprintln(name)
+							os.Chmod(path, 0777)
+							delErr := os.RemoveAll(path)
+							if delErr != nil {
+								log.Warnln("Could not remove", path)
+							}
+						} else if !Info.IsDir() {
+							log.Infoln("Not removing", path)
 						}
 					}
 				}
@@ -616,7 +617,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	if Site.Timestamp == "" {
 		drushMake.SetWorkingDir(Site.Path + "/")
 	} else {
-		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp)
+		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + "")
 	}
 	mkdirErr := os.MkdirAll(drushMake.GetWorkingDir(), 0755)
 	if mkdirErr != nil {
@@ -624,6 +625,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	} else {
 		log.Infoln("Created directory", drushMake.GetWorkingDir())
 	}
+
 	_ = drushMake.LiveOutput()
 
 	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/README.txt"); os.IsNotExist(err) {
