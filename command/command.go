@@ -82,12 +82,13 @@ func (drush *Command) LiveOutput() error {
 		drush.alias = fmt.Sprintf("@%v", drush.alias)
 	}
 	if drush.verbose == true {
-		drush.alias = fmt.Sprintf("%v --verbose", drush.alias)
+		drush.command = fmt.Sprintf("%v --verbose", drush.command)
 	}
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 
 	comm := new(exec.Cmd)
-	comm = exec.Command("sh", "-c", "cd "+drush.workingdir+" && "+pathDrush+" "+args)
+	comm = exec.Command("sh", "-c", pathDrush + " " + " " + args)
+	comm.Dir = drush.GetWorkingDir()
 	Pipe, _ := comm.StderrPipe()
 	scanner := bufio.NewScanner(Pipe)
 	go func() {
