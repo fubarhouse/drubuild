@@ -8,7 +8,9 @@
 
 Golang-Drush is a suite of tools designed for use behind the terminal via scripts or to tie into CI configurations which are designed to build and maintain Drupal websites and support the needs of development teams in building Drupal sites with a vast array of Drush integration tasks to remove the complexities of having developers behind a command-line.
 
-History proves that not all developers are comfortable or fo not completely embrace command-line tools and these non-interactive tools allow use in many different configurations and platforms. 
+History proves that not all developers are comfortable or fo not completely embrace command-line tools and these non-interactive tools allow use in many different configurations and platforms.
+
+**Note**: This project is the predecessor to a follow-up project which will become known as *Drubuild*. Once this project is alpha-ready it will be made public and this project will be marked as deprecated.
 
 ## Package rundown
 
