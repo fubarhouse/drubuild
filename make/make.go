@@ -96,6 +96,7 @@ type Site struct {
 	FilePathPublic             string
 	FilePathTemp               string
 	WorkingCopy                bool
+	Composer 				   bool
 }
 
 // NewSite instantiates an instance of the struct Site
@@ -163,7 +164,13 @@ func (Site *Site) ActionInstall() {
 	}
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
-	_, installErr := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd).Output()
+	var sitePath string
+	if Site.Composer {
+		sitePath = Site.Path+"/"+Site.Name+Site.Timestamp+"/docroot"
+	} else {
+		sitePath = Site.Path+"/"+Site.Name+Site.Timestamp
+	}
+	_, installErr := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd).Output()
 	if installErr != nil {
 		log.Warnln("Unable to install Drupal:", installErr)
 	} else {
@@ -656,7 +663,12 @@ func (Site *Site) InstallSiteRef() {
 		"Name":   Site.Name,
 		"Domain": Site.Domain,
 	}
-	dirPath := Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/"
+	var dirPath string
+	if Site.Composer {
+		dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/sites/"
+	} else {
+		dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/"
+	}
 	dirErr := os.MkdirAll(dirPath+Site.Name, 0755)
 	if dirErr != nil {
 		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)

@@ -62,16 +62,32 @@ func (Alias *Alias) GetPath() string {
 // Install an alias from an alias struct
 func (Alias *Alias) Install() {
 	Root := Alias.GetPath()
-	if strings.HasSuffix(Root, "latest") == true {
-		Root = strings.TrimSuffix(Root, "latest")
+	if strings.HasSuffix(Root, "_latest/docroot") {
+		if strings.HasSuffix(Root, "_latest/docroot") {
+			Root = strings.TrimSuffix(Root, "_latest/docroot")
+		}
+		if strings.HasSuffix(Root, "latest") {
+			Root = strings.TrimSuffix(Root, "latest")
+		}
+		if strings.HasSuffix(Root, ".") {
+			Root = strings.TrimSuffix(Root, ".")
+		}
+		if strings.HasSuffix(Root, "_") {
+			Root = strings.TrimSuffix(Root, "_")
+		}
+		Root = fmt.Sprintf("%v/%v.latest/docroot", Root, Alias.GetURI())
+	} else {
+		if strings.HasSuffix(Root, "latest") {
+			Root = strings.TrimSuffix(Root, "latest")
+		}
+		if strings.HasSuffix(Root, ".") {
+			Root = strings.TrimSuffix(Root, ".")
+		}
+		if strings.HasSuffix(Root, "_") {
+			Root = strings.TrimSuffix(Root, "_")
+		}
+		Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetURI())
 	}
-	if strings.HasSuffix(Root, ".") == true {
-		Root = strings.TrimSuffix(Root, ".")
-	}
-	if strings.HasSuffix(Root, "_") == true {
-		Root = strings.TrimSuffix(Root, "_")
-	}
-	Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetURI())
 
 	data := map[string]string{
 		"Name":   Alias.GetName(),

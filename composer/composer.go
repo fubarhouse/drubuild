@@ -9,6 +9,9 @@ import (
 	"strings"
 	"path/filepath"
 	"os"
+	"io/ioutil"
+	"github.com/fubarhouse/golang-drush/make"
+	"github.com/fubarhouse/drubuild/composer"
 )
 
 // DrupalProject is a type to provide both name and verison of a given Drupal project.
@@ -101,4 +104,50 @@ func InstallComposerJSONFiles(Paths []string) {
 			log.Println(string(cpOut))
 		}
 	}
+}
+
+// copy will copy a file to a destination.
+func copy(src, dest string) error {
+	data, err := ioutil.ReadFile(src)
+	if err != nil {
+		log.Fatalf("Could not read %v: %v", src, err.Error())
+		return err
+	}
+	err = ioutil.WriteFile(dest, data, 0644)
+	if err != nil {
+		log.Fatalf("Could not write %v: %v", dest, err.Error())
+		return err
+	}
+	return nil
+}
+
+// InstallComposerCodebase will accept a []string of paths
+// and run a composer install over each of the files found.
+func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination string) {
+	Destination += "/" + Name + Timestamp
+	// Identify if copying the file is required.
+	ComposerPath := strings.Replace(ComposerFile, "/composer.json", "",  -1)
+	ComposerPath = strings.TrimRight(ComposerPath, "/")
+	ComposerDestination := strings.TrimRight(Destination, "/") + "/" + Name + Timestamp
+
+	if _, err := os.Stat(Destination); err != nil {
+		ok := os.MkdirAll(Destination, 0775);
+		if ok != nil {
+			log.Fatalf("could not create directory %v: %v", Destination, ok.Error())
+		}
+	}
+
+	if !strings.HasSuffix(ComposerDestination, ComposerPath) {
+		log.Infof("composer.json not found, copying from %v", ComposerFile)
+		copy(ComposerFile, Destination + "/composer.json")
+	} else {
+		log.Infof("%v/composer.json was found, not copying", ComposerDestination)
+	}
+	cpCmd := exec.Command("sh", "-c", "composer install")
+	cpCmd.Dir = Destination
+	cpCmd.Stdout = os.Stdout
+	cpCmd.Stderr = os.Stderr
+	cpCmd.Run()
+	cpCmd.Wait()
+
 }

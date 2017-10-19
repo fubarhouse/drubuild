@@ -1,11 +1,12 @@
 package main
 
 import (
-	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/make"
-	"os"
-	"strings"
+"flag"
+log "github.com/Sirupsen/logrus"
+"github.com/fubarhouse/golang-drush/composer"
+"github.com/fubarhouse/golang-drush/make"
+"os"
+"strings"
 )
 
 func main() {
@@ -15,6 +16,7 @@ func main() {
 	var Path = flag.String("path", "", "Path to site")
 	var Project = flag.String("project", "", "Machine name of project name")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
+	var ComposerPath = flag.String("composer", "", "Path to composer file, supersedes the make file parameter.")
 	var RemoveGit = flag.Bool("remove-git", true, "Remove the .git folder after this process for custom individual projects.")
 	var RewriteStringSource = flag.String("rewrite-source", "", "A string of text to replace in the make file before building.")
 	var RewriteStringDestination = flag.String("rewrite-dest", "", "A string of text to replace the rewrite-source value with before building.")
@@ -61,6 +63,12 @@ func main() {
 	if *Project != "" {
 		x.ActionRebuildProject(MakeFiles, *Project, *GitPath, *Branch, *RemoveGit)
 	} else {
-		x.ActionRebuildCodebase(MakeFiles)
+
+		if *ComposerPath != "" {
+			x.Composer = true
+			composer.InstallComposerCodebase(*ComposerPath, x.Path)
+		} else {
+			x.ActionRebuildCodebase(MakeFiles)
+		}
 	}
 }

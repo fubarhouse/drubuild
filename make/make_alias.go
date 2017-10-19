@@ -20,12 +20,30 @@ func (Site *Site) AliasExists(filter string) bool {
 
 // AliasInstall installs an alias for a given site struct
 func (Site *Site) AliasInstall() {
-	siteAlias := alias.NewAlias(Site.Name, Site.Path+"_latest", Site.Alias)
+	var siteAlias alias.Alias
+	if Site.Composer {
+		siteAlias.SetName(Site.Name)
+		siteAlias.SetPath(Site.Path+"_latest/docroot")
+		siteAlias.SetURI(Site.Alias)
+	} else {
+		siteAlias.SetName(Site.Name)
+		siteAlias.SetPath(Site.Path+"_latest")
+		siteAlias.SetURI(Site.Alias)
+	}
 	siteAlias.Install()
 }
 
 // AliasUninstall un-installs an alias for a given site struct
 func (Site *Site) AliasUninstall() {
-	siteAlias := alias.NewAlias(Site.Name, Site.Path+"_latest", Site.Alias)
+	var siteAlias alias.Alias
+	if Site.Composer {
+		siteAlias.SetName(Site.Name)
+		siteAlias.SetPath(Site.Path+"_latest/docroot")
+		siteAlias.SetURI(Site.Alias)
+	} else {
+		siteAlias.SetName(Site.Name)
+		siteAlias.SetPath(Site.Path+"_latest")
+		siteAlias.SetURI(Site.Alias)
+	}
 	siteAlias.Uninstall()
 }

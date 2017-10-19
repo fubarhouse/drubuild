@@ -6,6 +6,7 @@ import (
 	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
+	"github.com/fubarhouse/golang-drush/composer"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 	var Alias = flag.String("alias", "", "Alias of site")
 	var Makes = flag.String("makes", "", "Comma-separated list of make files to use")
 	var BuildID = flag.String("build", "", "optional timestamp of site")
+	var ComposerPath = flag.String("composer", "", "Path to composer file, supersedes the make file parameter.")
 	var VHostDir = flag.String("vhost-dir", "/etc/nginx/sites-enabled", "Directory containing virtual host file(s)")
 	var WebserverName = flag.String("webserver-name", "nginx", "The name of the web service on the server.")
 	var CustomTemplate = flag.String("template", "", "Absolute path to a custom template, which falls back to a given default.")
@@ -73,14 +75,19 @@ func main() {
 		x.WorkingCopy = true
 	}
 
-	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
-	MakeFiles := strings.Split(MakefilesFormatted, ",")
+	if *ComposerPath != "" {
+		x.Composer = true
+		composer.InstallComposerCodebase(x.Name, x.TimeStampGet(), *ComposerPath, x.Path)
+	} else {
+		MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
+		MakeFiles := strings.Split(MakefilesFormatted, ",")
 
-	if *RewriteStringSource != "" && *RewriteStringDestination != "" {
-		x.MakeFileRewriteSource = *RewriteStringSource
-		x.MakeFileRewriteDestination = *RewriteStringDestination
+		if *RewriteStringSource != "" && *RewriteStringDestination != "" {
+			x.MakeFileRewriteSource = *RewriteStringSource
+			x.MakeFileRewriteDestination = *RewriteStringDestination
+		}
+		x.ActionRebuildCodebase(MakeFiles)
 	}
-	x.ActionRebuildCodebase(MakeFiles)
 	x.InstallSiteRef()
 	x.InstallFileSystem(*FilepathPublic)
 	x.InstallFileSystem(*FilepathPrivate)
