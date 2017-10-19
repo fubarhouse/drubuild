@@ -66,7 +66,7 @@ func main() {
 
 		if *ComposerPath != "" {
 			x.Composer = true
-			composer.InstallComposerCodebase(*ComposerPath, x.Path)
+			composer.InstallComposerCodebase(x.Name, x.Timestamp, *ComposerPath, x.Path)
 		} else {
 			x.ActionRebuildCodebase(MakeFiles)
 		}
