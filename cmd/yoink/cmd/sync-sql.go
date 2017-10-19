@@ -23,10 +23,11 @@ import (
 	"fmt"
 )
 
-// backupCmd represents the backup command
-var backupCmd = &cobra.Command{
-	Use:   "backup",
-	Short: "Take a archive-dump snapshot of a local site",
+// syncCmd represents the backup command
+var syncCmd = &cobra.Command{
+	Use:   "sql-sync",
+	Short: "Execute drush sql-sync between two drush aliases" +
+		"Note: Drush does not allow remote-remote syncing.",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if source == "" || destination == "" {
@@ -38,7 +39,7 @@ var backupCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("Drush was not found in your $PATH")
 		}
-		c := exec.Command(d, source, "archive-dump", "--destination=" + destination)
+		c := exec.Command(d, source, "sql-sync", source, destination)
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		c.Run()
@@ -47,7 +48,7 @@ var backupCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(backupCmd)
-	backupCmd.Flags().StringVarP(&source, "source", "s", "", "Drush alias to use for operation")
-	backupCmd.Flags().StringVarP(&destination, "destination", "d", "", "Path to Drush archive-dump destination")
+	RootCmd.AddCommand(syncCmd)
+	syncCmd.Flags().StringVarP(&source, "source", "s", "", "Drush alias to use as source")
+	syncCmd.Flags().StringVarP(&destination, "destination", "d", "", "Drush alias to use as destination")
 }

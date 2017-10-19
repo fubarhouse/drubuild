@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Deprecated: use Yoink instead.
 func main() {
 
 	var Alias = flag.String("alias", "", "Alias of site")
@@ -20,6 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.Warnln("This binary has been deprecated in favor of `yoink backup`.")
 	x := make.NewSite("", "", "", *Alias, "", "", "", "")
 	x.ActionBackup(*Destination)
 }

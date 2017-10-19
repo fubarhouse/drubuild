@@ -15,39 +15,29 @@
 package cmd
 
 import (
-	"os/exec"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"fmt"
 )
 
-// backupCmd represents the backup command
-var backupCmd = &cobra.Command{
-	Use:   "backup",
-	Short: "Take a archive-dump snapshot of a local site",
+// syncCmd represents the backup command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialise a set of templates in the provided destination path",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if source == "" || destination == "" {
+		if destination == "" {
 			cmd.Usage()
-			fmt.Println("\nsource and/or destination are not set")
+			fmt.Println("\ndestination is not set")
 			os.Exit(1)
 		}
-		d, err := exec.LookPath("drush")
-		if err != nil {
-			log.Fatal("Drush was not found in your $PATH")
-		}
-		c := exec.Command(d, source, "archive-dump", "--destination=" + destination)
-		c.Stdout = os.Stdout
-		c.Stderr = os.Stderr
-		c.Run()
-		c.Wait()
+		fmt.Sprint(templateAlias, templateSitesPhp, templateVhostApache, templateVhostHttpd, templateVhostNginx)
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(backupCmd)
-	backupCmd.Flags().StringVarP(&source, "source", "s", "", "Drush alias to use for operation")
-	backupCmd.Flags().StringVarP(&destination, "destination", "d", "", "Path to Drush archive-dump destination")
+	RootCmd.AddCommand(initCmd)
+	initCmd.Flags().StringVarP(&webserver, "webserver", "w", "", "Name of webserver. Supports apache, httpd, nginx.")
+	initCmd.Flags().StringVarP(&destination, "destination", "d", "", "Destination path to where the templates will be installed.")
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Deprecated: use Yoink instead.
 func main() {
 
 	var SourceAlias = flag.String("source-alias", "", "Alias of source site")
@@ -35,6 +36,8 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
+
+	log.Warnln("This binary has been deprecated in favor of `yoink sync`.")
 
 	if *SyncDB {
 		log.Infoln("Database was marked for syncing, working now...")

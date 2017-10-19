@@ -1,4 +1,4 @@
-// Copyright © 2017 NAME HERE Karl.Hepworth@gmail.com
+// Copyright © 2017 Karl Hepworth <Karl.Hepworth@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,37 +14,151 @@
 
 package cmd
 
-import (
-	"fmt"
+var templateAlias = `
+<?php
+$aliases['{{ .Alias }}'] = array(
+  'root' => '{{ .Root }}',
+  'uri' => '{{ .Domain }}',
+  'path-aliases' => array(
+    '%files' => 'sites/{{ .Name }}/files',
+    '%private' => 'sites/{{ .Name }}/private',
+  ),
+);
+?>
+`
 
-	"github.com/spf13/cobra"
-)
+var templateVhostApache = `
+DirectoryIndex index.php
 
-// templateCmd represents the template command
-var template = &cobra.Command{
-	Use:   "template",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+<VirtualHost *:80>
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("template called")
-	},
+    ServerName {{ .Domain }}
+    DocumentRoot {{ .Root }}
+
+    <Directory "{{ .Root }}">
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Options -Indexes +FollowSymLinks
+      Require all granted
+    </Directory>
+
+</VirtualHost>
+`
+var templateVhostHttpd = `
+DirectoryIndex index.php
+<VirtualHost *:80>
+    ServerName {{ .Domain }}
+    DocumentRoot {{ .Root }}
+    <Directory "{{ .Root }}">
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Options -Indexes +FollowSymLinks
+      Require all granted
+    </Directory>
+</VirtualHost>
+`
+
+var templateVhostNginx = `
+server {
+    listen 80;
+
+    server_name {{ .Domain }}
+    error_log /var/log/nginx/error.log info;
+    root {{ .Root }};
+    index index.php index.html index.htm;
+
+    location / {
+        # Don't touch PHP for static content.
+        try_files $uri @rewrite;
+    }
+
+    # Don't allow direct access to PHP files in the vendor directory.
+    location ~ /vendor/.*\.php$ {
+        deny all;
+        return 404;
+    }
+
+    # Use fastcgi for all php files.
+    location ~ \.php$ {
+        # Secure *.php files.
+        try_files $uri = 404;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        # fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_pass unix:/var/run/php/php5.6-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 120;
+    }
+
+    location @rewrite {
+        # For D7 and above:
+        rewrite ^ /index.php;
+
+        # For Drupal 6 and below:
+        #rewrite ^/(.*)$ /index.php?q=$1;
+    }
+
+    location ~ ^/sites/.*/files/styles/ {
+        try_files $uri @rewrite;
+    }
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location ~ (^|/)\. {
+        return 403;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+    }
+
+    gzip on;
+    gzip_proxied any;
+    gzip_static on;
+    gzip_http_version 1.0;
+    gzip_disable "MSIE [1-6]\.";
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/javascript
+        application/x-javascript
+        application/json
+        application/xml
+        application/xml+rss
+        application/xhtml+xml
+        application/x-font-ttf
+        application/x-font-opentype
+        image/svg+xml
+        image/x-icon;
+    gzip_buffers 16 8k;
+    gzip_min_length 512;
 }
+`
 
-func init() {
-	RootCmd.AddCommand(template)
+var templateSitesPhp = `
+<?php
 
-	// Here you will define your flags and configuration settings.
+/**
+ * @file
+ * Configuration file for Drupal's multi-site directory aliasing feature.
+ */
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// template.PersistentFlags().String("foo", "", "A help for foo")
+$sites['{{ .Alias }}'] = '{{ .Name }}';
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// template.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
+?>
+`

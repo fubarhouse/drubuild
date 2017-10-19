@@ -83,6 +83,7 @@ func verifyFiles(FilepathVerification bool, DestAlias, FilepathPublic, FilepathP
 	}
 }
 
+// Deprecated: use Yoink instead.
 func main() {
 
 	var SourceAlias = flag.String("source-alias", "", "Alias of source site")

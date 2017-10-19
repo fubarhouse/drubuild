@@ -3,7 +3,6 @@ package make
 import (
 	"github.com/fubarhouse/golang-drush/vhost"
 	"strings"
-	"log"
 )
 
 // VhostPathSet sets a virtual host path

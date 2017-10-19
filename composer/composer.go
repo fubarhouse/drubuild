@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 	"os"
 	"io/ioutil"
-	"github.com/fubarhouse/golang-drush/make"
-	"github.com/fubarhouse/drubuild/composer"
 )
 
 // DrupalProject is a type to provide both name and verison of a given Drupal project.
