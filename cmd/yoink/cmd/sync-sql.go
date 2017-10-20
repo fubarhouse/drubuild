@@ -25,7 +25,7 @@ import (
 
 // syncCmd represents the backup command
 var syncCmd = &cobra.Command{
-	Use:   "sql-sync",
+	Use:   "sync-sql",
 	Short: "Execute drush sql-sync between two drush aliases" +
 		"Note: Drush does not allow remote-remote syncing.",
 	Long: ``,
@@ -39,7 +39,7 @@ var syncCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("Drush was not found in your $PATH")
 		}
-		c := exec.Command(d, source, "sql-sync", source, destination)
+		c := exec.Command(d, "sql-sync", source, destination)
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		c.Run()
