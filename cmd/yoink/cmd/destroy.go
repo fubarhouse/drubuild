@@ -15,36 +15,34 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+
+	"github.com/fubarhouse/golang-drush/make"
 )
 
 // destroyCmd represents the destroy command
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Remove all traces of an installed site.",
+	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("destroy called")
+		x := make.NewSite("none", name, destination, alias, "", domain, "", "")
+		y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
+		x.DatabaseSet(y)
+		x.ActionDestroy()
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(destroyCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// destroyCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// destroyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Flags
+	destroyCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
+	destroyCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
+	destroyCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
+	destroyCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
+	// Mark as required
+	destroyCmd.MarkFlagRequired("name")
+	destroyCmd.MarkFlagRequired("alias")
+	destroyCmd.MarkFlagRequired("destination")
+	destroyCmd.MarkFlagRequired("domain")
 }

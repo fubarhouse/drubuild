@@ -15,23 +15,39 @@
 package cmd
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
+
+	composer2 "github.com/fubarhouse/golang-drush/composer"
+	"github.com/fubarhouse/golang-drush/make"
 )
 
 // rebuildCmd represents the rebuild command
 var rebuildCmd = &cobra.Command{
 	Use:   "rebuild",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Rebuild a site",
+	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("rebuild called")
+		x := make.Site{}
+		x.TimeStampSet("")
+		x.Name = name
+		x.Path = destination
+		x.WorkingCopy = workingCopy
+
+		if rewriteSource != "" && rewriteDestination != "" {
+			x.MakeFileRewriteSource = rewriteSource
+			x.MakeFileRewriteDestination = rewriteDestination
+		}
+
+		MakefilesFormatted := strings.Replace(makes, " ", "", -1)
+		MakeFiles := strings.Split(MakefilesFormatted, ",")
+
+		if composer != "" {
+			composer2.InstallComposerCodebase(name, x.TimeStampGet(), composer, destination)
+		} else {
+			x.ActionRebuildCodebase(MakeFiles)
+		}
 	},
 }
 

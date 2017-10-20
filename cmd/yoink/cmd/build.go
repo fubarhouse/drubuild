@@ -21,7 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	make2 "github.com/fubarhouse/golang-drush/make"
+	"github.com/fubarhouse/golang-drush/make"
 	composer2 "github.com/fubarhouse/golang-drush/composer"
 )
 
@@ -47,8 +47,8 @@ var buildCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		x := make2.NewSite("", name, destination, alias, "", domain, "", "")
-		y := make2.NewmakeDB("127.0.0.1", "root", "root", 3306)
+		x := make.NewSite("", name, destination, alias, "", domain, "", "")
+		y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 		x.DatabaseSet(y)
 		if timestamp == 0 {
 			x.TimeStampReset()
