@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -27,25 +29,34 @@ import (
 var rebuildCmd = &cobra.Command{
 	Use:   "rebuild",
 	Short: "Rebuild a site",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		x := make.Site{}
 		x.TimeStampSet("")
 		x.Name = name
 		x.Path = destination
 		x.WorkingCopy = workingCopy
-
-		if rewriteSource != "" && rewriteDestination != "" {
-			x.MakeFileRewriteSource = rewriteSource
-			x.MakeFileRewriteDestination = rewriteDestination
-		}
-
-		MakefilesFormatted := strings.Replace(makes, " ", "", -1)
-		MakeFiles := strings.Split(MakefilesFormatted, ",")
+		x.Composer = false
 
 		if composer != "" {
-			composer2.InstallComposerCodebase(name, x.TimeStampGet(), composer, destination)
+			x.Composer = true
+			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path)
 		} else {
+
+			if makes == "" {
+				fmt.Println("Error: Required flag(s) \"makes\" have/has not been set")
+				cmd.Usage()
+				fmt.Println("\nRequired flag(s) \"makes\" have/has not been set")
+				os.Exit(1)
+			}
+
+			x.Make = makes
+			MakefilesFormatted := strings.Replace(makes, " ", "", -1)
+			MakeFiles := strings.Split(MakefilesFormatted, ",")
+			if rewriteSource != "" && rewriteDestination != "" {
+				x.MakeFileRewriteSource = rewriteSource
+				x.MakeFileRewriteDestination = rewriteDestination
+			}
 			x.ActionRebuildCodebase(MakeFiles)
 		}
 	},
@@ -53,14 +64,17 @@ var rebuildCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(rebuildCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// rebuildCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// rebuildCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rebuildCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
+	rebuildCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
+	rebuildCmd.Flags().StringVarP(&composer, "composer", "c", "", "Path to the composer.json file.")
+	rebuildCmd.Flags().BoolVarP(&workingCopy, "working-copy", "w", false, "Mark as a working-copy during the build process.")
+	// Deprecated flags
+	rebuildCmd.Flags().StringVarP(&makes, "makes", "m", "", "A comma-separated list of make files for use")
+	rebuildCmd.Flags().StringVarP(&rewriteSource, "rewrite-source", "x", "", "The rewrite string source")
+	rebuildCmd.Flags().StringVarP(&rewriteDestination, "rewrite-destination", "y", "", "The rewrite string destination")
+	// Markers
+	rebuildCmd.Flags().MarkHidden("rewrite-source")
+	rebuildCmd.Flags().MarkHidden("rewrite-destination")
+	rebuildCmd.MarkFlagRequired("name")
+	rebuildCmd.MarkFlagRequired("destination")
 }
