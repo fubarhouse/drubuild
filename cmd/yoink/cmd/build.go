@@ -16,45 +16,34 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/golang-drush/make"
 	composer2 "github.com/fubarhouse/golang-drush/composer"
+	"github.com/fubarhouse/golang-drush/make"
+	"github.com/spf13/viper"
 )
 
 // buildCmd represents the build command
 var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "The build process for Yoink",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		var quitOut bool
-		var quitMessages []string
-		if makes == "" && composer == "" {
-			quitMessages = append(quitMessages, "makes or composer values were not specified")
-			quitOut = true
-		}
-
-		if quitOut == true {
-			cmd.Usage()
-			fmt.Println()
-			for _, v := range quitMessages {
-				fmt.Println(v)
-			}
-			os.Exit(1)
+		if timestamp == 0 {
+			timestamp, _ = strconv.ParseInt(time.Now().Format("20060102150405"), 0, 0)
+			log.Printf("Timestamp not specified, using %v", timestamp)
 		}
 
 		x := make.NewSite("", name, destination, alias, "", domain, "", "")
-		y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
+		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
-		if timestamp == 0 {
-			x.TimeStampReset()
-		} else {
-			x.TimeStampSet(string(timestamp))
-		}
+
 		if workingCopy {
 			x.WorkingCopy = true
 		}
@@ -62,7 +51,7 @@ var buildCmd = &cobra.Command{
 		if composer != "" {
 			x.Composer = true
 			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path)
-		} else {
+		} else if makes != "" {
 			x.Make = makes
 			MakefilesFormatted := strings.Replace(makes, " ", "", -1)
 			MakeFiles := strings.Split(MakefilesFormatted, ",")
@@ -72,12 +61,33 @@ var buildCmd = &cobra.Command{
 				x.MakeFileRewriteDestination = rewriteDestination
 			}
 			x.ActionRebuildCodebase(MakeFiles)
+		} else {
+			cmd.Usage()
+			fmt.Println()
+			log.Fatalln("makes and/or composer values were not specified")
+			os.Exit(1)
 		}
+
 		x.InstallSiteRef()
-		x.ActionInstall()
 		x.SymReinstall()
-		//x.VhostInstall()
-		//x.AliasInstall()
+		x.ActionInstall()
+
+		if ok, err := os.Stat("vhost.gotpl"); err == nil {
+			log.Infof("Found template %v", ok.Name())
+			x.Template = ok.Name()
+			x.VhostInstall()
+		} else {
+			log.Println("Could not find virtual host template.")
+		}
+
+		//if ok, err := os.Stat("alias.gotpl"); err != nil {
+		//	log.Infof("Found template %v", ok.Name())
+		//	x.Template = ok.Name()
+		if alias == "" {
+			x.Alias = domain
+		}
+		x.AliasInstall()
+		//}
 	},
 }
 
@@ -85,7 +95,7 @@ func init() {
 	RootCmd.AddCommand(buildCmd)
 	// Required flags
 	buildCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
-	//buildCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
+	buildCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
 	buildCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
 	buildCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
 	// Very important but not completely needed > 0 is needed though.
@@ -102,7 +112,16 @@ func init() {
 	buildCmd.Flags().MarkHidden("rewrite-destination")
 	// Mark required flags.
 	buildCmd.MarkFlagRequired("name")
-	buildCmd.MarkFlagRequired("alias")
 	buildCmd.MarkFlagRequired("destination")
 	buildCmd.MarkFlagRequired("domain")
+
+	// Set configurables to defaults.
+	viper.SetDefault("db_user", "root")
+	viper.SetDefault("db_pass", "root")
+	viper.SetDefault("db_host", "127.0.0.1")
+	viper.SetDefault("db_port", 3306)
+	db_user = viper.GetString("db_user")
+	db_pass = viper.GetString("db_pass")
+	db_host = viper.GetString("db_host")
+	db_port = viper.GetInt("db_port")
 }

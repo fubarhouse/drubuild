@@ -1,8 +1,9 @@
 package make
 
 import (
-	"github.com/fubarhouse/golang-drush/vhost"
 	"strings"
+
+	"github.com/fubarhouse/golang-drush/vhost"
 )
 
 // VhostPathSet sets a virtual host path
@@ -13,11 +14,7 @@ func (Site *Site) VhostPathSet(value string) {
 // VhostInstall install a virtual host
 func (Site *Site) VhostInstall() {
 	var vhostPath string
-	if Site.Composer {
-		vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(),  ".latest/docroot", -1)
-	} else {
-		vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
-	}
+	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), Site.Domain+".latest/docroot", -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, Site.Webserver, Site.Domain, Site.Vhostpath)
 	vhostFile.Install(Site.Template)
 }
@@ -25,11 +22,7 @@ func (Site *Site) VhostInstall() {
 // VhostUninstall un-installs a virtual host
 func (Site *Site) VhostUninstall() {
 	var vhostPath string
-	if Site.Composer {
-		vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest" + "/docroot", -1)
-	} else {
-		vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest", -1)
-	}
+	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), Site.Domain+".latest/docroot", -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, Site.Webserver, Site.Domain, Site.Vhostpath)
 	vhostFile.Uninstall()
 }

@@ -4,11 +4,6 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
-	"github.com/fubarhouse/golang-drush/composer"
-	"github.com/fubarhouse/golang-drush/makeupdater"
-	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -17,6 +12,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/golang-drush/composer"
+	"github.com/fubarhouse/golang-drush/makeupdater"
+	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 )
 
 // ReplaceTextInFile is a utility function to replace all instances of a string in a file.
@@ -80,23 +81,29 @@ type DrupalLibrary struct {
 
 // Site struct which represents a build website being used.
 type Site struct {
-	Timestamp                  string
-	Path                       string
-	Make                       string
-	Name                       string
-	Alias                      string
-	Domain                     string
-	database                   *makeDB
-	Webserver                  string
-	Vhostpath                  string
-	Template                   string
-	MakeFileRewriteSource      string
+	Timestamp string
+	Path      string
+
+	// Deprecated: use composer instead
+	Make      string
+	Name      string
+	Alias     string
+	Domain    string
+	database  *makeDB
+	Webserver string
+	Vhostpath string
+	Template  string
+
+	// Deprecated: use composer instead
+	MakeFileRewriteSource string
+
+	// Deprecated: use composer instead
 	MakeFileRewriteDestination string
 	FilePathPrivate            string
 	FilePathPublic             string
 	FilePathTemp               string
 	WorkingCopy                bool
-	Composer 				   bool
+	Composer                   bool
 }
 
 // NewSite instantiates an instance of the struct Site
@@ -166,9 +173,9 @@ func (Site *Site) ActionInstall() {
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
 	if Site.Composer {
-		sitePath = Site.Path+"/"+Site.Name+Site.Timestamp+"/docroot"
+		sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot"
 	} else {
-		sitePath = Site.Path+"/"+Site.Name+Site.Timestamp
+		sitePath = Site.Path + "/" + Site.Name + Site.Timestamp
 	}
 	_, installErr := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd).Output()
 	if installErr != nil {
@@ -624,7 +631,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	if Site.Timestamp == "" {
 		drushMake.SetWorkingDir(Site.Path + "/")
 	} else {
-		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + "")
+		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/")
 	}
 	mkdirErr := os.MkdirAll(drushMake.GetWorkingDir(), 0755)
 	if mkdirErr != nil {
@@ -635,7 +642,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 
 	_ = drushMake.LiveOutput()
 
-	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/README.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/README.txt"); os.IsNotExist(err) {
 		log.Errorln("Drush failed to copy the file system into place.")
 		os.Exit(1)
 	}
@@ -664,11 +671,7 @@ func (Site *Site) InstallSiteRef() {
 		"Domain": Site.Domain,
 	}
 	var dirPath string
-	if Site.Composer {
-		dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/sites/"
-	} else {
-		dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/sites/"
-	}
+	dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/sites/"
 	dirErr := os.MkdirAll(dirPath+Site.Name, 0755)
 	if dirErr != nil {
 		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)

@@ -1,12 +1,12 @@
 package main
 
 import (
-"flag"
-log "github.com/Sirupsen/logrus"
-"github.com/fubarhouse/golang-drush/composer"
-"github.com/fubarhouse/golang-drush/make"
-"os"
-"strings"
+	"flag"
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/golang-drush/composer"
+	"github.com/fubarhouse/golang-drush/make"
+	"os"
+	"strings"
 )
 
 func main() {

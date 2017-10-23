@@ -18,16 +18,20 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/fubarhouse/golang-drush/make"
+	"github.com/spf13/viper"
 )
 
 // destroyCmd represents the destroy command
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "Remove all traces of an installed site.",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		if alias == "" {
+			alias = domain
+		}
 		x := make.NewSite("none", name, destination, alias, "", domain, "", "")
-		y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
+		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
 		x.ActionDestroy()
 	},
@@ -42,7 +46,15 @@ func init() {
 	destroyCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
 	// Mark as required
 	destroyCmd.MarkFlagRequired("name")
-	destroyCmd.MarkFlagRequired("alias")
 	destroyCmd.MarkFlagRequired("destination")
 	destroyCmd.MarkFlagRequired("domain")
+
+	viper.SetDefault("db_user", "root")
+	viper.SetDefault("db_pass", "root")
+	viper.SetDefault("db_host", "127.0.0.1")
+	viper.SetDefault("db_port", 3306)
+	db_user = viper.GetString("db_user")
+	db_pass = viper.GetString("db_pass")
+	db_host = viper.GetString("db_host")
+	db_port = viper.GetInt("db_port")
 }

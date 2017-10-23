@@ -2,11 +2,12 @@ package alias
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"os"
+	"os/exec"
 	"os/user"
 	"strings"
-	"os/exec"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Alias is a struct for managing a single Drush Alias
@@ -19,7 +20,7 @@ type Alias struct {
 // NewAlias instantiates an Alias struct
 func NewAlias(name, path, alias string) *Alias {
 	alias = strings.Replace(alias, "@", "", -1)
-	Command := exec.Command("drush", "sa", "@" + alias)
+	Command := exec.Command("drush", "sa", "@"+alias)
 	CommandOut, _ := Command.CombinedOutput()
 	if strings.Contains(string(CommandOut), "Could not find the alias") {
 		log.Warnln(string(CommandOut))
@@ -61,34 +62,7 @@ func (Alias *Alias) GetPath() string {
 
 // Install an alias from an alias struct
 func (Alias *Alias) Install() {
-	Root := Alias.GetPath()
-	if strings.HasSuffix(Root, "_latest/docroot") {
-		if strings.HasSuffix(Root, "_latest/docroot") {
-			Root = strings.TrimSuffix(Root, "_latest/docroot")
-		}
-		if strings.HasSuffix(Root, "latest") {
-			Root = strings.TrimSuffix(Root, "latest")
-		}
-		if strings.HasSuffix(Root, ".") {
-			Root = strings.TrimSuffix(Root, ".")
-		}
-		if strings.HasSuffix(Root, "_") {
-			Root = strings.TrimSuffix(Root, "_")
-		}
-		Root = fmt.Sprintf("%v/%v.latest/docroot", Root, Alias.GetURI())
-	} else {
-		if strings.HasSuffix(Root, "latest") {
-			Root = strings.TrimSuffix(Root, "latest")
-		}
-		if strings.HasSuffix(Root, ".") {
-			Root = strings.TrimSuffix(Root, ".")
-		}
-		if strings.HasSuffix(Root, "_") {
-			Root = strings.TrimSuffix(Root, "_")
-		}
-		Root = fmt.Sprintf("%v/%v.latest", Root, Alias.GetURI())
-	}
-
+	Root := fmt.Sprintf("%v/%v.latest/docroot", Alias.GetPath(), Alias.GetURI())
 	data := map[string]string{
 		"Name":   Alias.GetName(),
 		"Root":   Root,

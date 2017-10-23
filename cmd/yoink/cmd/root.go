@@ -18,10 +18,14 @@ import (
 	"fmt"
 	"os"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
+	cfgFile string
+
 	// timestamp is an int64 which is representational of a date format in the
 	// format of YYYYMMDDHHMMSS. An example of this is
 	// 19700101000000.
@@ -52,7 +56,8 @@ var (
 	// it will be determined based upon the command in use.
 	destination string
 
-	// alias is the destination drush alias this site should be using
+	// alias is the destination drush alias this site should be using.
+	// in many places this will default to the domain name if not specified.
 	alias string
 
 	// domain is the destination domain to be used when setting up a new site
@@ -66,7 +71,7 @@ var (
 
 	// when working with make files, you can tell the system to rewrite
 	// a given module branch to change via a unique string inside the make
-	// file(s). This represents the source of that change, what string is to be
+	// file(s). this represents the source of that change, what string is to be
 	// replaced in the generated make file.
 	//
 	// Deprecated: use composer instead.
@@ -74,7 +79,7 @@ var (
 
 	// when working with make files, you can tell the system to rewrite
 	// a given module branch to change via a unique string inside the make
-	// file(s). This represents the destination result of that change, what the
+	// file(s). this represents the destination result of that change, what the
 	// string is to be replaced to be in the generated make file.
 	//
 	// Deprecated: use composer instead.
@@ -101,18 +106,63 @@ var (
 	// a working-copy is the local file-system including any development
 	// file system data associated with each project/module.
 	workingCopy bool
-)
 
+	// db_user is the string which represents the configured user account.
+	// this user account should have permission to create databases, and
+	// this user can be configured at $HOME/golang-drush.yml, and defaults
+	// to 'root'.
+	db_user string
+
+	// db_pass is an unprotected string which represents the configured user
+	// password. this user account should have permission to create
+	// databases, and this password can be configured at
+	// $HOME/golang-drush.yml, and defaults to 'root'.
+	db_pass string
+
+	// db_host is the string which represents the configured database host
+	// this host path can be configured at $HOME/golang-drush.yml, and
+	// defaults to '127.0.0.1'.
+	db_host string
+
+	// db_port is an integer which represents the configured database port
+	// this port path can be configured at $HOME/golang-drush.yml, and
+	// defaults to 3306.
+	db_port int
+)
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "yoink",
 	Short: "A Drupal build system.",
-	Long: ``,
+	Long:  ``,
 }
 
 // Execute is the main function for the root command.
 func Execute() {
+
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Search config in home directory with name "golang-drush" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigName("golang-drush")
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

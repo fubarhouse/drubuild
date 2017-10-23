@@ -3,13 +3,14 @@ package composer
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/makeupdater"
-	"os/exec"
-	"strings"
-	"path/filepath"
-	"os"
-	"io/ioutil"
 )
 
 // DrupalProject is a type to provide both name and verison of a given Drupal project.
@@ -94,7 +95,7 @@ func FindComposerJSONFiles(Path string) []string {
 func InstallComposerJSONFiles(Paths []string) {
 	for _, v := range Paths {
 		v = strings.Replace(v, "composer.json", "", -1)
-		cpCmd := exec.Command("composer", "install", "--prefer-dist", "--working-dir=" + v)
+		cpCmd := exec.Command("composer", "install", "--prefer-dist", "--working-dir="+v)
 		cpOut, cpErr := cpCmd.CombinedOutput()
 		if cpErr != nil {
 			log.Errorln("Could not complete:", string(cpOut), cpErr)
@@ -124,12 +125,12 @@ func copy(src, dest string) error {
 func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination string) {
 	Destination += "/" + Name + Timestamp
 	// Identify if copying the file is required.
-	ComposerPath := strings.Replace(ComposerFile, "/composer.json", "",  -1)
+	ComposerPath := strings.Replace(ComposerFile, "/composer.json", "", -1)
 	ComposerPath = strings.TrimRight(ComposerPath, "/")
 	ComposerDestination := strings.TrimRight(Destination, "/") + "/" + Name + Timestamp
 
 	if _, err := os.Stat(Destination); err != nil {
-		ok := os.MkdirAll(Destination, 0775);
+		ok := os.MkdirAll(Destination, 0775)
 		if ok != nil {
 			log.Fatalf("could not create directory %v: %v", Destination, ok.Error())
 		}
@@ -137,7 +138,7 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 
 	if !strings.HasSuffix(ComposerDestination, ComposerPath) {
 		log.Infof("composer.json not found, copying from %v", ComposerFile)
-		copy(ComposerFile, Destination + "/composer.json")
+		copy(ComposerFile, Destination+"/composer.json")
 	} else {
 		log.Infof("%v/composer.json was found, not copying", ComposerDestination)
 	}
