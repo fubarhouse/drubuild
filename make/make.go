@@ -172,11 +172,7 @@ func (Site *Site) ActionInstall() {
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
-	if Site.Composer {
-		sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot"
-	} else {
-		sitePath = Site.Path + "/" + Site.Name + Site.Timestamp
-	}
+	sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot"
 	_, installErr := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd).Output()
 	if installErr != nil {
 		log.Warnln("Unable to install Drupal:", installErr)
