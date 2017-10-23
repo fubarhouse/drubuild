@@ -72,12 +72,12 @@ var buildCmd = &cobra.Command{
 		x.SymReinstall()
 		x.ActionInstall()
 
-		if ok, err := os.Stat("vhost.gotpl"); err == nil {
-			log.Infof("Found template %v", ok.Name())
+		if ok, err := os.Stat(virtualhost_template); err == nil {
+			log.Infof("Found template %v for usage", ok.Name())
 			x.Template = ok.Name()
 			x.VhostInstall()
 		} else {
-			log.Println("Could not find virtual host template.")
+			log.Println("Could not find configured or default virtual host template.")
 		}
 
 		//if ok, err := os.Stat("alias.gotpl"); err != nil {
@@ -120,8 +120,18 @@ func init() {
 	viper.SetDefault("db_pass", "root")
 	viper.SetDefault("db_host", "127.0.0.1")
 	viper.SetDefault("db_port", 3306)
+	viper.SetDefault("webserver", "nginx")
+	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-available")
+	viper.SetDefault("virtualhost_template", "vhost.gotpl")
+
+	// Database
 	db_user = viper.GetString("db_user")
 	db_pass = viper.GetString("db_pass")
 	db_host = viper.GetString("db_host")
 	db_port = viper.GetInt("db_port")
+
+	// Virtual host
+	webserver = viper.GetString("webserver")
+	virtualhost_path = viper.GetString("virtualhost_path")
+	virtualhost_template = viper.GetString("virtualhost_template")
 }

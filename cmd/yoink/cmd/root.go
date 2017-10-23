@@ -92,14 +92,6 @@ var (
 	// associated with legacy make files.
 	composer string
 
-	// webserver indicates which template should be used when using the
-	// init command, which will generate a new template for you to use in the
-	// destination folder, which will be at the location of the destination flag
-	// or the current directory.
-	//
-	// This flag only accepts the values "apache", "httpd" and "nginx".
-	webserver string
-
 	// working-copy identifies if the build should leave the .git file-system
 	// in-tact during the build. this would be useful when you are expecting
 	// to send a file system to production, or for local development.
@@ -128,6 +120,23 @@ var (
 	// this port path can be configured at $HOME/golang-drush.yml, and
 	// defaults to 3306.
 	db_port int
+
+	// webserver is the name of the software package which handles HTTP
+	// and HTTPS requests. this variable simply represents the name of
+	// the service associated with web request handling.
+	// setting this value is done through configuration management.
+	webserver string
+
+	// virtualhost_path is the path which the web server uses to store
+	// all virtual hosts for the server. this is to identify where
+	// processed templates should live and be removed from.
+	// setting this value is done through configuration management.
+	virtualhost_path string
+
+	// path to the template to be used for virtual hosts supported by
+	// the websrver variable. This assists to provide the webserver
+	// a pre-configured set of defaults for a working site.
+	virtualhost_template string
 )
 
 // RootCmd represents the base command when called without any subcommands
