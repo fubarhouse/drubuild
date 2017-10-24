@@ -25,6 +25,7 @@ func (Site *Site) AliasInstall() {
 	siteAlias.SetName(Site.Name)
 	siteAlias.SetPath(Site.Path)
 	siteAlias.SetURI(Site.Alias)
+	siteAlias.SetTemplate(Site.AliasTemplate)
 	siteAlias.Install()
 }
 

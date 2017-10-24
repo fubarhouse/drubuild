@@ -94,6 +94,8 @@ type Site struct {
 	Vhostpath string
 	Template  string
 
+	AliasTemplate string
+
 	// Deprecated: use composer instead
 	MakeFileRewriteSource string
 

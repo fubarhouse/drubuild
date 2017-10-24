@@ -17,22 +17,23 @@ package cmd
 import (
 	"os"
 
-	"github.com/spf13/cobra"
 	"fmt"
+
+	"github.com/spf13/cobra"
 )
 
 // syncCmd represents the backup command
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialise a set of templates in the provided destination path",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if destination == "" {
 			cmd.Usage()
 			fmt.Println("\ndestination is not set")
 			os.Exit(1)
 		}
-		fmt.Sprint(templateAlias, templateSitesPhp, templateVhostApache, templateVhostHttpd, templateVhostNginx)
+		//fmt.Sprint(templateAlias, templateSitesPhp, templateVhostApache, templateVhostHttpd, templateVhostNginx)
 	},
 }
 

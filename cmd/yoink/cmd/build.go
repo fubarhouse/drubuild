@@ -40,7 +40,8 @@ var buildCmd = &cobra.Command{
 			log.Printf("Timestamp not specified, using %v", timestamp)
 		}
 
-		x := make.NewSite("", name, destination, alias, "", domain, "", "")
+		x := make.NewSite("", name, destination, alias, webserver, domain, virtualhost_path, virtualhost_template)
+		x.AliasTemplate = alias_template
 		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
 
@@ -72,22 +73,29 @@ var buildCmd = &cobra.Command{
 		x.SymReinstall()
 		x.ActionInstall()
 
-		if ok, err := os.Stat(virtualhost_template); err == nil {
-			log.Infof("Found template %v for usage", ok.Name())
-			x.Template = ok.Name()
-			x.VhostInstall()
-		} else {
-			log.Println("Could not find configured or default virtual host template.")
+		if virtualhost_template != "" {
+			if ok, err := os.Stat(virtualhost_template); err == nil {
+				log.Infof("Found template %v for usage", ok.Name())
+				x.Template = ok.Name()
+			} else {
+				log.Println("Could not find configured or default virtual host template.")
+			}
 		}
+		x.VhostInstall()
 
-		//if ok, err := os.Stat("alias.gotpl"); err != nil {
-		//	log.Infof("Found template %v", ok.Name())
-		//	x.Template = ok.Name()
+		if alias_template != "" {
+			if ok, err := os.Stat(alias_template); err != nil {
+				log.Infof("Found template %v", ok.Name())
+				x.AliasTemplate = ok.Name()
+			} else {
+				t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/alias.gotpl", os.Getenv("GOPATH"))
+				log.Infof("Could not find template %v, using %v", ok.Name(), t)
+			}
+		}
 		if alias == "" {
 			x.Alias = domain
 		}
 		x.AliasInstall()
-		//}
 	},
 }
 
@@ -121,14 +129,18 @@ func init() {
 	viper.SetDefault("db_host", "127.0.0.1")
 	viper.SetDefault("db_port", 3306)
 	viper.SetDefault("webserver", "nginx")
+	viper.SetDefault("alias_template", "")
 	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-available")
-	viper.SetDefault("virtualhost_template", "vhost.gotpl")
+	viper.SetDefault("virtualhost_template", "")
 
 	// Database
 	db_user = viper.GetString("db_user")
 	db_pass = viper.GetString("db_pass")
 	db_host = viper.GetString("db_host")
 	db_port = viper.GetInt("db_port")
+
+	// Alias template
+	alias_template = viper.GetString("alias_template")
 
 	// Virtual host
 	webserver = viper.GetString("webserver")

@@ -127,6 +127,12 @@ var (
 	// setting this value is done through configuration management.
 	webserver string
 
+	// alias_template is the path to the drush alias template file
+	// processed by this application. It can be blank/empty and
+	// it will use the template file located parallel to this.cmd
+	// this value is configurable through configuration management.
+	alias_template string
+
 	// virtualhost_path is the path which the web server uses to store
 	// all virtual hosts for the server. this is to identify where
 	// processed templates should live and be removed from.

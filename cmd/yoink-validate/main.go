@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/alias"
 	//"github.com/fubarhouse/golang-drush/make"
-	"github.com/fubarhouse/golang-drush/vhost"
 	"os"
 	"os/user"
+
+	"github.com/fubarhouse/golang-drush/vhost"
 )
 
 func main() {
@@ -43,7 +45,7 @@ func main() {
 		log.Println("Found", *WebserverDir)
 	}
 	log.Println("Installing Vhost")
-	VirtualHost.Install()
+	VirtualHost.Install("")
 	log.Println("Uninstalling Vhost")
 	VirtualHost.Uninstall()
 

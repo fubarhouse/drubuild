@@ -1,0 +1,15 @@
+DirectoryIndex index.php
+
+<VirtualHost *:80>
+
+    ServerName {{ .Domain }}
+    DocumentRoot {{ .Root }}
+
+    <Directory "{{ .Root }}">
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Options -Indexes +FollowSymLinks
+      Require all granted
+    </Directory>
+
+</VirtualHost>

@@ -7,14 +7,27 @@ import (
 	"os/user"
 	"strings"
 
+	"text/template"
+
+	"io/ioutil"
+
 	log "github.com/Sirupsen/logrus"
 )
 
 // Alias is a struct for managing a single Drush Alias
 type Alias struct {
-	name string
-	path string
-	uri  string
+	name     string
+	path     string
+	uri      string
+	template string
+}
+
+func (a *Alias) Template() string {
+	return a.template
+}
+
+func (a *Alias) SetTemplate(template string) {
+	a.template = template
 }
 
 // NewAlias instantiates an Alias struct
@@ -26,7 +39,7 @@ func NewAlias(name, path, alias string) *Alias {
 		log.Warnln(string(CommandOut))
 		return &Alias{}
 	} else {
-		return &Alias{name, path, alias}
+		return &Alias{name, path, alias, ""}
 	}
 }
 
@@ -74,28 +87,24 @@ func (Alias *Alias) Install() {
 	filename := Alias.GetURI() + ".alias.drushrc.php"
 	fullpath := filedir + "/" + filename
 
-	buffer := []byte{60, 63, 112, 104, 112, 10, 36, 97, 108, 105, 97, 115, 101, 115, 91, 39, 65, 76, 73, 65, 83, 39, 93, 32, 61, 32, 97, 114, 114, 97, 121, 40, 10, 32, 32, 39, 114, 111, 111, 116, 39, 32, 61, 62, 32, 39, 82, 79, 79, 84, 39, 44, 10, 32, 32, 39, 117, 114, 105, 39, 32, 61, 62, 32, 39, 68, 79, 77, 65, 73, 78, 39, 44, 10, 32, 32, 39, 112, 97, 116, 104, 45, 97, 108, 105, 97, 115, 101, 115, 39, 32, 61, 62, 32, 97, 114, 114, 97, 121, 40, 10, 32, 32, 32, 32, 39, 37, 102, 105, 108, 101, 115, 39, 32, 61, 62, 32, 39, 115, 105, 116, 101, 115, 47, 78, 65, 77, 69, 47, 102, 105, 108, 101, 115, 39, 44, 10, 32, 32, 32, 32, 39, 37, 112, 114, 105, 118, 97, 116, 101, 39, 32, 61, 62, 32, 39, 115, 105, 116, 101, 115, 47, 78, 65, 77, 69, 47, 112, 114, 105, 118, 97, 116, 101, 39, 44, 10, 32, 32, 41, 44, 10, 41, 59, 10, 63, 62}
-	tpl := fmt.Sprintf("%v", string(buffer[:]))
-	tpl = strings.Replace(tpl, "NAME", data["Name"], -1)
-	tpl = strings.Replace(tpl, "ROOT", data["Root"], -1)
-	tpl = strings.Replace(tpl, "ALIAS", data["Alias"], -1)
-	tpl = strings.Replace(tpl, "DOMAIN", data["Domain"], -1)
-
-	_, statErr := os.Stat(fullpath)
-	if statErr != nil {
-		nf, err := os.Create(fullpath)
-		if err != nil {
-			log.Fatalln("Error creating file", err)
-		}
-		_, err = nf.WriteString(tpl)
-		if err != nil {
-			log.Warnln("Could not add alias", fullpath)
-		} else {
-			log.Infoln("Added alias", filename)
-		}
-		defer nf.Close()
+	t := template.New("alias")
+	if Alias.template == "" {
+		defaultTemplate := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/alias.gotpl", os.Getenv("GOPATH"))
+		defaultData, _ := ioutil.ReadFile(defaultTemplate)
+		t.Parse(string(defaultData))
 	} else {
-		log.Warnln("Alias already created")
+		defaultData, _ := ioutil.ReadFile(Alias.template)
+		t.Parse(string(defaultData))
+	}
+
+	os.Remove(fullpath)
+	file, _ := os.Create(fullpath)
+	tplErr := t.Execute(file, data)
+
+	if tplErr == nil {
+		log.Infof("Successfully templated alias to file %v", fullpath)
+	} else {
+		log.Warnf("Error templating alias to file %v", fullpath)
 	}
 }
 
