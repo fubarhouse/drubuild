@@ -39,7 +39,7 @@ var syncCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("Drush was not found in your $PATH")
 		}
-		c := exec.Command(d, "sql-sync", source, destination)
+		c := exec.Command(d, "sql-sync", source, destination, "--yes")
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		c.Run()
