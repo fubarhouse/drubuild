@@ -77,7 +77,7 @@ func (VirtualHost *VirtualHost) GetInstallationDirectory() string {
 func (VirtualHost *VirtualHost) Install(Template string) {
 	data := map[string]string{
 		"Domain":     VirtualHost.GetDomain(),
-		"ServerRoot": VirtualHost.GetURI(),
+		"Root": VirtualHost.GetURI(),
 	}
 
 	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetDomain() + ".conf"
