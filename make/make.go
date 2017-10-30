@@ -34,6 +34,8 @@ func ReplaceTextInFile(fullPath string, oldString string, newString string) {
 }
 
 // RestartWebServer is a function to run a command to restart the given web service.
+//
+// Deprecated: should be otherwise handled, will be removed in the future.
 func (Site *Site) RestartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "restart").Output()
 	if stdErr != nil {
@@ -44,6 +46,8 @@ func (Site *Site) RestartWebServer() {
 }
 
 // StartWebServer is a function to run a command to start the given web service.
+//
+// Deprecated: should be otherwise handled, will be removed in the future.
 func (Site *Site) StartWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "start").Output()
 	if stdErr != nil {
@@ -54,6 +58,8 @@ func (Site *Site) StartWebServer() {
 }
 
 // StopWebServer is a function to run a command to stop the given web service.
+//
+// Deprecated: should be otherwise handled, will be removed in the future.
 func (Site *Site) StopWebServer() {
 	_, stdErr := exec.Command("sudo", "service", Site.Webserver, "stop").Output()
 	if stdErr != nil {
@@ -64,6 +70,8 @@ func (Site *Site) StopWebServer() {
 }
 
 // DrupalProject struct which represents a Drupal project on drupal.org
+//
+// Deprecated: use composer instead.
 type DrupalProject struct {
 	Type   string
 	Name   string `json:"name"`
@@ -72,6 +80,8 @@ type DrupalProject struct {
 }
 
 // DrupalLibrary houses a single Drupal Library
+//
+// Deprecated: use composer instead.
 type DrupalLibrary struct {
 	Name          string `json:"name"`
 	DownloadType  string `json:"download-type"`
@@ -83,7 +93,6 @@ type DrupalLibrary struct {
 type Site struct {
 	Timestamp string
 	Path      string
-
 	// Deprecated: use composer instead
 	Make      string
 	Name      string
@@ -93,12 +102,9 @@ type Site struct {
 	Webserver string
 	Vhostpath string
 	Template  string
-
 	AliasTemplate string
-
 	// Deprecated: use composer instead
 	MakeFileRewriteSource string
-
 	// Deprecated: use composer instead
 	MakeFileRewriteDestination string
 	FilePathPrivate            string
@@ -130,6 +136,8 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 }
 
 // ActionBackup performs a Drush archive-dump command.
+//
+// Deprecated: use yoink command instead.
 func (Site *Site) ActionBackup(destination string) {
 	if Site.AliasExists(Site.Name) == true {
 		x := command.NewDrushCommand()
@@ -140,16 +148,6 @@ func (Site *Site) ActionBackup(destination string) {
 		} else {
 			log.Infof("Could not back up site %v to %v: %v", Site.Alias, destination, err.Error())
 		}
-	}
-}
-
-// ActionBuild is a superseded build action, requires action, documentation or removal.
-func (Site *Site) ActionBuild() {
-	// TODO: Define purpose with the existence of ProcessMake()
-	if Site.AliasExists(Site.Name) == true {
-		Site.Path = fmt.Sprintf("%v%v", Site.Path, Site.TimeStampGet())
-		//Site.ProcessMakes([]string{"core.make", "libraries.make", "contrib.make", "custom.make"})
-		Site.ActionInstall()
 	}
 }
 
@@ -183,31 +181,10 @@ func (Site *Site) ActionInstall() {
 	}
 }
 
-// ActionKill will delete a single site instance.
-func (Site *Site) ActionKill() {
-	// What to do with the default...
-	if Site.AliasExists(Site.Name) == true {
-		Site.Path = fmt.Sprintf("%v", Site.Path)
-		_, err := os.Stat(Site.Path)
-		if err == nil {
-			os.Remove(Site.Path)
-		}
-	}
-}
-
-// ActionRebuild rebuild site structs, needs action, documentation or purging.
-func (Site *Site) ActionRebuild() {
-	// TODO: Define purpose with the existence of ProcessMake()
-	if Site.AliasExists(Site.Name) == true {
-		Site.TimeStampReset()
-		Site.Path = fmt.Sprintf("%v%v", Site.Path, Site.TimeStampGet())
-		//Site.ProcessMake()
-		//Site.ActionInstall()
-	}
-}
-
 // ActionRebuildProject purges a specific project from a specified path, and re-download it
 // Re-downloading will use drush dl, or git clone depending on availability.
+//
+// Deprecated: should otherwise be handled - will be removed in the future.
 func (Site *Site) ActionRebuildProject(Makefiles []string, Project string, GitPath, Branch string, RemoveGit bool) {
 
 	var MajorVersion int64
@@ -375,6 +352,8 @@ func (Site *Site) CleanCodebase() {
 }
 
 // ActionRebuildCodebase re-runs drush make on a specified path.
+//
+// Deprecated: use composer instead.
 func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 	// This function exists for the sole purpose of
 	// rebuilding a specific Drupal codebase in a specific
@@ -446,32 +425,6 @@ func (Site *Site) ActionRebuildCodebase(Makefiles []string) {
 		log.Warnln("Could not remove temporary make file", MakeFile.Path)
 	} else {
 		log.Infoln("Removed temporary make file", MakeFile.Path)
-	}
-}
-
-// ActionDatabaseDumpLocal run drush sql-dump to a specified path on a site struct.
-func (Site *Site) ActionDatabaseDumpLocal(path string) {
-	srcAlias := strings.Replace(Site.Alias, "@", "", -1)
-	x := command.NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Println("Dump complete. Dump can be found at", path)
-	} else {
-		log.Println("Could not dump database.", err)
-	}
-}
-
-// ActionDatabaseDumpRemote run drush sql-dump to a specified path on a site alias.
-func (Site *Site) ActionDatabaseDumpRemote(alias, path string) {
-	srcAlias := strings.Replace(alias, "@", "", -1)
-	x := command.NewDrushCommand()
-	x.Set(srcAlias, fmt.Sprintf("sql-dump %v", path), true)
-	_, err := x.Output()
-	if err == nil {
-		log.Infoln("Dump complete. Dump can be found at", path)
-	} else {
-		log.Errorln("Could not dump database.", err)
 	}
 }
 
@@ -548,60 +501,9 @@ func (Site *Site) TimeStampGenerate() string {
 	return fmt.Sprintf(".%v_%v", time.Now().Format("20060102150405"), r)
 }
 
-// VerifyProcessedMake requires documentation, @TODO for revisitation.
-func (Site *Site) VerifyProcessedMake(makeFile string) []DrupalProject {
-	unprocessedMakes, unprocessedMakeErr := ioutil.ReadFile(makeFile)
-	Projects := make([]DrupalProject, 50)
-	if unprocessedMakeErr != nil {
-		log.Infoln("Could not read from", unprocessedMakeErr)
-	}
-	for _, Line := range strings.Split(string(unprocessedMakes), "\n") {
-		var Type string
-		if strings.Contains(Line, "subdir") || strings.Contains(Line, "directory_name") {
-			currentType := strings.SplitAfter(Line, "=")
-			Type = strings.Replace(currentType[1], "\"", "", -1)
-			Type = strings.Replace(Type, " ", "", -1)
-		}
-		if Type != "" {
-			if strings.HasPrefix(Line, "projects") {
-				Project := strings.SplitAfter(Line, "[")
-				Project[1] = strings.Replace(Project[1], "[", "", -1)
-				Project[1] = strings.Replace(Project[1], "]", "", -1)
-				thisProject := DrupalProject{"modules", Project[1], Type, false}
-				Projects = append(Projects, thisProject)
-			}
-			if strings.HasPrefix(Line, "libraries") {
-				Library := strings.SplitAfter(Line, "[")
-				Library[1] = strings.Replace(Library[1], "[", "", -1)
-				Library[1] = strings.Replace(Library[1], "]", "", -1)
-				thisProject := DrupalProject{"libraries", Library[1], Type, false}
-				Projects = append(Projects, thisProject)
-			}
-		}
-	}
-	var foundModules int
-	for index, Project := range Projects {
-		if Project.Name != "" {
-			//log.Printf("Package %v is of type %v, belonging to subdir %v", Project.Name, Project.Type, Project.Subdir)
-			err := new(error)
-			_ = filepath.Walk(Site.Path, func(path string, _ os.FileInfo, _ error) error {
-				realpath := strings.Split(Site.Path, "\n")
-				for _, name := range realpath {
-					if strings.Contains(path, "custom/"+Project.Name+"/") || strings.Contains(path, "contrib/"+Project.Name+"/") || strings.Contains(path, "libraries/"+Project.Subdir+"/") {
-						fmt.Sprintln(name)
-						foundModules++
-						Projects[index].Status = true
-						break
-					}
-				}
-				return *err
-			})
-		}
-	}
-	return Projects
-}
-
 // ProcessMake processes a make file at a particular path.
+//
+// Deprecated: use composer instead.
 func (Site *Site) ProcessMake(Make Make) bool {
 
 	// Test the make file exists
@@ -685,6 +587,8 @@ func (Site *Site) InstallSiteRef() {
 	}
 
 	filename := dirPath + "/sites.php"
+	// TODO Convert this to a proper template found under cmd/yoink/templates/
+	// TODO it needs to be configurable via viper like other templates.
 	buffer := []byte{60, 63, 112, 104, 112, 10, 10, 47, 42, 42, 10, 32, 42, 32, 64, 102, 105, 108, 101, 10, 32, 42, 32, 67, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 32, 102, 105, 108, 101, 32, 102, 111, 114, 32, 68, 114, 117, 112, 97, 108, 39, 115, 32, 109, 117, 108, 116, 105, 45, 115, 105, 116, 101, 32, 100, 105, 114, 101, 99, 116, 111, 114, 121, 32, 97, 108, 105, 97, 115, 105, 110, 103, 32, 102, 101, 97, 116, 117, 114, 101, 46, 10, 32, 42, 47, 10, 10, 32, 32, 32, 36, 115, 105, 116, 101, 115, 91, 39, 68, 111, 109, 97, 105, 110, 39, 93, 32, 61, 32, 39, 78, 97, 109, 101, 39, 59, 10, 10, 63, 62, 10}
 	tpl := fmt.Sprintf("%v", string(buffer[:]))
 	tpl = strings.Replace(tpl, "Name", data["Name"], -1)
