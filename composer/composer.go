@@ -1,7 +1,8 @@
-// composer is a basic package to run composer tasks in a Drupal 8 docroot.
+// Package composer is a basic package to run composer tasks in a Drupal 8 docroot.
 package composer
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,29 +28,32 @@ func GetProjects(fullpath string) []DrupalProject {
 	Projects := []DrupalProject{}
 	for _, Project := range makeupdater.GetProjectsFromMake(fullpath) {
 		catCmd := fmt.Sprintf("cat %v | grep \"projects\\[%v\\]\"", fullpath, Project)
-		y, _ := exec.Command("sh", "-c", catCmd).CombinedOutput()
-		DrupalProject := DrupalProject{}
+		y, e := exec.Command("sh", "-c", catCmd).CombinedOutput()
+		if e != nil {
+			log.Warnf("Could not execute `%v`\n", catCmd)
+		}
+		project := DrupalProject{}
 		for _, Line := range strings.Split(string(y), "\n") {
 			if strings.Contains(Line, "projects["+Project+"][version] = ") {
 				Version := strings.Split(Line, "=")
 				Version[1] = strings.Trim(Version[1], " ")
 				Version[1] = strings.Replace(Version[1], "\"", "", -1)
-				DrupalProject.Version = Version[1]
+				project.Version = Version[1]
 			} else if strings.Contains(Line, "projects["+Project+"][subdir] = ") {
 				Subdir := strings.Split(Line, "=")
 				Subdir[1] = strings.Trim(Subdir[1], " ")
 				Subdir[1] = strings.Replace(Subdir[1], "\"", "", -1)
-				DrupalProject.Subdir = Subdir[1]
+				project.Subdir = Subdir[1]
 			} else if strings.Contains(Line, "projects["+Project+"][patch] = ") {
 				Patch := strings.Split(Line, "=")
 				Patch[1] = strings.Trim(Patch[1], " ")
 				Patch[1] = strings.Replace(Patch[1], "\"", "", -1)
-				DrupalProject.Patch = Patch[1]
+				project.Patch = Patch[1]
 			}
 		}
 		if Project != "drupal" {
-			DrupalProject.Project = Project
-			Projects = append(Projects, DrupalProject)
+			project.Project = Project
+			Projects = append(Projects, project)
 		}
 	}
 	return Projects
@@ -75,10 +79,14 @@ func InstallProjects(Projects []DrupalProject, Path string) {
 func FindComposerJSONFiles(Path string) []string {
 	fileList := []string{}
 	fmt.Println(len(fileList))
-	filepath.Walk(Path, func(path string, f os.FileInfo, err error) error {
+	e := filepath.Walk(Path, func(path string, f os.FileInfo, err error) error {
 		fileList = append(fileList, path)
 		return nil
 	})
+
+	if e != nil {
+		log.Warnf("Could not scan for composer.json files under %v: %v\n", Path, e)
+	}
 
 	results := []string{}
 	for _, file := range fileList {
@@ -109,13 +117,11 @@ func InstallComposerJSONFiles(Paths []string) {
 func copy(src, dest string) error {
 	data, err := ioutil.ReadFile(src)
 	if err != nil {
-		log.Fatalf("Could not read %v: %v", src, err.Error())
-		return err
+		return errors.New("could not read " + src + ": " + err.Error())
 	}
 	err = ioutil.WriteFile(dest, data, 0644)
 	if err != nil {
-		log.Fatalf("Could not write %v: %v", dest, err.Error())
-		return err
+		return errors.New("could not write " + src + ": " + err.Error())
 	}
 	return nil
 }
@@ -130,7 +136,7 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 	ComposerDestination := strings.TrimRight(Destination, "/") + "/" + Name + Timestamp
 
 	if _, err := os.Stat(Destination); err != nil {
-		ok := os.MkdirAll(Destination, 0775)
+		ok := os.MkdirAll(Destination, 0700)
 		if ok != nil {
 			log.Fatalf("could not create directory %v: %v", Destination, ok.Error())
 		}
@@ -138,7 +144,12 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 
 	if !strings.HasSuffix(ComposerDestination, ComposerPath) {
 		log.Infof("composer.json not found, copying from %v", ComposerFile)
-		copy(ComposerFile, Destination+"/composer.json")
+		e := copy(ComposerFile, Destination+"/composer.json")
+		if e != nil {
+			log.Warnln(e)
+		} else {
+			log.Printf("Copied %v to %v\n", ComposerFile, Destination+"/composer.json")
+		}
 	} else {
 		log.Infof("%v/composer.json was found, not copying", ComposerDestination)
 	}
@@ -146,7 +157,13 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 	cpCmd.Dir = Destination
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
-	cpCmd.Run()
-	cpCmd.Wait()
+	e := cpCmd.Run()
+	if e != nil {
+		log.Warnln("could not execute composer install --prefer-source\n")
+	}
+	f := cpCmd.Wait()
+	if f != nil {
+		log.Warnln(f)
+	}
 
 }
