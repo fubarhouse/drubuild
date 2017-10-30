@@ -24,12 +24,18 @@ import (
 )
 
 var (
+	// cfgFile is the path to the config file in use.
+	// cfgFile will default to $HOME/golang-drush.yaml
+	// Other formats are supported natively by Viper,
+	// however in this case yaml is recommended.
 	cfgFile string
 
 	// timestamp is an int64 which is representational of a date format in the
 	// format of YYYYMMDDHHMMSS. An example of this is
 	// 19700101000000.
-	// if the timestamp is not set, this will change the file-system, drush
+	//
+	// if the timestamp is not set, a timestamp will be generated.
+	// this value will affect the output file-system paths used by drush
 	// aliases and virtual hosts which are created or modified.
 	//
 	// these formats are used depending on this timestamp, and if composer
@@ -66,6 +72,11 @@ var (
 	// makes is a comma-separated list of legacy make files to be used.
 	// it will be automatically superseded by the use of the composer flag
 	// however there is a lot of available deprecated functionality here.
+	//
+	// it is still appropriate to use this subset of functionality when
+	// working with older codebases still accommodated to using make files.
+	// these features may or may not be removed or isolated at a later time.
+	//
 	// Deprecated: use composer instead.
 	makes string
 
@@ -74,7 +85,8 @@ var (
 	// file(s). this represents the source of that change, what string is to be
 	// replaced in the generated make file.
 	//
-	// Deprecated: use composer instead.
+	// Deprecated: used exclusively by make file functionality.
+	// upgrade to use composer instead.
 	rewriteSource string
 
 	// when working with make files, you can tell the system to rewrite
@@ -82,7 +94,8 @@ var (
 	// file(s). this represents the destination result of that change, what the
 	// string is to be replaced to be in the generated make file.
 	//
-	// Deprecated: use composer instead.
+	// Deprecated: used exclusively by make file functionality.
+	// upgrade to use composer instead.
 	rewriteDestination string
 
 	// composer represents the path to the composer file to be used.
@@ -120,6 +133,16 @@ var (
 	// this port path can be configured at $HOME/golang-drush.yml, and
 	// defaults to 3306.
 	db_port int
+
+	// syncDatabase is a bool which represents the expressive action to
+	// syncronise databases between a source and destination in the sync
+	// command.
+	syncDatabase bool
+
+	// syncFiles is a bool which represents the expressive action to
+	// syncronise public and private file systems between a source
+	// and destination in the sync command.
+	syncFiles bool
 
 	// webserver is the name of the software package which handles HTTP
 	// and HTTPS requests. this variable simply represents the name of
