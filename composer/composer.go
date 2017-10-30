@@ -142,7 +142,7 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 	} else {
 		log.Infof("%v/composer.json was found, not copying", ComposerDestination)
 	}
-	cpCmd := exec.Command("sh", "-c", "composer install")
+	cpCmd := exec.Command("sh", "-c", "composer install --prefer-source")
 	cpCmd.Dir = Destination
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
