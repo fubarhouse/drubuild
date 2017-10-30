@@ -125,6 +125,7 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 	if *SyncDB || *SyncFiles {
 		log.Infoln("Attempting to rebuild registries...")
 		command.DrushRebuildRegistry(*DestAlias)

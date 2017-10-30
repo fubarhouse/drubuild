@@ -37,7 +37,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Warnln("This binary has been deprecated in favor of `yoink sync`.")
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 
 	if *SyncDB {
 		log.Infoln("Database was marked for syncing, working now...")

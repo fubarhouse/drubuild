@@ -21,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Warnln("This binary has been deprecated in favor of `yoink backup`.")
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 	x := make.NewSite("", "", "", *Alias, "", "", "", "")
 	x.ActionBackup(*Destination)
 }

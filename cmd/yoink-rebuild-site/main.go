@@ -57,6 +57,7 @@ func main() {
 		x.WorkingCopy = true
 	}
 
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 	MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 	MakeFiles := strings.Split(MakefilesFormatted, ",")
 

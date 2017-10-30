@@ -42,6 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 	x := make.NewSite("none", *Site, *Path, *Alias, *WebserverName, *Domain, *VHostDir, "")
 	y := make.NewmakeDB("127.0.0.1", "root", "root", 3306)
 	x.DatabaseSet(y)
