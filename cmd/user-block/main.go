@@ -5,10 +5,11 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/user"
 	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/golang-drush/user"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 	var strPattern = flag.String("pattern", "%v", "A modifier which allows rewriting of aliases replacing '%v' in the pattern with the alias.")
 	var strUser = flag.String("user", "", "User name for blocking, example 'Firstname Sirname'")
 	flag.Parse()
+
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 
 	// Remove double spaces.
 	*strUser = strings.Replace(*strUser, "  ", " ", -1)

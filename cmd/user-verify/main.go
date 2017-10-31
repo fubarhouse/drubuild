@@ -5,12 +5,13 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/user"
 	"net/mail"
 	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/alias"
+	"github.com/fubarhouse/golang-drush/user"
 )
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 	var strState = flag.Bool("active", true, "The active state of the user account for each account - should the account be active?")
 	var boolCreate = flag.Bool("create-user", false, "If required, create the user if it doesn't exist on each alias.")
 	flag.Parse()
+
+	log.Warnln("This binary has been deprecated in favor of `yoink`.")
 
 	// Remove double spaces.
 	*strAliases = strings.Replace(*strAliases, "  ", " ", -1)

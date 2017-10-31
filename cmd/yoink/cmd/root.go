@@ -66,6 +66,11 @@ var (
 	// in many places this will default to the domain name if not specified.
 	alias string
 
+	// aliases
+	aliases string
+
+	pattern string
+
 	// domain is the destination domain to be used when setting up a new site
 	domain string
 
@@ -155,6 +160,16 @@ var (
 	// it will use the template file located parallel to this.cmd
 	// this value is configurable through configuration management.
 	alias_template string
+
+	user_block   bool
+	user_unblock bool
+	user_create  bool
+	user_verify  bool
+
+	user_name     string
+	user_email    string
+	user_password string
+	user_role     string
 
 	// virtualhost_path is the path which the web server uses to store
 	// all virtual hosts for the server. this is to identify where
