@@ -2,9 +2,10 @@ package user
 
 import (
 	"fmt"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/command"
-	"strings"
 )
 
 // DrupalUser represents fields from Drupals user table, as well as roles.
@@ -68,10 +69,12 @@ func (DrupalUser *DrupalUser) Create(Password string) {
 		cmd.Set(DrupalUser.Alias, Command, false)
 		cmdOut, cmdErr := cmd.CombinedOutput()
 		if cmdErr != nil {
-			log.Warnf("Could not create user %v on site %v: %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), string(cmdOut))
+			log.Warnf("Could not create user '%v' on site '%v': %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), string(cmdOut))
 		} else {
-			log.Infof("Created user %v on site %v.", DrupalUser.Name, DrupalUser.Alias)
+			log.Infof("Created user '%v' on site '%v'.", DrupalUser.Name, DrupalUser.Alias)
 		}
+	} else {
+		log.Warnln("Could not create user, user already exists.")
 	}
 }
 
