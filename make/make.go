@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -94,14 +95,14 @@ type Site struct {
 	Timestamp string
 	Path      string
 	// Deprecated: use composer instead
-	Make      string
-	Name      string
-	Alias     string
-	Domain    string
-	database  *makeDB
-	Webserver string
-	Vhostpath string
-	Template  string
+	Make          string
+	Name          string
+	Alias         string
+	Domain        string
+	database      *makeDB
+	Webserver     string
+	Vhostpath     string
+	Template      string
 	AliasTemplate string
 	// Deprecated: use composer instead
 	MakeFileRewriteSource string
@@ -564,11 +565,27 @@ func (Site *Site) ProcessMake(Make Make) bool {
 }
 
 // InstallSiteRef installs the Drupal multisite sites.php file for the site struct.
-func (Site *Site) InstallSiteRef() {
+func (Site *Site) InstallSiteRef(Template string) {
+
+	if Template != "" {
+		if ok, err := os.Stat(Template); err != nil {
+			log.Infof("Found template %v", ok.Name())
+		} else {
+			t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
+			log.Infof("Could not find template %v, using %v", ok.Name(), t)
+			Template = t
+		}
+	}
+
+	if Template == "" {
+		t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
+		log.Infof("No template specified, using %v", t)
+		Template = t
+	}
 
 	data := map[string]string{
-		"Name":   Site.Name,
-		"Domain": Site.Domain,
+		"Name":  Site.Name,
+		"Alias": Site.Alias,
 	}
 	var dirPath string
 	dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/sites/"
@@ -587,25 +604,19 @@ func (Site *Site) InstallSiteRef() {
 	}
 
 	filename := dirPath + "/sites.php"
-	// TODO Convert this to a proper template found under cmd/yoink/templates/
-	// TODO it needs to be configurable via viper like other templates.
-	buffer := []byte{60, 63, 112, 104, 112, 10, 10, 47, 42, 42, 10, 32, 42, 32, 64, 102, 105, 108, 101, 10, 32, 42, 32, 67, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 32, 102, 105, 108, 101, 32, 102, 111, 114, 32, 68, 114, 117, 112, 97, 108, 39, 115, 32, 109, 117, 108, 116, 105, 45, 115, 105, 116, 101, 32, 100, 105, 114, 101, 99, 116, 111, 114, 121, 32, 97, 108, 105, 97, 115, 105, 110, 103, 32, 102, 101, 97, 116, 117, 114, 101, 46, 10, 32, 42, 47, 10, 10, 32, 32, 32, 36, 115, 105, 116, 101, 115, 91, 39, 68, 111, 109, 97, 105, 110, 39, 93, 32, 61, 32, 39, 78, 97, 109, 101, 39, 59, 10, 10, 63, 62, 10}
-	tpl := fmt.Sprintf("%v", string(buffer[:]))
-	tpl = strings.Replace(tpl, "Name", data["Name"], -1)
-	tpl = strings.Replace(tpl, "Domain", data["Domain"], -1)
 
-	nf, err := os.Create(filename)
-	nf.Chmod(0755)
-	if err != nil {
-		log.Fatalln("Could not create", err)
-	}
-	_, err = nf.WriteString(tpl)
-	if err != nil {
-		log.Errorln("Could not add", filename)
+	t := template.New("sites.php")
+	defaultData, _ := ioutil.ReadFile(Template)
+	t.Parse(string(defaultData))
+	file, _ := os.Create(filename)
+	tplErr := t.Execute(file, data)
+	t.Execute(os.Stdout, data)
+
+	if tplErr == nil {
+		log.Infof("Successfully templated multisite config to file %v", filename)
 	} else {
-		log.Infoln("Added", filename)
+		log.Warnf("Error templating multisite config to file %v", filename)
 	}
-	defer nf.Close()
 }
 
 // ReplaceTextInFile reinstalls and verifies the ctools cache folder for the site struct.

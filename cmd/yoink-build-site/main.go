@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/make"
 	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/composer"
+	"github.com/fubarhouse/golang-drush/make"
 )
 
 func main() {
@@ -89,7 +90,7 @@ func main() {
 		}
 		x.ActionRebuildCodebase(MakeFiles)
 	}
-	x.InstallSiteRef()
+	x.InstallSiteRef("")
 	x.InstallFileSystem(*FilepathPublic)
 	x.InstallFileSystem(*FilepathPrivate)
 	x.InstallFileSystem(*FilepathTemporary)

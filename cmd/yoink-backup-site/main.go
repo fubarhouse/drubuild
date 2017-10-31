@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
+	"os"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/golang-drush/make"
-	"os"
 )
 
 // Deprecated: use Yoink instead.

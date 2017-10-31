@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
 	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/golang-drush/command"
 )
 
 // Deprecated: use Yoink instead.

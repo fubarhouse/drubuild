@@ -76,8 +76,8 @@ func (VirtualHost *VirtualHost) GetInstallationDirectory() string {
 // Install installs a virtual host from an optional input template file path.
 func (VirtualHost *VirtualHost) Install(Template string) {
 	data := map[string]string{
-		"Domain":     VirtualHost.GetDomain(),
-		"Root": VirtualHost.GetURI(),
+		"Domain": VirtualHost.GetDomain(),
+		"Root":   VirtualHost.GetURI(),
 	}
 
 	filename := VirtualHost.GetInstallationDirectory() + "/" + VirtualHost.GetDomain() + ".conf"

@@ -139,6 +139,12 @@ var (
 	// defaults to 3306.
 	db_port int
 
+	// sites_php_template is the path to a template to be used for sites.php
+	// for the default multi-site installation which must accompany builds.
+	// this is to match server-side consistency for multi-sites or non-default
+	// file system naming conventions.
+	sites_php_template string
+
 	// syncDatabase is a bool which represents the expressive action to
 	// syncronise databases between a source and destination in the sync
 	// command.

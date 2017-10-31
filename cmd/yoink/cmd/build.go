@@ -42,6 +42,9 @@ var buildCmd = &cobra.Command{
 
 		x := make.NewSite("", name, destination, alias, webserver, domain, virtualhost_path, virtualhost_template)
 		x.AliasTemplate = alias_template
+		if alias == "" {
+			x.Alias = domain
+		}
 		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
 
@@ -69,7 +72,7 @@ var buildCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		x.InstallSiteRef()
+		x.InstallSiteRef(sites_php_template)
 		x.SymReinstall()
 		x.ActionInstall()
 
@@ -130,6 +133,7 @@ func init() {
 	viper.SetDefault("db_port", 3306)
 	viper.SetDefault("webserver", "nginx")
 	viper.SetDefault("alias_template", "")
+	viper.SetDefault("sites_php_template", "")
 	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-available")
 	viper.SetDefault("virtualhost_template", "")
 
@@ -138,6 +142,9 @@ func init() {
 	db_pass = viper.GetString("db_pass")
 	db_host = viper.GetString("db_host")
 	db_port = viper.GetInt("db_port")
+
+	// Sites.php template
+	sites_php_template = viper.GetString("sites_php_template")
 
 	// Alias template
 	alias_template = viper.GetString("alias_template")

@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
 	"os"
 	"strings"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/golang-drush/command"
 )
 
 // syncDatabase will begin the database sync task.
