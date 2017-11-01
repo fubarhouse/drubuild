@@ -3,10 +3,12 @@ package command
 import (
 	"bufio"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Command is our structured data/object for Command
@@ -72,6 +74,28 @@ func (drush *Command) SetVerbose(value bool) {
 	drush.verbose = value
 }
 
+func (drush *Command) RawOutput() error {
+	if strings.Contains(drush.alias, "@") == true {
+		drush.alias = strings.Replace(drush.alias, "@", "", -1)
+	}
+	if drush.alias != "" {
+		drush.alias = fmt.Sprintf("@%v", drush.alias)
+	}
+	if drush.verbose == true {
+		drush.command = fmt.Sprintf("%v --verbose", drush.command)
+	}
+	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
+
+	comm := new(exec.Cmd)
+	comm = exec.Command("sh", "-c", pathDrush+" "+" "+args)
+	comm.Dir = drush.GetWorkingDir()
+	comm.Stderr = os.Stderr
+	comm.Stdout = os.Stdout
+	err := comm.Start()
+	comm.Wait()
+	return err
+}
+
 // LiveOutput returns, and prints the live output of the executing program
 // This will wait for completion before proceeding.
 func (drush *Command) LiveOutput() error {
@@ -87,7 +111,7 @@ func (drush *Command) LiveOutput() error {
 	args := fmt.Sprintf("%v %v", drush.alias, drush.command)
 
 	comm := new(exec.Cmd)
-	comm = exec.Command("sh", "-c", pathDrush + " " + " " + args)
+	comm = exec.Command("sh", "-c", pathDrush+" "+" "+args)
 	comm.Dir = drush.GetWorkingDir()
 	Pipe, _ := comm.StderrPipe()
 	scanner := bufio.NewScanner(Pipe)
