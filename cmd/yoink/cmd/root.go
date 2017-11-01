@@ -51,6 +51,9 @@ var (
 	//
 	timestamp int64
 
+	// commands
+	commands string
+
 	// name is the human-readable name for the target of this application.
 	name string
 
