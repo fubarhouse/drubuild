@@ -85,6 +85,20 @@ var userCmd = &cobra.Command{
 				}
 			}
 		}
+		if user_delete {
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					User.Delete()
+				} else {
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
+				}
+			}
+		}
 
 		if user_unblock {
 			for _, Alias := range strings.Split(aliases, ",") {
@@ -101,7 +115,7 @@ var userCmd = &cobra.Command{
 						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
 					}
 				} else {
-					log.Printf("User '%v' was not found on %v", User.Name, Alias)
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
 				}
 			}
 		}
@@ -163,7 +177,7 @@ var userCmd = &cobra.Command{
 			}
 		}
 
-		if !user_block && !user_unblock && !user_create && !user_verify {
+		if !user_block && !user_create && !user_delete && !user_unblock && !user_verify {
 			cmd.Usage()
 			fmt.Println()
 			log.Fatalln("no action specified.")
@@ -186,8 +200,9 @@ func init() {
 	userCmd.Flags().StringVarP(&pattern, "pattern", "p", "%v", "Pattern to match against drush aliases, where token is '%v'")
 
 	userCmd.Flags().BoolVarP(&user_block, "block", "b", false, "Execute user block action.")
-	userCmd.Flags().BoolVarP(&user_unblock, "unblock", "u", false, "Execute user unblock action.")
 	userCmd.Flags().BoolVarP(&user_create, "create", "c", false, "Execute user create action.")
+	userCmd.Flags().BoolVarP(&user_delete, "delete", "d", false, "Execute user delete action.")
+	userCmd.Flags().BoolVarP(&user_unblock, "unblock", "u", false, "Execute user unblock action.")
 	userCmd.Flags().BoolVarP(&user_verify, "verify", "v", false, "Execute user verification action.")
 
 	userCmd.MarkFlagRequired("name")

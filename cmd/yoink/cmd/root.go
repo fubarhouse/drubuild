@@ -168,8 +168,9 @@ var (
 	alias_template string
 
 	user_block   bool
-	user_unblock bool
 	user_create  bool
+	user_delete  bool
+	user_unblock bool
 	user_verify  bool
 
 	user_name     string
