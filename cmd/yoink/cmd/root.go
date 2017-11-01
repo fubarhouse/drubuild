@@ -24,11 +24,126 @@ import (
 )
 
 var (
+
+	// alias is the destination drush alias this site should be using.
+	// in many places this will default to the domain name if not specified.
+	alias string
+
+	// alias_template is the path to the drush alias template file
+	// processed by this application. It can be blank/empty and
+	// it will use the template file located parallel to this.cmd
+	// this value is configurable through configuration management.
+	alias_template string
+
+	// aliases is a comma-separated list of aliases which translates into a
+	// []string. each string in the slice represents a target in commands
+	// which use multiple aliases. the usage of this variable often will
+	// accompany the use of the pattern variable to match aliases against
+	// patterns.
+	aliases string
+
 	// cfgFile is the path to the config file in use.
 	// cfgFile will default to $HOME/golang-drush.yaml
 	// Other formats are supported natively by Viper,
 	// however in this case yaml is recommended.
 	cfgFile string
+
+	// commands is a comma-separated string which contains translates to a
+	// []string of drush commands which are executed upon a list of aliases
+	// provided with the aliases and pattern variables.
+	commands string
+
+	// composer represents the path to the composer file to be used.
+	// it also represents a source file, in the event a composer.json file
+	// does not exist at the destination path.
+	// this flag will also supersede the necessity and the functionality
+	// associated with legacy make files.
+	composer string
+
+	// db_host is the string which represents the configured database host
+	// this host path can be configured at $HOME/golang-drush.yml, and
+	// defaults to '127.0.0.1'.
+	db_host string
+
+	// db_pass is an unprotected string which represents the configured user
+	// password. this user account should have permission to create
+	// databases, and this password can be configured at
+	// $HOME/golang-drush.yml, and defaults to 'root'.
+	db_pass string
+
+	// db_port is an integer which represents the configured database port
+	// this port path can be configured at $HOME/golang-drush.yml, and
+	// defaults to 3306.
+	db_port int
+
+	// db_user is the string which represents the configured user account.
+	// this user account should have permission to create databases, and
+	// this user can be configured at $HOME/golang-drush.yml, and defaults
+	// to 'root'.
+	db_user string
+
+	// destination is the destination alias or path for the desired action.
+	// it will be determined based upon the command in use.
+	destination string
+
+	// domain is the destination domain to be used when setting up a new site
+	domain string
+
+	// makes is a comma-separated list of legacy make files to be used.
+	// it will be automatically superseded by the use of the composer flag
+	// however there is a lot of available deprecated functionality here.
+	//
+	// it is still appropriate to use this subset of functionality when
+	// working with older codebases still accommodated to using make files.
+	// these features may or may not be removed or isolated at a later time.
+	//
+	// Deprecated: use composer instead.
+	makes string
+
+	// name is the human-readable name for the target of this application.
+	name string
+
+	// pattern is a string which replaces the substring '%v' with another string
+	// when dealing with operational work - most commonly aliases.
+	pattern string
+
+	// when working with make files, you can tell the system to rewrite
+	// a given module branch to change via a unique string inside the make
+	// file(s). this represents the destination result of that change, what the
+	// string is to be replaced to be in the generated make file.
+	//
+	// Deprecated: used exclusively by make file functionality.
+	// upgrade to use composer instead.
+	rewriteDestination string
+
+	// when working with make files, you can tell the system to rewrite
+	// a given module branch to change via a unique string inside the make
+	// file(s). this represents the source of that change, what string is to be
+	// replaced in the generated make file.
+	//
+	// Deprecated: used exclusively by make file functionality.
+	// upgrade to use composer instead.
+	rewriteSource string
+
+	// sites_php_template is the path to a template to be used for sites.php
+	// for the default multi-site installation which must accompany builds.
+	// this is to match server-side consistency for multi-sites or non-default
+	// file system naming conventions.
+	sites_php_template string
+
+	// source is the source alias or path to a source file to be used.
+	// the specific action will be determined based on the command.
+	source string
+
+	// syncDatabase is a bool which represents the expressive action to
+	// syncronise databases between a source and destination in the sync
+	// command.
+	syncDatabase bool
+
+	// syncFiles is a bool which represents the expressive action to
+	// syncronise public and private file systems between a source
+	// and destination in the sync command.
+	syncFiles bool
 
 	// timestamp is an int64 which is representational of a date format in the
 	// format of YYYYMMDDHHMMSS. An example of this is
@@ -51,112 +166,37 @@ var (
 	//
 	timestamp int64
 
-	// commands
-	commands string
+	// user_block is a boolean which controls command action in the user command.
+	// in this case, the user block action will be invoked.
+	user_block bool
 
-	// name is the human-readable name for the target of this application.
-	name string
+	// user_create is a boolean which controls command action in the user command.
+	// in this case, the user create action will be invoked.
+	user_create bool
 
-	// source is the source alias or path to a source file to be used.
-	// the specific action will be determined based on the command.
-	source string
+	// user_delete is a boolean which controls command action in the user command.
+	// in this case, the user delete action will be invoked.
+	user_delete bool
 
-	// destination is the destination alias or path for the desired action.
-	// it will be determined based upon the command in use.
-	destination string
+	// user_email is a string which represents the drupal user's emails to be affected.
+	user_email string
 
-	// alias is the destination drush alias this site should be using.
-	// in many places this will default to the domain name if not specified.
-	alias string
+	// user_name is a string which represents the drupal user to be affected.
+	user_name string
 
-	// aliases
-	aliases string
+	// user_password is a string which represents the drupal user's password to be affected.
+	user_password string
 
-	pattern string
+	// user_role is a string which represents the drupal user's role to be affected.
+	user_role string
 
-	// domain is the destination domain to be used when setting up a new site
-	domain string
+	// user_unblock is a boolean which controls command action in the user command.
+	// in this case, the user unblock action will be invoked.
+	user_unblock bool
 
-	// makes is a comma-separated list of legacy make files to be used.
-	// it will be automatically superseded by the use of the composer flag
-	// however there is a lot of available deprecated functionality here.
-	//
-	// it is still appropriate to use this subset of functionality when
-	// working with older codebases still accommodated to using make files.
-	// these features may or may not be removed or isolated at a later time.
-	//
-	// Deprecated: use composer instead.
-	makes string
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the source of that change, what string is to be
-	// replaced in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteSource string
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the destination result of that change, what the
-	// string is to be replaced to be in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteDestination string
-
-	// composer represents the path to the composer file to be used.
-	// it also represents a source file, in the event a composer.json file
-	// does not exist at the destination path.
-	// this flag will also supersede the necessity and the functionality
-	// associated with legacy make files.
-	composer string
-
-	// working-copy identifies if the build should leave the .git file-system
-	// in-tact during the build. this would be useful when you are expecting
-	// to send a file system to production, or for local development.
-	// a working-copy is the local file-system including any development
-	// file system data associated with each project/module.
-	workingCopy bool
-
-	// db_user is the string which represents the configured user account.
-	// this user account should have permission to create databases, and
-	// this user can be configured at $HOME/golang-drush.yml, and defaults
-	// to 'root'.
-	db_user string
-
-	// db_pass is an unprotected string which represents the configured user
-	// password. this user account should have permission to create
-	// databases, and this password can be configured at
-	// $HOME/golang-drush.yml, and defaults to 'root'.
-	db_pass string
-
-	// db_host is the string which represents the configured database host
-	// this host path can be configured at $HOME/golang-drush.yml, and
-	// defaults to '127.0.0.1'.
-	db_host string
-
-	// db_port is an integer which represents the configured database port
-	// this port path can be configured at $HOME/golang-drush.yml, and
-	// defaults to 3306.
-	db_port int
-
-	// sites_php_template is the path to a template to be used for sites.php
-	// for the default multi-site installation which must accompany builds.
-	// this is to match server-side consistency for multi-sites or non-default
-	// file system naming conventions.
-	sites_php_template string
-
-	// syncDatabase is a bool which represents the expressive action to
-	// syncronise databases between a source and destination in the sync
-	// command.
-	syncDatabase bool
-
-	// syncFiles is a bool which represents the expressive action to
-	// syncronise public and private file systems between a source
-	// and destination in the sync command.
-	syncFiles bool
+	// user_verify is a boolean which controls command action in the user command.
+	// in this case, the user verification action will be invoked.
+	user_verify bool
 
 	// webserver is the name of the software package which handles HTTP
 	// and HTTPS requests. this variable simply represents the name of
@@ -164,22 +204,12 @@ var (
 	// setting this value is done through configuration management.
 	webserver string
 
-	// alias_template is the path to the drush alias template file
-	// processed by this application. It can be blank/empty and
-	// it will use the template file located parallel to this.cmd
-	// this value is configurable through configuration management.
-	alias_template string
-
-	user_block   bool
-	user_create  bool
-	user_delete  bool
-	user_unblock bool
-	user_verify  bool
-
-	user_name     string
-	user_email    string
-	user_password string
-	user_role     string
+	// working-copy identifies if the build should leave the .git file-system
+	// in-tact during the build. this would be useful when you are expecting
+	// to send a file system to production, or for local development.
+	// a working-copy is the local file-system including any development
+	// file system data associated with each project/module.
+	workingCopy bool
 
 	// virtualhost_path is the path which the web server uses to store
 	// all virtual hosts for the server. this is to identify where
