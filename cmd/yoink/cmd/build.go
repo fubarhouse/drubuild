@@ -54,7 +54,7 @@ var buildCmd = &cobra.Command{
 
 		if composer != "" {
 			x.Composer = true
-			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path)
+			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, workingCopy)
 		} else if makes != "" {
 			x.Make = makes
 			MakefilesFormatted := strings.Replace(makes, " ", "", -1)

@@ -79,7 +79,7 @@ func main() {
 
 	if *ComposerPath != "" {
 		x.Composer = true
-		composer.InstallComposerCodebase(x.Name, x.TimeStampGet(), *ComposerPath, x.Path)
+		composer.InstallComposerCodebase(x.Name, x.TimeStampGet(), *ComposerPath, x.Path, *WorkingCopy)
 	} else {
 		MakefilesFormatted := strings.Replace(*Makes, " ", "", -1)
 		MakeFiles := strings.Split(MakefilesFormatted, ",")

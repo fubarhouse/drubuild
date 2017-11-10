@@ -40,7 +40,7 @@ var rebuildCmd = &cobra.Command{
 
 		if composer != "" {
 			x.Composer = true
-			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path)
+			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, x.WorkingCopy)
 		} else {
 
 			if makes == "" {
