@@ -42,7 +42,13 @@ var projectCmd = &cobra.Command{
 			d.Wait()
 		}
 		if add {
-			d := exec.Command(composer, "require", name)
+			var r string
+			if workingCopy {
+				r = "require --prefer-source"
+			} else {
+				r = "require --prefer-dist"
+			}
+			d := exec.Command(composer, r, name)
 			d.Dir = destination
 			d.Stdout = os.Stdout
 			d.Stderr = os.Stderr
@@ -64,6 +70,7 @@ func init() {
 	projectCmd.Flags().StringVarP(&destination, "path", "p", "", "The path to where the site(s) exist.")
 	projectCmd.Flags().BoolVarP(&add, "add", "a", false, "Flag to trigger add action.")
 	projectCmd.Flags().BoolVarP(&remove, "remove", "r", false, "Flag to trigger remove action.")
+	projectCmd.Flags().BoolVarP(&workingCopy, "working-copy", "w", false, "Mark as a working-copy.")
 
 	projectCmd.MarkFlagRequired("name")
 	projectCmd.MarkFlagRequired("path")
