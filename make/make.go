@@ -572,8 +572,12 @@ func (Site *Site) InstallSiteRef(Template string) {
 			log.Infof("Found template %v", ok.Name())
 		} else {
 			t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
-			log.Infof("Could not find template %v, using %v", ok.Name(), t)
-			Template = t
+			if _, err := os.Stat(t); err != nil {
+				log.Warnln("default sites.php template could not be found, source files do not exist.")
+			} else {
+				log.Infof("Could not find template %v, using %v", ok.Name(), t)
+				Template = t
+			}
 		}
 	}
 
@@ -610,7 +614,6 @@ func (Site *Site) InstallSiteRef(Template string) {
 	t.Parse(string(defaultData))
 	file, _ := os.Create(filename)
 	tplErr := t.Execute(file, data)
-	t.Execute(os.Stdout, data)
 
 	if tplErr == nil {
 		log.Infof("Successfully templated multisite config to file %v", filename)
