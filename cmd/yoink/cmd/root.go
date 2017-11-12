@@ -18,12 +18,17 @@ import (
 	"fmt"
 	"os"
 
+	"strings"
+
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
+
+	// add is a boolean which will indicate to install a composer application.
+	add bool
 
 	// alias is the destination drush alias this site should be using.
 	// in many places this will default to the domain name if not specified.
@@ -43,7 +48,7 @@ var (
 	aliases string
 
 	// cfgFile is the path to the config file in use.
-	// cfgFile will default to $HOME/golang-drush.yaml
+	// cfgFile will default to $HOME/yoink/config.yml
 	// Other formats are supported natively by Viper,
 	// however in this case yaml is recommended.
 	cfgFile string
@@ -61,24 +66,24 @@ var (
 	composer string
 
 	// db_host is the string which represents the configured database host
-	// this host path can be configured at $HOME/golang-drush.yml, and
+	// this host path can be configured at $HOME/yoink/config.yml, and
 	// defaults to '127.0.0.1'.
 	db_host string
 
 	// db_pass is an unprotected string which represents the configured user
 	// password. this user account should have permission to create
 	// databases, and this password can be configured at
-	// $HOME/golang-drush.yml, and defaults to 'root'.
+	// $HOME/yoink/config.yml, and defaults to 'root'.
 	db_pass string
 
 	// db_port is an integer which represents the configured database port
-	// this port path can be configured at $HOME/golang-drush.yml, and
+	// this port path can be configured at $HOME/yoink/config.yml, and
 	// defaults to 3306.
 	db_port int
 
 	// db_user is the string which represents the configured user account.
 	// this user account should have permission to create databases, and
-	// this user can be configured at $HOME/golang-drush.yml, and defaults
+	// this user can be configured at $HOME/yoink/config.yml, and defaults
 	// to 'root'.
 	db_user string
 
@@ -106,6 +111,9 @@ var (
 	// pattern is a string which replaces the substring '%v' with another string
 	// when dealing with operational work - most commonly aliases.
 	pattern string
+
+	// remove is a boolean which will indicate to remove a composer application.
+	remove bool
 
 	// when working with make files, you can tell the system to rewrite
 	// a given module branch to change via a unique string inside the make
@@ -244,9 +252,12 @@ func Execute() {
 			os.Exit(1)
 		}
 
+		r := strings.Join([]string{home, "yoink"}, string(os.PathSeparator))
+
 		// Search config in home directory with name "golang-drush" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName("golang-drush")
+		viper.AddConfigPath(r)
+		viper.SetConfigName("config")
+		viper.SetConfigType("yml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
