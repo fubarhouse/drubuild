@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"log"
 	"os"
 
 	"fmt"
@@ -22,7 +23,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/gpmgo/gopm/modules/log"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
