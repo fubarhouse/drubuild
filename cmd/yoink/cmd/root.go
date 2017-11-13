@@ -91,8 +91,19 @@ var (
 	// it will be determined based upon the command in use.
 	destination string
 
+	// docroot is a string which indicates the nested file system destination.
+	// it is not currently used, but is intended to open up flexibility in case
+	// your composer file builds to a different root, such as 'web' or 'pub'.
+	docroot = "docroot"
+
 	// domain is the destination domain to be used when setting up a new site
 	domain string
+
+	// drupal will always be true, which indicates the site is a drupal website.
+	// this ties into the build process when drush aliases are created.
+	//
+	// by setting this to false, it will not create a drush alias.
+	drupal = true
 
 	// makes is a comma-separated list of legacy make files to be used.
 	// it will be automatically superseded by the use of the composer flag
@@ -205,6 +216,11 @@ var (
 	// user_verify is a boolean which controls command action in the user command.
 	// in this case, the user verification action will be invoked.
 	user_verify bool
+
+	// vhost is a bool which indicates that a virtual host should be created.
+	// it will default to true, so if you're rebuilding a codebase or an existing
+	// site, it would be logical to be able to skip that process.
+	vhost = true
 
 	// webserver is the name of the software package which handles HTTP
 	// and HTTPS requests. this variable simply represents the name of

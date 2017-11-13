@@ -84,7 +84,10 @@ var buildCmd = &cobra.Command{
 				log.Println("Could not find configured or default virtual host template.")
 			}
 		}
-		x.VhostInstall()
+
+		if vhost {
+			x.VhostInstall()
+		}
 
 		if alias_template != "" {
 			if ok, err := os.Stat(alias_template); err != nil {
@@ -98,7 +101,10 @@ var buildCmd = &cobra.Command{
 		if alias == "" {
 			x.Alias = domain
 		}
-		x.AliasInstall()
+
+		if drupal {
+			x.AliasInstall()
+		}
 	},
 }
 
@@ -113,7 +119,10 @@ func init() {
 	buildCmd.Flags().StringVarP(&makes, "makes", "m", "", "A comma-separated list of make files for use")
 	buildCmd.Flags().StringVarP(&composer, "composer", "c", "", "Path to the composer.json file.")
 	// Optional flags
+	buildCmd.Flags().StringVarP(&docroot, "docroot", "o", "docroot", "The folder to use for the built codebase.")
+	buildCmd.Flags().BoolVarP(&drupal, "drupal", "r", true, "Mark the build process as a Drupal build.")
 	buildCmd.Flags().Int64VarP(&timestamp, "timestamp", "t", 0, "Optional timestamp in the format YYYYMMDDHHMMSS")
+	buildCmd.Flags().BoolVarP(&vhost, "vhost", "v", true, "Include a virtual host as configured with this build.")
 	// Deprecated flags
 	buildCmd.Flags().StringVarP(&rewriteSource, "rewrite-source", "x", "", "The rewrite string source")
 	buildCmd.Flags().StringVarP(&rewriteDestination, "rewrite-destination", "y", "", "The rewrite string destination")
