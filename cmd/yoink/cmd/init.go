@@ -22,6 +22,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/gpmgo/gopm/modules/log"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
@@ -211,6 +212,12 @@ var initCmd = &cobra.Command{
 		}
 
 		r := strings.Join([]string{Home, "yoink", ""}, string(os.PathSeparator))
+
+		e := os.Mkdir(r, 0755)
+		if e != nil {
+			log.Fatal("error in creating directory", r, ": ", e)
+		}
+
 		WriteStringToFile(r+"sites.php.tmpl", sites_php_template_date)
 		WriteStringToFile(r+"config.yml", config_yml_template_data)
 		WriteStringToFile(r+"alias.tmpl", drush_alias_template)
@@ -220,8 +227,6 @@ var initCmd = &cobra.Command{
 			fmt.Println("\ndestination is not set")
 			os.Exit(1)
 		}
-		fmt.Println(config_yml_template_data)
-		//fmt.Sprint(templateAlias, templateSitesPhp, templateVhostApache, templateVhostHttpd, templateVhostNginx)
 	},
 }
 
