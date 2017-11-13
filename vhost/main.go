@@ -87,7 +87,12 @@ func (VirtualHost *VirtualHost) Install(Template string) {
 	t.Parse(string(defaultData))
 
 	os.Remove(filename)
-	file, _ := os.Create(filename)
+	file, fe := os.Create(filename)
+
+	if fe != nil {
+		log.Warnf("could not create file: %v", fe)
+	}
+
 	tplErr := t.Execute(file, data)
 
 	if tplErr == nil {
