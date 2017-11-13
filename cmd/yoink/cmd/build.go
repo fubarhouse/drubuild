@@ -77,7 +77,9 @@ var buildCmd = &cobra.Command{
 		}
 
 		x.InstallSiteRef(sites_php_template)
-		x.SymReinstall()
+		if timestamp != 0 {
+			x.SymReinstall()
+		}
 		x.ActionInstall()
 
 		if virtualhost_template != "" {

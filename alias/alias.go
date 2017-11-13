@@ -76,7 +76,7 @@ func (Alias *Alias) GetPath() string {
 
 // Install an alias from an alias struct
 func (Alias *Alias) Install() {
-	Root := fmt.Sprintf("%v/%v.latest/%v", Alias.GetPath(), Alias.GetURI(), Alias.Docroot)
+	Root := fmt.Sprintf("%v/%v.latest/%v/", Alias.GetPath(), Alias.GetURI(), Alias.Docroot)
 	data := map[string]string{
 		"Name":   Alias.GetName(),
 		"Root":   Root,

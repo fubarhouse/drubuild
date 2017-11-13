@@ -533,7 +533,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	if Site.Timestamp == "" {
 		drushMake.SetWorkingDir(Site.Path + "/")
 	} else {
-		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + Site.Docroot)
+		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + "/" + Site.Docroot)
 	}
 	mkdirErr := os.MkdirAll(drushMake.GetWorkingDir(), 0755)
 	if mkdirErr != nil {
