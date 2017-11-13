@@ -19,8 +19,181 @@ import (
 
 	"fmt"
 
+	"io"
+	"strings"
+
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
+
+var (
+
+	// Home is the package variable to store the location of the config files.
+	Home string
+
+	// sites_php_template_date is the data for sites.php file.
+	// it was taken from the templates folder and serves as a backup
+	// when that file isn't available (not a go get install).
+	sites_php_template_date = `
+<?php
+
+/**
+ * @file
+ * Configuration file for Drupal's multi-site directory aliasing feature.
+ */
+
+ $sites['default'] = '{{ .Name }}';
+ $sites['{{ .Alias }}'] = '{{ .Name }}';
+
+?>
+`
+
+	// drush_alias_template is the data for drush alias file.
+	// it was taken from the templates folder and serves as a backup
+	// when that file isn't available (not a go get install).
+	drush_alias_template = `
+<?php
+	$aliases['{{ .Alias }}'] = array(
+		'root' => '{{ .Root }}',
+		'uri' => '{{ .Domain }}',
+		'path-aliases' => array(
+			'%files' => 'sites/{{ .Name }}/files',
+			'%private' => 'sites/{{ .Name }}/private',
+		),
+	);
+?>
+`
+	// vhost_template_data is the data for an nginx virtualhost config.
+	// nginx is the default configured webserver, so other web server
+	// templates will need to be added/changed as required.
+	// it was taken from the templates folder and serves as a backup
+	// when that file isn't available (not a go get install).
+	vhost_template_data = `
+server {
+    listen 80;
+
+    server_name {{ .Domain }}
+    error_log /var/log/nginx/error.log info;
+    root {{ .Root }};
+    index index.php index.html index.htm;
+
+    location / {
+        # Don't touch PHP for static content.
+        try_files $uri @rewrite;
+    }
+
+    # Don't allow direct access to PHP files in the vendor directory.
+    location ~ /vendor/.*\.php$ {
+        deny all;
+        return 404;
+    }
+
+    # Use fastcgi for all php files.
+    location ~ \.php$ {
+        # Secure *.php files.
+        try_files $uri = 404;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        # fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_pass unix:/var/run/php/php5.6-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 120;
+    }
+
+    location @rewrite {
+        # For D7 and above:
+        rewrite ^ /index.php;
+
+        # For Drupal 6 and below:
+        #rewrite ^/(.*)$ /index.php?q=$1;
+    }
+
+    location ~ ^/sites/.*/files/styles/ {
+        try_files $uri @rewrite;
+    }
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location ~ (^|/)\. {
+        return 403;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+    }
+
+    gzip on;
+    gzip_proxied any;
+    gzip_static on;
+    gzip_http_version 1.0;
+    gzip_disable "MSIE [1-6]\.";
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/javascript
+        application/x-javascript
+        application/json
+        application/xml
+        application/xml+rss
+        application/xhtml+xml
+        application/x-font-ttf
+        application/x-font-opentype
+        image/svg+xml
+        image/x-icon;
+    gzip_buffers 16 8k;
+    gzip_min_length 512;
+}
+`
+
+	// config_yml_template_data is the data for sites.php file.
+	// it was taken from the templates folder and serves as a backup
+	// when that file isn't available (not a go get install).
+	config_yml_template_data = `
+---
+
+db_user: drupal
+db_pass: drupal
+db_host: 127.0.0.1
+db_port: 3306
+
+webserver: nginx
+alias_template:
+sites_php_template:
+virtualhost_template:
+
+virtualhost_path: /etc/nginx/sites-available/
+`
+)
+
+func WriteStringToFile(filepath, s string) error {
+	fo, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fo.Close()
+
+	_, err = io.Copy(fo, strings.NewReader(s))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // syncCmd represents the backup command
 var initCmd = &cobra.Command{
@@ -28,17 +201,30 @@ var initCmd = &cobra.Command{
 	Short: "Initialise a set of templates in the provided destination path",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		} else {
+			Home = home
+		}
+
+		r := strings.Join([]string{Home, "yoink", ""}, string(os.PathSeparator))
+		WriteStringToFile(r+"sites.php.tmpl", sites_php_template_date)
+		WriteStringToFile(r+"config.yml", config_yml_template_data)
+		WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+		WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
 		if destination == "" {
 			cmd.Usage()
 			fmt.Println("\ndestination is not set")
 			os.Exit(1)
 		}
+		fmt.Println(config_yml_template_data)
 		//fmt.Sprint(templateAlias, templateSitesPhp, templateVhostApache, templateVhostHttpd, templateVhostNginx)
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(initCmd)
-	initCmd.Flags().StringVarP(&webserver, "webserver", "w", "", "Name of webserver. Supports apache, httpd, nginx.")
-	initCmd.Flags().StringVarP(&destination, "destination", "d", "", "Destination path to where the templates will be installed.")
 }

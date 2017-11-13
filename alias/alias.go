@@ -87,13 +87,19 @@ func (Alias *Alias) Install() {
 	filename := Alias.GetURI() + ".alias.drushrc.php"
 	fullpath := filedir + "/" + filename
 
-	t := template.New("alias")
+	defaultTemplate := ""
 	if Alias.template == "" {
-		defaultTemplate := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/alias.gotpl", os.Getenv("GOPATH"))
-		defaultData, _ := ioutil.ReadFile(defaultTemplate)
-		t.Parse(string(defaultData))
+		defaultTemplate = fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/alias.gotpl", os.Getenv("GOPATH"))
 	} else {
-		defaultData, _ := ioutil.ReadFile(Alias.template)
+		defaultTemplate = Alias.template
+	}
+
+	t := template.New("alias")
+	if _, err := os.Stat(defaultTemplate); err != nil {
+		log.Warnln("default drush alias template could not be found, source files do not exist.")
+	} else {
+		log.Infof("Found template %v for usage", defaultTemplate)
+		defaultData, _ := ioutil.ReadFile(defaultTemplate)
 		t.Parse(string(defaultData))
 	}
 
