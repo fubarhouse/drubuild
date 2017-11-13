@@ -18,7 +18,7 @@ func (Site *Site) VhostPathSet(value string) {
 // VhostInstall install a virtual host
 func (Site *Site) VhostInstall() {
 	var vhostPath string
-	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), Site.Domain+".latest/"+Site.Docroot, -1)
+	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest/"+Site.Docroot, -1)
 	fmt.Println("Path", Site.Path)
 	fmt.Println("Timestamp", Site.TimeStampGet())
 	fmt.Println("S", Site.Domain)
