@@ -213,20 +213,21 @@ var initCmd = &cobra.Command{
 
 		r := strings.Join([]string{Home, "yoink", ""}, string(os.PathSeparator))
 
-		e := os.Mkdir(r, 0755)
-		if e != nil {
-			log.Fatal("error in creating directory", r, ": ", e)
+		if _, s := os.Stat(r); s != nil {
+			e := os.Mkdir(r, 0755)
+			if e != nil {
+				log.Fatalf("error in creating directory %v\n%v", r, e)
+			}
 		}
 
-		WriteStringToFile(r+"sites.php.tmpl", sites_php_template_date)
+		log.Printf("Creating/replacing %vconfig.yml", r)
 		WriteStringToFile(r+"config.yml", config_yml_template_data)
+		log.Printf("Creating/replacing %vsites.php.tmpl", r)
+		WriteStringToFile(r+"sites.php.tmpl", sites_php_template_date)
+		log.Printf("Creating/replacing %valias.tmpl", r)
 		WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+		log.Printf("Creating/replacing %vvhost.tmpl", r)
 		WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
-		if destination == "" {
-			cmd.Usage()
-			fmt.Println("\ndestination is not set")
-			os.Exit(1)
-		}
 	},
 }
 
