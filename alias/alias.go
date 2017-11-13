@@ -16,6 +16,7 @@ import (
 
 // Alias is a struct for managing a single Drush Alias
 type Alias struct {
+	Docroot	 string
 	name     string
 	path     string
 	uri      string
@@ -39,7 +40,7 @@ func NewAlias(name, path, alias string) *Alias {
 		log.Warnln(string(CommandOut))
 		return &Alias{}
 	} else {
-		return &Alias{name, path, alias, ""}
+		return &Alias{"", name, path, alias, ""}
 	}
 }
 
@@ -75,7 +76,7 @@ func (Alias *Alias) GetPath() string {
 
 // Install an alias from an alias struct
 func (Alias *Alias) Install() {
-	Root := fmt.Sprintf("%v/%v.latest/docroot", Alias.GetPath(), Alias.GetURI())
+	Root := fmt.Sprintf("%v/%v.latest/%v", Alias.GetPath(), Alias.GetURI(), Alias.Docroot)
 	data := map[string]string{
 		"Name":   Alias.GetName(),
 		"Root":   Root,

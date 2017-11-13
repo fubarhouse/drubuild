@@ -35,13 +35,17 @@ var buildCmd = &cobra.Command{
 	Short: "The build process for Yoink",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if timestamp == 0 {
+		if docroot == "" {
+			log.Printf("docroot value is emptied, sub-folders will not be used.")
+			timestamp = 0
+		} else if timestamp == 0 {
 			timestamp, _ = strconv.ParseInt(time.Now().Format("20060102150405"), 0, 0)
 			log.Printf("Timestamp not specified, using %v", timestamp)
 		}
 
 		x := make.NewSite("", name, destination, alias, webserver, domain, virtualhost_path, virtualhost_template)
 		x.AliasTemplate = alias_template
+		x.Docroot = docroot
 		if alias == "" {
 			x.Alias = domain
 		}

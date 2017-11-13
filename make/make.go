@@ -99,6 +99,7 @@ type Site struct {
 	Name          string
 	Alias         string
 	Domain        string
+	Docroot		  string
 	database      *makeDB
 	Webserver     string
 	Vhostpath     string
@@ -173,7 +174,7 @@ func (Site *Site) ActionInstall() {
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
-	sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot"
+	sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + Site.Docroot
 	_, installErr := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd).Output()
 	if installErr != nil {
 		log.Warnln("Unable to install Drupal:", installErr)
@@ -532,7 +533,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	if Site.Timestamp == "" {
 		drushMake.SetWorkingDir(Site.Path + "/")
 	} else {
-		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/")
+		drushMake.SetWorkingDir(Site.Path + "/" + Site.Name + Site.Timestamp + Site.Docroot)
 	}
 	mkdirErr := os.MkdirAll(drushMake.GetWorkingDir(), 0755)
 	if mkdirErr != nil {
@@ -543,7 +544,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 
 	_ = drushMake.LiveOutput()
 
-	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/README.txt"); os.IsNotExist(err) {
+	if _, err := os.Stat(Site.Path + "/" + Site.Name + Site.Timestamp + "/" + Site.Docroot + "/README.txt"); os.IsNotExist(err) {
 		log.Errorln("Drush failed to copy the file system into place.")
 		os.Exit(1)
 	}
@@ -592,7 +593,7 @@ func (Site *Site) InstallSiteRef(Template string) {
 		"Alias": Site.Alias,
 	}
 	var dirPath string
-	dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/docroot/sites/"
+	dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/" + Site.Docroot + "/sites/"
 	dirErr := os.MkdirAll(dirPath+Site.Name, 0755)
 	if dirErr != nil {
 		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)
