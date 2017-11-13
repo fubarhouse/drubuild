@@ -80,7 +80,10 @@ var buildCmd = &cobra.Command{
 		if timestamp != 0 {
 			x.SymReinstall()
 		}
-		x.ActionInstall()
+
+		if !noInstall {
+			x.ActionInstall()
+		}
 
 		if virtualhost_template != "" {
 			if ok, err := os.Stat(virtualhost_template); err == nil {
@@ -127,6 +130,7 @@ func init() {
 	// Optional flags
 	buildCmd.Flags().StringVarP(&docroot, "docroot", "o", "docroot", "The folder to use for the built codebase.")
 	buildCmd.Flags().BoolVarP(&drupal, "drupal", "r", true, "Mark the build process as a Drupal build.")
+	buildCmd.Flags().BoolVarP(&noInstall, "no-install", "n", false, "Mark this build so that installation doesn't happen.")
 	buildCmd.Flags().Int64VarP(&timestamp, "timestamp", "t", 0, "Optional timestamp in the format YYYYMMDDHHMMSS")
 	buildCmd.Flags().BoolVarP(&vhost, "vhost", "v", true, "Include a virtual host as configured with this build.")
 	// Deprecated flags
