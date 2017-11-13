@@ -89,7 +89,6 @@ func (VirtualHost *VirtualHost) Install(Template string) {
 	os.Remove(filename)
 	file, _ := os.Create(filename)
 	tplErr := t.Execute(file, data)
-	t.Execute(os.Stdout, data)
 
 	if tplErr == nil {
 		log.Infof("Successfully templated vhost to file %v", filename)
