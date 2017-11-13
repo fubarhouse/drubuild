@@ -109,7 +109,7 @@ var buildCmd = &cobra.Command{
 		}
 
 		if drupal {
-			x.AliasInstall()
+			x.AliasInstall(docroot)
 		}
 	},
 }

@@ -20,8 +20,9 @@ func (Site *Site) AliasExists(filter string) bool {
 }
 
 // AliasInstall installs an alias for a given site struct
-func (Site *Site) AliasInstall() {
+func (Site *Site) AliasInstall(docroot string) {
 	var siteAlias alias.Alias
+	siteAlias.Docroot = docroot
 	siteAlias.SetName(Site.Name)
 	siteAlias.SetPath(Site.Path)
 	siteAlias.SetURI(Site.Alias)

@@ -97,7 +97,7 @@ func main() {
 	x.ActionInstall()
 	x.SymReinstall()
 	x.VhostInstall()
-	x.AliasInstall()
+	x.AliasInstall("docroot")
 	x.StopWebServer()
 	x.StartWebServer()
 }
