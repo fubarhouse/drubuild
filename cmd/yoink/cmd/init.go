@@ -177,7 +177,7 @@ alias_template:
 sites_php_template:
 virtualhost_template:
 
-virtualhost_path: /etc/nginx/sites-available/
+virtualhost_path: /etc/nginx/sites-enabled/
 `
 )
 

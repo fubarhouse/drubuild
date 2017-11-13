@@ -149,7 +149,7 @@ func init() {
 	viper.SetDefault("webserver", "nginx")
 	viper.SetDefault("alias_template", "")
 	viper.SetDefault("sites_php_template", "")
-	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-available")
+	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-enabled")
 	viper.SetDefault("virtualhost_template", "")
 
 	// Database
