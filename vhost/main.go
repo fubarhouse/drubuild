@@ -94,7 +94,7 @@ func (VirtualHost *VirtualHost) Install(Template string) {
 	if tplErr == nil {
 		log.Infof("Successfully templated vhost to file %v", filename)
 	} else {
-		log.Warnf("Error templating vhost to file %v", filename)
+		log.Warnf("Error templating vhost to file %v: %v", filename, tplErr)
 	}
 }
 

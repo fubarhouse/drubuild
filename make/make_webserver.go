@@ -19,11 +19,6 @@ func (Site *Site) VhostPathSet(value string) {
 func (Site *Site) VhostInstall() {
 	var vhostPath string
 	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), ".latest/"+Site.Docroot, -1)
-	fmt.Println("Path", Site.Path)
-	fmt.Println("Timestamp", Site.TimeStampGet())
-	fmt.Println("S", Site.Domain)
-	fmt.Println("D", Site.Docroot)
-	fmt.Println("X", Site.Domain+".latest/"+Site.Docroot)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, Site.Webserver, Site.Domain, Site.Vhostpath)
 
 	if Site.Template == "" {
