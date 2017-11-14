@@ -145,17 +145,6 @@ func init() {
 	buildCmd.MarkFlagRequired("destination")
 	buildCmd.MarkFlagRequired("domain")
 
-	// Set configurables to defaults.
-	viper.SetDefault("db_user", "root")
-	viper.SetDefault("db_pass", "root")
-	viper.SetDefault("db_host", "127.0.0.1")
-	viper.SetDefault("db_port", 3306)
-	viper.SetDefault("webserver", "nginx")
-	viper.SetDefault("alias_template", "")
-	viper.SetDefault("sites_php_template", "")
-	viper.SetDefault("virtualhost_path", "/etc/nginx/sites-enabled")
-	viper.SetDefault("virtualhost_template", "")
-
 	// Database
 	db_user = viper.GetString("db_user")
 	db_pass = viper.GetString("db_pass")
