@@ -35,6 +35,19 @@ var buildCmd = &cobra.Command{
 	Short: "The build process for Yoink",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		db_user = viper.GetString("db_user")
+		db_pass = viper.GetString("db_pass")
+		db_host = viper.GetString("db_host")
+		db_port = viper.GetInt("db_port")
+
+		webserver = viper.GetString("webserver")
+
+		alias_template = viper.GetString("alias_template")
+		sites_php_template = viper.GetString("sites_php_template")
+		virtualhost_path = viper.GetString("virtualhost_path")
+		virtualhost_template = viper.GetString("virtualhost_template")
+
 		if docroot == "" {
 			log.Printf("docroot value is emptied, sub-folders will not be used.")
 			timestamp = 0
