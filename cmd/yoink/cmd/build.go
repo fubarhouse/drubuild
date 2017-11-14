@@ -113,14 +113,14 @@ var buildCmd = &cobra.Command{
 		}
 
 		if alias_template != "" {
-			if ok, err := os.Stat(alias_template); err == nil {
-				log.Infof("Found template %v", ok.Name())
-				x.AliasTemplate = ok.Name()
+			if _, err := os.Stat(alias_template); err == nil {
+				log.Infof("Found template %v", alias_template)
+				x.AliasTemplate = alias_template
 			} else {
-				t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/alias.gotpl", os.Getenv("GOPATH"))
-				log.Infof("Could not find template %v, using %v", ok.Name(), t)
+				log.Warnln("alias file could not be found.")
 			}
 		}
+
 		if alias == "" {
 			x.Alias = domain
 		}
