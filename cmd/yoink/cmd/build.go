@@ -27,6 +27,7 @@ import (
 	composer2 "github.com/fubarhouse/golang-drush/composer"
 	"github.com/fubarhouse/golang-drush/make"
 	"github.com/spf13/viper"
+	"github.com/mitchellh/go-homedir"
 )
 
 // buildCmd represents the build command
@@ -36,6 +37,15 @@ var buildCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		r := strings.Join([]string{home, "yoink"}, string(os.PathSeparator))
+
 		db_user = viper.GetString("db_user")
 		db_pass = viper.GetString("db_pass")
 		db_host = viper.GetString("db_host")
@@ -43,10 +53,10 @@ var buildCmd = &cobra.Command{
 
 		webserver = viper.GetString("webserver")
 
-		alias_template = viper.GetString("alias_template")
-		sites_php_template = viper.GetString("sites_php_template")
-		virtualhost_path = viper.GetString("virtualhost_path")
-		virtualhost_template = viper.GetString("virtualhost_template")
+		alias_template = r + viper.GetString("alias_template")
+		sites_php_template = r + viper.GetString("sites_php_template")
+		virtualhost_path = r + viper.GetString("virtualhost_path")
+		virtualhost_template = r + viper.GetString("virtualhost_template")
 
 		if docroot == "" {
 			log.Printf("docroot value is emptied, sub-folders will not be used.")
