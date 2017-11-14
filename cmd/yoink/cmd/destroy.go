@@ -49,10 +49,6 @@ func init() {
 	destroyCmd.MarkFlagRequired("destination")
 	destroyCmd.MarkFlagRequired("domain")
 
-	viper.SetDefault("db_user", "root")
-	viper.SetDefault("db_pass", "root")
-	viper.SetDefault("db_host", "127.0.0.1")
-	viper.SetDefault("db_port", 3306)
 	db_user = viper.GetString("db_user")
 	db_pass = viper.GetString("db_pass")
 	db_host = viper.GetString("db_host")

@@ -169,7 +169,7 @@ server {
 
 db_user: drupal
 db_pass: drupal
-db_host: 127.0.0.1
+db_host: localhost
 db_port: 3306
 
 webserver: nginx
