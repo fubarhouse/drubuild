@@ -49,6 +49,7 @@ var buildCmd = &cobra.Command{
 		if alias == "" {
 			x.Alias = domain
 		}
+		log.Println(db_host, db_user, db_pass, db_port)
 		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
 
