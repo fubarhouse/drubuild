@@ -48,8 +48,6 @@ var buildCmd = &cobra.Command{
 		virtualhost_path = viper.GetString("virtualhost_path")
 		virtualhost_template = viper.GetString("virtualhost_template")
 
-		log.Println(alias_template, sites_php_template, virtualhost_path, virtualhost_template)
-
 		if ok, err := os.Stat(sites_php_template); err == nil {
 			log.Infof("Found template %v", ok.Name())
 		}
