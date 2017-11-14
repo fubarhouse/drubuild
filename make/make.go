@@ -174,8 +174,13 @@ func (Site *Site) ActionInstall() {
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
-	sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + Site.Docroot
-	i := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd)
+	sitePath = Site.Path + string(os.PathSeparator) + Site.Name + Site.Timestamp + string(os.PathSeparator) + Site.Docroot
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		log.Fatalln(e)
+	}
+	i := exec.Command(d, thisCmd)
+	i.Dir = sitePath
 	i.Stderr = os.Stderr
 	i.Stdout = os.Stdout
 	i.Run()
