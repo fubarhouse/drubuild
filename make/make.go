@@ -175,12 +175,11 @@ func (Site *Site) ActionInstall() {
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
 	sitePath = Site.Path + "/" + Site.Name + Site.Timestamp + Site.Docroot
-	_, installErr := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd).Output()
-	if installErr != nil {
-		log.Warnln("Unable to install Drupal:", installErr)
-	} else {
-		log.Infoln("Installed Drupal.")
-	}
+	i := exec.Command("sh", "-c", "cd "+sitePath+" && drush "+thisCmd)
+	i.Stderr = os.Stderr
+	i.Stdout = os.Stdout
+	i.Run()
+	i.Wait()
 }
 
 // ActionRebuildProject purges a specific project from a specified path, and re-download it
