@@ -179,7 +179,7 @@ func (Site *Site) ActionInstall() {
 	if e != nil {
 		log.Fatalln(e)
 	}
-	i := exec.Command(d, "site-install", thisCmd)
+	i := exec.Command(d + " site-install", thisCmd)
 	i.Dir = sitePath
 	i.Stderr = os.Stderr
 	i.Stdout = os.Stdout
