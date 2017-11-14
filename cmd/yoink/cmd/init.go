@@ -173,9 +173,9 @@ db_host: 127.0.0.1
 db_port: 3306
 
 webserver: nginx
-alias_template:
-sites_php_template:
-virtualhost_template:
+alias_template: $HOME/alias.tmpl
+sites_php_template: $HOME/sites.php.tmpl
+virtualhost_template: $HOME/vhost.tmpl
 
 virtualhost_path: /etc/nginx/sites-enabled/
 `
@@ -219,6 +219,9 @@ var initCmd = &cobra.Command{
 				log.Fatalf("error in creating directory %v\n%v", r, e)
 			}
 		}
+
+		config_yml_template_data = strings.Replace(config_yml_template_data, "$HOME", r, -1)
+		config_yml_template_data = strings.Replace(config_yml_template_data, "//", string(os.PathSeparator), -1)
 
 		log.Printf("Creating/replacing %vconfig.yml", r)
 		WriteStringToFile(r+"config.yml", config_yml_template_data)
