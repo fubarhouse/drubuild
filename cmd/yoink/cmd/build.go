@@ -48,10 +48,6 @@ var buildCmd = &cobra.Command{
 		virtualhost_path = viper.GetString("virtualhost_path")
 		virtualhost_template = viper.GetString("virtualhost_template")
 
-		if ok, err := os.Stat(sites_php_template); err == nil {
-			log.Infof("Found template %v", ok.Name())
-		}
-
 		if docroot == "" {
 			log.Printf("docroot value is emptied, sub-folders will not be used.")
 			timestamp = 0
