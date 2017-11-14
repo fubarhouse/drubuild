@@ -172,14 +172,14 @@ func (Site *Site) ActionInstall() {
 		panic(dbErr)
 	}
 	// Drush site-install
-	thisCmd := fmt.Sprintf("standard -y --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
+	thisCmd := fmt.Sprintf("--yes --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
 	var sitePath string
 	sitePath = Site.Path + string(os.PathSeparator) + Site.Name + Site.Timestamp + string(os.PathSeparator) + Site.Docroot
 	d, e := exec.LookPath("drush")
 	if e != nil {
 		log.Fatalln(e)
 	}
-	i := exec.Command(d, "site-install", thisCmd)
+	i := exec.Command(d, "site-install", "standard", thisCmd)
 	i.Dir = sitePath
 	i.Stderr = os.Stderr
 	i.Stdout = os.Stdout
@@ -574,7 +574,7 @@ func (Site *Site) ProcessMake(Make Make) bool {
 func (Site *Site) InstallSiteRef(Template string) {
 
 	if Template != "" {
-		if ok, err := os.Stat(Template); err != nil {
+		if ok, err := os.Stat(Template); err == nil {
 			log.Infof("Found template %v", ok.Name())
 		} else {
 			t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
