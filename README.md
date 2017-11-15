@@ -1,84 +1,122 @@
 <img style="float:left" alight="left" height="128px" width="100px" src="https://github.com/fubarhouse/ansible-role-golang/raw/master/gopher.png">
 
-# Golang Drush
+# Drubuild
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
 
 ## Purpose
 
-Drubuild is a suite of tools designed for use behind the terminal via scripts or to tie into CI configurations which are designed to build and maintain Drupal websites and support the needs of development teams in building Drupal sites with a vast array of Drush integration tasks to remove the complexities of having developers behind a command-line.
+Drubuild is a command-line application which builds and manages sites via some common composer and drush commands.
 
-History proves that not all developers are comfortable or fo not completely embrace command-line tools and these non-interactive tools allow use in many different configurations and platforms.
+This application was born of the personal desire of the creator to be a useful tool for CI and automation to be used at work, however the stability and reliability was a catalyst for a lot of work here. 
 
-**Note**: This project is the predecessor to a follow-up project which will become known as *Drubuild*. Once this project is alpha-ready it will be made public and this project will be marked as deprecated.
+This application is fully-intended to work out of the box with [DrupalVM](https://www.drupalvm.com/), and a fork of DrupalVM with the configuration of the maintainer's Ansible role [fubarhouse.golang](https://github.com/fubarhouse/ansible-role-golang) will be available shortly.
 
-## Package rundown
-
-* alias:  
-  Provides types and functions associated to managing a single Drush alias.
-* aliases:  
-  Provides types and functions associated to grouping a collection of Drush aliases.
-* command:  
-  Provides types and functions associated to execution of a Drush command, in a range of ways including live pipelines.
-* commandlist:  
-  Provides types and functions for grouping a list/group of Drush commands for execution.
-* make:  
-  Provides many types and functions associated to the creation and removal of many aspects of Drupal sites via Drush.
-* makeupdater:  
-  Provides types and functions associated to updating make files, including make file creation, recreation and generation.
-* sites:  
-  Provides types and functions for a collection of sites, such as finding an available site via `drush sa`
-* solr:  
-  Provides a way to manage solr cores for installation, removal and verification.
-* user:  
-  Provides types and functions for user management, including creating, blocking and verification.
-* vhost:  
-  Provides types and functions for creating and removing virtual hosts.
-
-## Included binaries
-
-All of the following binaries should be used with the -h flag to invoke the usage. Usage will not be supplied here explicitly as there are a lot of binaries and a lot of potential parameters for them.
-
-* module-auditor:  
-  Uses Drush to run run a report against make files and Drush aliases.
-* rewrite-make:  
-  Completely rewrites a make file - supports contributed make files only.
-* site-checker:  
-  Binary name needs to be rewritten, but it will run a series of commands on a series of aliases matching a specified pattern and report results and verbose output if desired.
-* update-make:  
-  Runs through a make file with pm-info and updates version numbers to the latest available recommended version for each project.
-* user-block:  
-  Performs a set of actions to block a given user on aliases matching a specific pattern.
-* user-create:  
-  Performs a set of actions to create a given user on aliases matching a specific pattern.
-* user-unblock:  
-  Performs a set of actions to unblock a given user on aliases matching a specific pattern.
-* user-verify:  
-  Performs a set of actions to validate and change the information on a given user on aliases matching a specific pattern.
-* yoink-backup-site:  
-  Performs a Drush archive-dump command on an alias to a given destination
-* yoink-build-site:  
-  Builds a Drupal website based upon MySQL with a drush alias, virtualhosts from specified make files, and supports infinite amount of builds per site.
-* yoink-destroy-site:  
-  Removes everything put in place by the build program. 
-* yoink-rebuild-site:  
-  Rebuilds a site without virtual hosts, aliases or anything, it will build a site at a specific location with given make files.
-* yoink-solr-build:  
-  Installs a solr core with provided resource files.
-* yoink-solr-destroy:  
-  Removes a solr core installed by the solr build program.
-* yoink-sync-remote-site:  
-  Syncs files and/or database between a source and destination alias.
-* yoink-sync-site:  
-  Syncs files and/or database between a source and destination alias, which performs basic checks on the destination upon completion.
-* yoink-validate:  
-  Runs some basic system tests to ensure funtionality will execute.
+The application has previously been used for CI tooling for the management of more than 40 websites simultaneously, supporting developers during their local build and development cycle with Jenkins. 
 
 ## Install
 
-### Install the entire package
+It is *highly* recommended to install this using Go, and currently no other options are available. 
+
 ```console
 $ go get -u github.com/fubarhouse/drubuild
+```
+
+## Usage
+
+Before you can begin, you will need to run `drubuild init` to establish a set of templates and configuration settings at `$HOME/drubuild/`.
+
+After having made the templates and config available, you can run `drubuild` like any other console application.
+
+```
+Using config file: /Users/karl/drubuild/config.yml
+A Drupal build system.
+
+Usage:
+  drubuild [command]
+
+Available Commands:
+  backup      Take a archive-dump snapshot of a local site
+  build       The build process for Drubuild
+  destroy     Remove all traces of an installed site.
+  help        Help about any command
+  init        Initialise a set of templates in the provided destination path
+  project     Install or remove a project.
+  runner      Runs a series of drush commands consecutively.
+  sync        Execute drush sql-sync or rsync between two drush aliases
+  user        User management tasks
+
+Flags:
+  -h, --help   help for drubuild
+
+Use "drubuild [command] --help" for more information about a command.
+```
+
+### Backup
+
+A very simple terminal interface which allows for `drush archive-dump`.
+```
+drubuild backup --source @mysite.dev --destination /mysite.dev.tar.gz
+```
+
+### Build
+
+The actual build process, which will accept a make file (for now), a composer.json file, and some other basic information and build you a site, including installation, multi-site setup, drush alias and virtualhost - all provided by the templates used by the system.
+
+There are many options here to control the process for site builds, folder hierarchy (specify a docroot in the folder) etc.
+```
+drubuild build --name mysite --domain mysite.dev --destination /sites/mysite.dev --composer /composer.json
+```
+
+### Destroy
+
+The reverse of building, to remove all traces of a previously built site, including file system, databases, aliases, virtual hosts etc.
+```
+drubuild destroy --name mysite --domain mysite.dev --destination /sites/mysite.dev
+```
+
+### Help
+
+Basically provide the help text listed above.
+```
+drubuild --help
+```
+
+### Init
+
+Initialise or replace configurables and templates with defaults.
+```
+drubuild init
+```
+
+### Project
+
+Add or remove a project to a built site using information available in the composer.json file.
+```
+drubuild project --name drupal/core --path /sites/mysite.dev --remove --add
+```
+
+### Runner
+
+The drush command runner is a scalable task runner which will execute a comma-separated list of drush commands on a comma-separated list of drush aliases with pattern matching supported for scaling.
+```
+drubuild runner --aliases dev,test,preprod,prod --pattern mysite.%v --commands "updb -y,cache-rebuild"
+```
+
+### Sync
+
+The syncer will attempt to sync the databases and files between two Drush aliases. Note that this can be very dangerous if used incorrectly, and Drush doesn't support remote to remote syncs. The exact settings for this can be found in the Drush alias template.
+```
+drubuild sync --source mysite.prod --destination mysite.local  --database --files
+```
+
+### User
+
+The user command will act much like the runner, which can create, block, unblock, delete, reset password, add roles, and general maintenance accross a set of sites using alias pattern matching.
+
+This one has proven critical when managing literally hundreds of Drupal accounts.
+```
+drubuild user --name TestUser --email test@user.com --password MyPassword --aliases dev,test,preprod,prod --pattern mysite.%v --create
 ```
 
 ## Author Information
