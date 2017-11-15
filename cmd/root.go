@@ -48,7 +48,7 @@ var (
 	aliases string
 
 	// cfgFile is the path to the config file in use.
-	// cfgFile will default to $HOME/yoink/config.yml
+	// cfgFile will default to $HOME/drubuild/config.yml
 	// Other formats are supported natively by Viper,
 	// however in this case yaml is recommended.
 	cfgFile string
@@ -66,24 +66,24 @@ var (
 	composer string
 
 	// db_host is the string which represents the configured database host
-	// this host path can be configured at $HOME/yoink/config.yml, and
+	// this host path can be configured at $HOME/drubuild/config.yml, and
 	// defaults to '127.0.0.1'.
 	db_host string
 
 	// db_pass is an unprotected string which represents the configured user
 	// password. this user account should have permission to create
 	// databases, and this password can be configured at
-	// $HOME/yoink/config.yml, and defaults to 'root'.
+	// $HOME/drubuild/config.yml, and defaults to 'root'.
 	db_pass string
 
 	// db_port is an integer which represents the configured database port
-	// this port path can be configured at $HOME/yoink/config.yml, and
+	// this port path can be configured at $HOME/drubuild/config.yml, and
 	// defaults to 3306.
 	db_port int
 
 	// db_user is the string which represents the configured user account.
 	// this user account should have permission to create databases, and
-	// this user can be configured at $HOME/yoink/config.yml, and defaults
+	// this user can be configured at $HOME/drubuild/config.yml, and defaults
 	// to 'root'.
 	db_user string
 
@@ -254,7 +254,7 @@ var (
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "yoink",
+	Use:   "drubuild",
 	Short: "A Drupal build system.",
 	Long:  ``,
 }
@@ -273,7 +273,7 @@ func Execute() {
 			os.Exit(1)
 		}
 
-		r := strings.Join([]string{home, "yoink"}, string(os.PathSeparator))
+		r := strings.Join([]string{home, "drubuild"}, string(os.PathSeparator))
 
 		// Search config in home directory with name "drubuild" (without extension).
 		viper.AddConfigPath(r)

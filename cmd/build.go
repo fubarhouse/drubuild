@@ -32,7 +32,7 @@ import (
 // buildCmd represents the build command
 var buildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "The build process for Yoink",
+	Short: "The build process for Drubuild",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 

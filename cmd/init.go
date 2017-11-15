@@ -211,7 +211,7 @@ var initCmd = &cobra.Command{
 			Home = home
 		}
 
-		r := strings.Join([]string{Home, "yoink", ""}, string(os.PathSeparator))
+		r := strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
 
 		if _, s := os.Stat(r); s != nil {
 			e := os.Mkdir(r, 0755)

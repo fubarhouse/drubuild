@@ -139,7 +139,7 @@ func NewSite(make, name, path, alias, webserver, domain, vhostpath, template str
 
 // ActionBackup performs a Drush archive-dump command.
 //
-// Deprecated: use yoink command instead.
+// Deprecated: use drubuild command instead.
 func (Site *Site) ActionBackup(destination string) {
 	if Site.AliasExists(Site.Name) == true {
 		x := command.NewDrushCommand()
