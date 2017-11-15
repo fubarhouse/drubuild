@@ -97,7 +97,7 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         # fastcgi_pass  127.0.0.1:9000;
         fastcgi_index index.php;
-        fastcgi_pass unix:/var/run/php/php5.6-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_read_timeout 120;
     }
