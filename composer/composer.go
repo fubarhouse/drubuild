@@ -163,13 +163,6 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 	cpCmd.Dir = Destination
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
-	e := cpCmd.Run()
-	if e != nil {
-		log.Warnf("could not execute composer %v\n", c)
-	}
-	f := cpCmd.Wait()
-	if f != nil {
-		log.Warnln(f)
-	}
-
+	cpCmd.Run()
+	cpCmd.Wait()
 }
