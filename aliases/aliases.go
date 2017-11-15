@@ -2,8 +2,8 @@ package aliases
 
 import (
 	"fmt"
-	"github.com/fubarhouse/golang-drush/alias"
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/alias"
+	"github.com/fubarhouse/drubuild/command"
 	"strings"
 )
 

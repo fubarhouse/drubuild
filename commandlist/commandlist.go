@@ -2,7 +2,7 @@ package commandlist
 
 import (
 	"fmt"
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/command"
 	"os/exec"
 )
 

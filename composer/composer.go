@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/makeupdater"
+	"github.com/fubarhouse/drubuild/makeupdater"
 )
 
 // DrupalProject is a type to provide both name and verison of a given Drupal project.

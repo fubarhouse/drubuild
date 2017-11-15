@@ -15,9 +15,9 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
-	"github.com/fubarhouse/golang-drush/composer"
-	"github.com/fubarhouse/golang-drush/makeupdater"
+	"github.com/fubarhouse/drubuild/command"
+	"github.com/fubarhouse/drubuild/composer"
+	"github.com/fubarhouse/drubuild/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 )
 
@@ -572,23 +572,13 @@ func (Site *Site) ProcessMake(Make Make) bool {
 func (Site *Site) InstallSiteRef(Template string) {
 
 	if Template != "" {
-		if ok, err := os.Stat(Template); err == nil {
-			log.Infof("Found template %v", ok.Name())
-		} else {
-			t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
-			if _, err := os.Stat(t); err != nil {
-				log.Warnln("default sites.php template could not be found, source files do not exist.")
-			} else {
-				log.Infof("Could not find template %v, using %v", ok.Name(), t)
-				Template = t
-			}
+		if _, err := os.Stat(Template); err == nil {
+			log.Infof("Found template %v", Template)
 		}
 	}
 
 	if Template == "" {
-		t := fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/sites.php.gotpl", os.Getenv("GOPATH"))
-		log.Infof("No template specified, using %v", t)
-		Template = t
+		log.Warnln("no template specified for sites.php")
 	}
 
 	data := map[string]string{

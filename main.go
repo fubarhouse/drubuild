@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/fubarhouse/golang-drush/cmd/yoink/cmd"
+import "github.com/fubarhouse/drubuild/cmd"
 
 func main() {
 	cmd.Execute()
