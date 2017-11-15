@@ -24,8 +24,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	composer2 "github.com/fubarhouse/golang-drush/composer"
-	"github.com/fubarhouse/golang-drush/make"
+	composer2 "github.com/fubarhouse/drubuild/composer"
+	"github.com/fubarhouse/drubuild/make"
 	"github.com/spf13/viper"
 )
 

@@ -23,8 +23,8 @@ import (
 
 	"fmt"
 
-	alias2 "github.com/fubarhouse/golang-drush/alias"
-	"github.com/fubarhouse/golang-drush/user"
+	alias2 "github.com/fubarhouse/drubuild/alias"
+	"github.com/fubarhouse/drubuild/user"
 	"github.com/spf13/cobra"
 )
 

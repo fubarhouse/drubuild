@@ -275,7 +275,7 @@ func Execute() {
 
 		r := strings.Join([]string{home, "yoink"}, string(os.PathSeparator))
 
-		// Search config in home directory with name "golang-drush" (without extension).
+		// Search config in home directory with name "drubuild" (without extension).
 		viper.AddConfigPath(r)
 		viper.SetConfigName("config")
 		viper.SetConfigType("yml")

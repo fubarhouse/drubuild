@@ -19,7 +19,7 @@ import (
 
 	"log"
 
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/command"
 	"github.com/spf13/cobra"
 )
 

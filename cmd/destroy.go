@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/golang-drush/make"
+	"github.com/fubarhouse/drubuild/make"
 	"github.com/spf13/viper"
 )
 
