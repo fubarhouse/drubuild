@@ -99,7 +99,7 @@ type Site struct {
 	Name          string
 	Alias         string
 	Domain        string
-	Docroot		  string
+	Docroot       string
 	database      *makeDB
 	Webserver     string
 	Vhostpath     string
@@ -178,7 +178,7 @@ func (Site *Site) ActionInstall() {
 	if e != nil {
 		log.Fatalln(e)
 	}
-	i := exec.Command(d, "site-install", "standard", "--yes", "--sites-subdir="+Site.Name, fmt.Sprint("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName))
+	i := exec.Command(d, "site-install", "standard", "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName))
 	i.Dir = sitePath
 	i.Stderr = os.Stderr
 	i.Stdout = os.Stdout
