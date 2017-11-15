@@ -100,11 +100,11 @@ var buildCmd = &cobra.Command{
 		}
 
 		if virtualhost_template != "" {
-			if ok, err := os.Stat(virtualhost_template); err == nil {
-				log.Infof("Found template %v for usage", ok.Name())
-				x.Template = ok.Name()
+			if _, err := os.Stat(virtualhost_template); err == nil {
+				log.Infof("Found template %v for usage", virtualhost_template)
+				x.Template = virtualhost_template
 			} else {
-				log.Println("Could not find configured or default virtual host template.")
+				log.Warnln("Could not find configured virtual host template.")
 			}
 		}
 
