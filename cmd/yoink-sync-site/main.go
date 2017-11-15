@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/command"
 	"os"
 	"strings"
 	"sync"

@@ -2,11 +2,11 @@
 
 # Golang Drush
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/golang-drush)](https://goreportcard.com/report/github.com/fubarhouse/golang-drush)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
 
 ## Purpose
 
-Golang-Drush is a suite of tools designed for use behind the terminal via scripts or to tie into CI configurations which are designed to build and maintain Drupal websites and support the needs of development teams in building Drupal sites with a vast array of Drush integration tasks to remove the complexities of having developers behind a command-line.
+Drubuild is a suite of tools designed for use behind the terminal via scripts or to tie into CI configurations which are designed to build and maintain Drupal websites and support the needs of development teams in building Drupal sites with a vast array of Drush integration tasks to remove the complexities of having developers behind a command-line.
 
 History proves that not all developers are comfortable or fo not completely embrace command-line tools and these non-interactive tools allow use in many different configurations and platforms.
 
@@ -78,28 +78,28 @@ All of the following binaries should be used with the -h flag to invoke the usag
 
 ### Install the entire package
 ```console
-$ go get -u github.com/fubarhouse/golang-drush/...
+$ go get -u github.com/fubarhouse/drubuild/...
 ```
 
 ### Installing individual binaries
 ```console
-$ go get -u github.com/fubarhouse/golang-drush/cmd/module-auditor
-$ go get -u github.com/fubarhouse/golang-drush/cmd/rewrite-make
-$ go get -u github.com/fubarhouse/golang-drush/cmd/site-checker
-$ go get -u github.com/fubarhouse/golang-drush/cmd/update-make
-$ go get -u github.com/fubarhouse/golang-drush/cmd/user-block
-$ go get -u github.com/fubarhouse/golang-drush/cmd/user-create
-$ go get -u github.com/fubarhouse/golang-drush/cmd/user-unblock
-$ go get -u github.com/fubarhouse/golang-drush/cmd/user-verify
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-backup-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-build-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-destroy-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-rebuild-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-solr-build
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-solr-destroy
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-sync-remote-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-sync-site
-$ go get -u github.com/fubarhouse/golang-drush/cmd/yoink-validate
+$ go get -u github.com/fubarhouse/drubuild/cmd/module-auditor
+$ go get -u github.com/fubarhouse/drubuild/cmd/rewrite-make
+$ go get -u github.com/fubarhouse/drubuild/cmd/site-checker
+$ go get -u github.com/fubarhouse/drubuild/cmd/update-make
+$ go get -u github.com/fubarhouse/drubuild/cmd/user-block
+$ go get -u github.com/fubarhouse/drubuild/cmd/user-create
+$ go get -u github.com/fubarhouse/drubuild/cmd/user-unblock
+$ go get -u github.com/fubarhouse/drubuild/cmd/user-verify
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-backup-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-build-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-destroy-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-rebuild-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-solr-build
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-solr-destroy
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-sync-remote-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-sync-site
+$ go get -u github.com/fubarhouse/drubuild/cmd/yoink-validate
 ```
 
 ## Author Information

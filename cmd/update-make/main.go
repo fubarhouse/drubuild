@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/makeupdater"
+	"github.com/fubarhouse/drubuild/makeupdater"
 	"strings"
 )
 

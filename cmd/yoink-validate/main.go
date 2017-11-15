@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/alias"
-	//"github.com/fubarhouse/golang-drush/make"
-	"github.com/fubarhouse/golang-drush/vhost"
+	"github.com/fubarhouse/drubuild/alias"
+	//"github.com/fubarhouse/drubuild/make"
+	"github.com/fubarhouse/drubuild/vhost"
 	"os"
 	"os/user"
 )

@@ -8,9 +8,9 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/alias"
-	"github.com/fubarhouse/golang-drush/aliases"
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/alias"
+	"github.com/fubarhouse/drubuild/aliases"
+	"github.com/fubarhouse/drubuild/command"
 	"os/exec"
 	"strings"
 )

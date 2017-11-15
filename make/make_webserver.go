@@ -1,7 +1,7 @@
 package make
 
 import (
-	"github.com/fubarhouse/golang-drush/vhost"
+	"github.com/fubarhouse/drubuild/vhost"
 	"strings"
 )
 

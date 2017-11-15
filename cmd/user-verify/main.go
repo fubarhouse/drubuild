@@ -6,11 +6,11 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/user"
+	"github.com/fubarhouse/drubuild/user"
 	"net/mail"
 	"os"
 	"strings"
-	"github.com/fubarhouse/golang-drush/alias"
+	"github.com/fubarhouse/gdrubuild/alias"
 )
 
 func main() {

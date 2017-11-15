@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
-	"github.com/fubarhouse/golang-drush/composer"
-	"github.com/fubarhouse/golang-drush/makeupdater"
+	"github.com/fubarhouse/drubuild/command"
+	"github.com/fubarhouse/drubuild/composer"
+	"github.com/fubarhouse/drubuild/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
 	"math/rand"

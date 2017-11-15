@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/command"
+	"github.com/fubarhouse/drubuild/command"
 	"strconv"
 	"strings"
 )

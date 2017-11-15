@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/golang-drush/solr"
+	"github.com/fubarhouse/drubuild/solr"
 	"os"
 )
 
