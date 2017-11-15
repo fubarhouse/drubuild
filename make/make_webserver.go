@@ -1,11 +1,7 @@
 package make
 
 import (
-	"fmt"
-	"os"
 	"strings"
-
-	log "github.com/Sirupsen/logrus"
 
 	"github.com/fubarhouse/golang-drush/vhost"
 )
