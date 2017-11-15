@@ -21,11 +21,6 @@ func (Site *Site) VhostInstall() {
 	vhostPath = strings.Replace(Site.Path+Site.TimeStampGet(), Site.TimeStampGet(), "/" + Site.Domain + ".latest/"+Site.Docroot, -1)
 	vhostFile := vhost.NewVirtualHost(Site.Name, vhostPath, Site.Webserver, Site.Domain, Site.Vhostpath)
 
-	if Site.Template == "" {
-		Site.Template = fmt.Sprintf("%v/src/github.com/fubarhouse/golang-drush/cmd/yoink/templates/vhost-%v.gotpl", os.Getenv("GOPATH"), Site.Webserver)
-		log.Printf("No input vhost file, using %v", Site.Template)
-	}
-
 	vhostFile.Install(Site.Template)
 }
 

@@ -114,7 +114,6 @@ var buildCmd = &cobra.Command{
 
 		if alias_template != "" {
 			if _, err := os.Stat(alias_template); err == nil {
-				log.Infof("Found template %v", alias_template)
 				x.AliasTemplate = alias_template
 			} else {
 				log.Warnln("alias file could not be found.")
