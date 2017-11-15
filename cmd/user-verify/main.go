@@ -10,7 +10,7 @@ import (
 	"net/mail"
 	"os"
 	"strings"
-	"github.com/fubarhouse/gdrubuild/alias"
+	"github.com/fubarhouse/drubuild/alias"
 )
 
 func main() {
