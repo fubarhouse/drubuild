@@ -127,6 +127,8 @@ var buildCmd = &cobra.Command{
 		if drupal {
 			x.AliasInstall(docroot)
 		}
+
+		log.Infoln("Based upon the output above, you may need to restart the web service.")
 	},
 }
 
