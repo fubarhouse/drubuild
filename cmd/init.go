@@ -167,8 +167,8 @@ server {
 	config_yml_template_data = `
 ---
 
-db_user: drupal
-db_pass: drupal
+db_user: root
+db_pass: root
 db_host: localhost
 db_port: 3306
 
