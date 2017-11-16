@@ -178,7 +178,8 @@ func (Site *Site) ActionInstall() {
 	if e != nil {
 		log.Fatalln(e)
 	}
-	i := exec.Command(d, "site-install", "standard", "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName))
+	a := []string{"site-install", "--root="+sitePath, "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)}
+	i := exec.Command(d, a...)
 	i.Dir = sitePath
 	i.Stderr = os.Stderr
 	i.Stdout = os.Stdout
