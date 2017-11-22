@@ -23,6 +23,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// todo: find a way to manually purge the git file system for one single package.
+
 // projectCmd represents the project command
 var projectCmd = &cobra.Command{
 	Use:   "project",

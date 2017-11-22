@@ -27,7 +27,29 @@ import (
 	composer2 "github.com/fubarhouse/drubuild/composer"
 	"github.com/fubarhouse/drubuild/make"
 	"github.com/spf13/viper"
+	"path/filepath"
 )
+
+// removeGitFromPath will purge all .git data recursively from the specified path.
+func removeGitFromPath(path string) {
+	// Generate a list of .git file systems from the input path.
+	fileList := []string{}
+	filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if strings.HasSuffix(path, ".git") && f.IsDir() {
+			fileList = append(fileList, path)
+		}
+		return nil
+	})
+
+	// Loop over the generated list to remove them.
+	for _, file := range fileList {
+		if err := os.RemoveAll(file); err != nil {
+			fmt.Printf("could not delete file system %v: %v\n", file, err)
+		} else {
+			fmt.Printf("removed %v\n", file)
+		}
+	}
+}
 
 // buildCmd represents the build command
 var buildCmd = &cobra.Command{
@@ -126,6 +148,10 @@ var buildCmd = &cobra.Command{
 
 		if drupal {
 			x.AliasInstall(docroot)
+		}
+
+		if workingCopy {
+			removeGitFromPath(strings.Join([]string{x.Path, x.Domain + ".latest"}, string(os.PathSeparator)))
 		}
 
 		log.Infoln("Based upon the output above, you may need to restart the web service.")
