@@ -22,6 +22,61 @@ type DrupalProject struct {
 	Subdir  string
 }
 
+// GetPath will get the relative file path of a given project.
+// This assumes that the composer.json file is setup for a custom
+// package, where the path is allocated to a custom path for a given
+// package. The string {$name} will be replaced with the input project name.
+// The input project name should reflect the dependency declaration in
+// composer.json. An example of this is drupal/views
+func GetPath(fullpath, project string) (string, error) {
+	var projectType string
+	var projectPath string
+	name := strings.Split(project, "/")[1]
+	// Find composer.
+	composer, e := exec.LookPath("composer")
+	if e != nil {
+		return "", e
+	}
+	// Get project information.
+	c := exec.Command(composer, "show", project)
+	c.Dir = fullpath
+	o, oe := c.Output()
+	if e != nil {
+		return "", oe
+	}
+	// Get the package type from the output of the above command.
+	for _, pr := range strings.Split(string(o), "\n") {
+		if strings.Contains(pr, "type") {
+			s := strings.Split(pr, ":")[1]
+			projectType = strings.Trim(s, " ")
+		}
+	}
+	// Get the information required from composer.json.
+	p := strings.Join([]string{fullpath, string(os.PathSeparator), "composer.json"}, string(os.PathSeparator))
+	data, de := ioutil.ReadFile(p)
+	if de != nil {
+		return "", oe
+	}
+	// Begin processing the file looking for the project path.
+	allData := strings.Split(string(data), "\n")
+	for _, d := range allData {
+		cd := fmt.Sprintf("\"%v\":", projectType)
+		if strings.Contains(d, cd) {
+			// We found the project type declaration, pull out and process the piece required.
+			projectPath = strings.Split(d, ":")[1]
+			projectPath = strings.Trim(projectPath, " ")
+			projectPath = strings.Replace(projectPath, string(os.PathSeparator)+"{$name}", "", -1)
+			projectPath = strings.Replace(projectPath, "\"", "", -1)
+			projectPath = strings.Replace(projectPath, ",", "", -1)
+			projectPath = strings.TrimRight(projectPath, string(os.PathSeparator))
+			projectPath = strings.Join([]string{projectPath, name}, string(os.PathSeparator))
+		}
+	}
+
+	// Return the end result.
+	return projectPath, nil
+}
+
 // GetProjects will return all projects in a make file with the format of a DrupalProject.
 // This function will slowly take over a lot of similar functionality.
 func GetProjects(fullpath string) []DrupalProject {
