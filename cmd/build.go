@@ -150,7 +150,7 @@ var buildCmd = &cobra.Command{
 			x.AliasInstall(docroot)
 		}
 
-		if workingCopy {
+		if !workingCopy {
 			removeGitFromPath(strings.Join([]string{x.Path, x.Domain + ".latest"}, string(os.PathSeparator)))
 		}
 
