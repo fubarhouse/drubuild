@@ -25,6 +25,7 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 )
 
 var (
@@ -32,10 +33,10 @@ var (
 	// Home is the package variable to store the location of the config files.
 	Home string
 
-	// sites_php_template_date is the data for sites.php file.
+	// sites_php_template_data is the data for sites.php file.
 	// it was taken from the templates folder and serves as a backup
 	// when that file isn't available (not a go get install).
-	sites_php_template_date = `
+	sites_php_template_data = `
 <?php
 
 /**
@@ -222,6 +223,32 @@ var initCmd = &cobra.Command{
 			r = strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
 		} else {
 			r = strings.Join([]string{dir, "drubuild", ""}, string(os.PathSeparator))
+			m := strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
+
+			// Alias template
+			{
+				c, d := ioutil.ReadFile(m + "alias.tmpl")
+				if d != nil {
+					panic("could not read alias template, initialise and try again.")
+				}
+				drush_alias_template = string(c)
+			}
+			// Sites.php template
+			{
+				c, d := ioutil.ReadFile(m + "sites.php.tmpl")
+				if d != nil {
+					panic("could not read sites template, initialise and try again.")
+				}
+				sites_php_template_data = string(c)
+			}
+			// Vhost template
+			{
+				c, d := ioutil.ReadFile(m + "vhost.tmpl")
+				if d != nil {
+					panic("could not read vhost template, initialise and try again.")
+				}
+				vhost_template_data = string(c)
+			}
 		}
 
 		if _, s := os.Stat(r); s != nil {
@@ -234,14 +261,26 @@ var initCmd = &cobra.Command{
 		config_yml_template_data = strings.Replace(config_yml_template_data, "$HOME", r, -1)
 		config_yml_template_data = strings.Replace(config_yml_template_data, "//", string(os.PathSeparator), -1)
 
-		log.Printf("Creating/replacing %vconfig.yml", r)
-		WriteStringToFile(r+"config.yml", config_yml_template_data)
-		log.Printf("Creating/replacing %vsites.php.tmpl", r)
-		WriteStringToFile(r+"sites.php.tmpl", sites_php_template_date)
-		log.Printf("Creating/replacing %valias.tmpl", r)
-		WriteStringToFile(r+"alias.tmpl", drush_alias_template)
-		log.Printf("Creating/replacing %vvhost.tmpl", r)
-		WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+		if global {
+			log.Printf("Templating %vconfig.yml from defaults.", r)
+			WriteStringToFile(r+"config.yml", config_yml_template_data)
+			log.Printf("Templating %vsites.php.tmpl from defaults.", r)
+			WriteStringToFile(r+"sites.php.tmpl", sites_php_template_data)
+			log.Printf("Templating %valias.tmpl from defaults.", r)
+			WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+			log.Printf("Templating %vvhost.tmpl from defaults.", r)
+			WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+		} else {
+			rn := strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
+			log.Printf("Templating %vconfig.yml from defaults.", r)
+			WriteStringToFile(r+"config.yml", config_yml_template_data)
+			log.Printf("Replacing %vsites.php.tmpl with %v.", r, rn+"sites.php.tmpl")
+			WriteStringToFile(r+"sites.php.tmpl", sites_php_template_data)
+			log.Printf("Replacing %valias.tmpl with %v.", r, rn+"alias.tmpl")
+			WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+			log.Printf("Replacing %vvhost.tmpl with %v.", r, rn+"vhost.tmpl")
+			WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+		}
 	},
 }
 
