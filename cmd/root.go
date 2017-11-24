@@ -222,6 +222,11 @@ var (
 	// in this case, the user verification action will be invoked.
 	user_verify bool
 
+	// version is a string which represents the version of a packages. it is only used
+	// by the project command, to decouple the package name and version. it is optional
+	// and can otherwise be placed explicitly in the name flag.
+	version string
+
 	// vhost is a bool which indicates that a virtual host should be created.
 	// it will default to true, so if you're rebuilding a codebase or an existing
 	// site, it would be logical to be able to skip that process.

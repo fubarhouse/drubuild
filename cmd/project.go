@@ -51,6 +51,9 @@ var projectCmd = &cobra.Command{
 			} else {
 				r = "require --prefer-dist"
 			}
+			if version != "" {
+				name += ":" + version
+			}
 			d := exec.Command(ComposerCmd, r, name)
 			d.Dir = destination
 			d.Stdout = os.Stdout
@@ -65,7 +68,9 @@ var projectCmd = &cobra.Command{
 				err := errors.New("could not find path associated to " + name)
 				err.Error()
 			}
-			removeGitFromPath(x)
+			if x != "" {
+				removeGitFromPath(x)
+			}
 		}
 
 		if !add && !remove {
@@ -80,10 +85,12 @@ func init() {
 
 	projectCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
 	projectCmd.Flags().StringVarP(&destination, "path", "p", "", "The path to where the site(s) exist.")
+	projectCmd.Flags().StringVarP(&version, "version", "v", "", "Version of the package.")
 	projectCmd.Flags().BoolVarP(&add, "add", "a", false, "Flag to trigger add action.")
 	projectCmd.Flags().BoolVarP(&remove, "remove", "r", false, "Flag to trigger remove action.")
 	projectCmd.Flags().BoolVarP(&workingCopy, "working-copy", "w", false, "Mark as a working-copy.")
 
 	projectCmd.MarkFlagRequired("name")
 	projectCmd.MarkFlagRequired("path")
+
 }
