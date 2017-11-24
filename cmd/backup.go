@@ -41,10 +41,18 @@ var backupCmd = &cobra.Command{
 }
 
 func init() {
+
 	RootCmd.AddCommand(backupCmd)
+
+	// Get the current working directory.
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Flags
 	backupCmd.Flags().StringVarP(&source, "source", "s", "", "Drush alias to use for operation")
-	backupCmd.Flags().StringVarP(&destination, "destination", "d", "", "Path to Drush archive-dump destination")
+	backupCmd.Flags().StringVarP(&destination, "destination", "d", dir, "Path to Drush archive-dump destination")
 	// Mark flags as required
 	backupCmd.MarkFlagRequired("source")
 	backupCmd.MarkFlagRequired("destination")

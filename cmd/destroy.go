@@ -19,6 +19,8 @@ import (
 
 	"github.com/fubarhouse/drubuild/make"
 	"github.com/spf13/viper"
+	"log"
+	"os"
 )
 
 // destroyCmd represents the destroy command
@@ -52,10 +54,17 @@ var destroyCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(destroyCmd)
+
+	// Get the current working directory.
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Flags
 	destroyCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
 	destroyCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
-	destroyCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
+	destroyCmd.Flags().StringVarP(&destination, "destination", "p", dir, "The path to where the site(s) exist.")
 	destroyCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
 	// Mark as required
 	destroyCmd.MarkFlagRequired("name")

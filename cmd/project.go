@@ -83,8 +83,14 @@ var projectCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(projectCmd)
 
+	// Get the current working directory.
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	projectCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
-	projectCmd.Flags().StringVarP(&destination, "path", "p", "", "The path to where the site(s) exist.")
+	projectCmd.Flags().StringVarP(&destination, "path", "p", dir, "The path to where the site(s) exist.")
 	projectCmd.Flags().StringVarP(&version, "version", "v", "", "Version of the package.")
 	projectCmd.Flags().BoolVarP(&add, "add", "a", false, "Flag to trigger add action.")
 	projectCmd.Flags().BoolVarP(&remove, "remove", "r", false, "Flag to trigger remove action.")

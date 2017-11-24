@@ -63,6 +63,10 @@ var (
 	// does not exist at the destination path.
 	// this flag will also supersede the necessity and the functionality
 	// associated with legacy make files.
+	//
+	// this value will default to composer.json in the value specified by
+	// the destination value. destination will default to the current
+	// directory when it's not specified.
 	composer string
 
 	// db_host is the string which represents the configured database host
@@ -89,6 +93,8 @@ var (
 
 	// destination is the destination alias or path for the desired action.
 	// it will be determined based upon the command in use.
+	//
+	// if not specified, the default value will be the current directory.
 	destination string
 
 	// docroot is a string which indicates the nested file system destination.

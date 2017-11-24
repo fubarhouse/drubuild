@@ -160,14 +160,23 @@ var buildCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(buildCmd)
+
+	// Get the current working directory.
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cf := strings.Join([]string{dir, "composer.json"}, string(os.PathSeparator))
+
 	// Required flags
 	buildCmd.Flags().StringVarP(&name, "name", "n", "", "The human-readable name for this site")
 	buildCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
-	buildCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
+	buildCmd.Flags().StringVarP(&destination, "destination", "p", dir, "The path to where the site(s) exist.")
 	buildCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
 	// Very important but not completely needed > 0 is needed though.
 	buildCmd.Flags().StringVarP(&makes, "makes", "m", "", "A comma-separated list of make files for use")
-	buildCmd.Flags().StringVarP(&composer, "composer", "c", "", "Path to the composer.json file.")
+	buildCmd.Flags().StringVarP(&composer, "composer", "c", cf, "Path to the composer.json file.")
 	// Optional flags
 	buildCmd.Flags().StringVarP(&docroot, "docroot", "o", "docroot", "The folder to use for the built codebase.")
 	buildCmd.Flags().BoolVarP(&drupal, "drupal", "r", true, "Mark the build process as a Drupal build.")
@@ -183,7 +192,6 @@ func init() {
 	buildCmd.Flags().MarkHidden("rewrite-destination")
 	// Mark required flags.
 	buildCmd.MarkFlagRequired("name")
-	buildCmd.MarkFlagRequired("destination")
 	buildCmd.MarkFlagRequired("domain")
 
 	// Database
