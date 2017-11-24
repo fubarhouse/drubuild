@@ -243,6 +243,11 @@ var (
 	// to send a file system to production, or for local development.
 	// a working-copy is the local file-system including any development
 	// file system data associated with each project/module.
+	//
+	// although it will be treated as logic for --prefer-dist or
+	// --prefer-source, it will also always git file systems when
+	// it is false. the removal of .git folders will be done upon
+	// completion of the build and project commands.
 	workingCopy bool
 
 	// virtualhost_path is the path which the web server uses to store
