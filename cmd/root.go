@@ -23,6 +23,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
 var (
@@ -110,6 +111,12 @@ var (
 	//
 	// by setting this to false, it will not create a drush alias.
 	drupal = true
+
+	// global is a boolean which indicates an action or process will be run
+	// with the intent of global usage. it is used exclusively by the init
+	// command to determine what path to use: the current directory or the
+	// drubuild folder at the user profile path.
+	global bool
 
 	// makes is a comma-separated list of legacy make files to be used.
 	// it will be automatically superseded by the use of the composer flag
@@ -289,7 +296,19 @@ func Execute() {
 			os.Exit(1)
 		}
 
-		r := strings.Join([]string{home, "drubuild"}, string(os.PathSeparator))
+		// Get the current working directory.
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var r string
+		n := strings.Join([]string{dir, "drubuild", "config.yml"}, string(os.PathSeparator))
+		if _, err := os.Stat(n); err == nil {
+			r = strings.Join([]string{dir, "drubuild"}, string(os.PathSeparator))
+		} else {
+			r = strings.Join([]string{home, "drubuild"}, string(os.PathSeparator))
+		}
 
 		// Search config in home directory with name "drubuild" (without extension).
 		viper.AddConfigPath(r)

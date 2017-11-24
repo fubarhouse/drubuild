@@ -58,6 +58,12 @@ var buildCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// Get the current working directory.
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		db_user = viper.GetString("db_user")
 		db_pass = viper.GetString("db_pass")
 		db_host = viper.GetString("db_host")
@@ -112,7 +118,23 @@ var buildCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		x.InstallSiteRef(sites_php_template)
+		m := strings.Join([]string{dir, "drubuild", "sites.php.tmpl"}, string(os.PathSeparator))
+		if _, err := os.Stat(m); err == nil {
+			log.Infof("Found template %v for usage", m)
+			x.Template = m
+		} else {
+			if _, err := os.Stat(sites_php_template); err == nil {
+				log.Infof("Found template %v for usage", sites_php_template)
+				x.Template = sites_php_template
+			} else {
+				log.Warnln("Could not find configured virtual host template.")
+			}
+		}
+
+		if x.Template != "" {
+			x.InstallSiteRef(x.Template)
+		}
+
 		if timestamp != 0 {
 			x.SymReinstall()
 		}
@@ -121,7 +143,11 @@ var buildCmd = &cobra.Command{
 			x.ActionInstall()
 		}
 
-		if virtualhost_template != "" {
+		v := strings.Join([]string{dir, "drubuild", "vhost.tmpl"}, string(os.PathSeparator))
+		if _, err := os.Stat(v); err == nil {
+			log.Infof("Found template %v for usage", v)
+			x.Template = v
+		} else {
 			if _, err := os.Stat(virtualhost_template); err == nil {
 				log.Infof("Found template %v for usage", virtualhost_template)
 				x.Template = virtualhost_template
@@ -134,7 +160,11 @@ var buildCmd = &cobra.Command{
 			x.VhostInstall()
 		}
 
-		if alias_template != "" {
+		n := strings.Join([]string{dir, "drubuild", "alias.tmpl"}, string(os.PathSeparator))
+		if _, err := os.Stat(n); err == nil {
+			log.Infof("Found template %v for usage", n)
+			x.Template = n
+		} else {
 			if _, err := os.Stat(alias_template); err == nil {
 				x.AliasTemplate = alias_template
 			} else {

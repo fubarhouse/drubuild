@@ -572,14 +572,9 @@ func (Site *Site) ProcessMake(Make Make) bool {
 // InstallSiteRef installs the Drupal multisite sites.php file for the site struct.
 func (Site *Site) InstallSiteRef(Template string) {
 
-	if Template != "" {
-		if _, err := os.Stat(Template); err == nil {
-			log.Infof("Found template %v", Template)
-		}
-	}
-
 	if Template == "" {
 		log.Warnln("no template specified for sites.php")
+		return
 	}
 
 	data := map[string]string{

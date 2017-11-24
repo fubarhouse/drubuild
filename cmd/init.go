@@ -211,7 +211,18 @@ var initCmd = &cobra.Command{
 			Home = home
 		}
 
-		r := strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
+		// Get the current working directory.
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var r string
+		if global {
+			r = strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
+		} else {
+			r = strings.Join([]string{dir, "drubuild", ""}, string(os.PathSeparator))
+		}
 
 		if _, s := os.Stat(r); s != nil {
 			e := os.Mkdir(r, 0755)
@@ -236,4 +247,5 @@ var initCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(initCmd)
+	initCmd.Flags().BoolVarP(&global, "global", "g", false, "Establish global initialisation, instead of localized ($PWD).")
 }
