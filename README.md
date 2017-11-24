@@ -93,7 +93,7 @@ drubuild init
 
 Add or remove a project to a built site using information available in the composer.json file.
 ```
-drubuild project --name drupal/core --path /sites/mysite.dev --remove --add
+drubuild project --name drupal/core --path /sites/mysite.dev --remove --add --version ^8
 ```
 
 ### Runner
