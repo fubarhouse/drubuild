@@ -229,25 +229,28 @@ var initCmd = &cobra.Command{
 			{
 				c, d := ioutil.ReadFile(m + "alias.tmpl")
 				if d != nil {
-					panic("could not read alias template, initialise and try again.")
+					fmt.Println("could not read alias template, using defaults.")
+				} else {
+					drush_alias_template = string(c)
 				}
-				drush_alias_template = string(c)
 			}
 			// Sites.php template
 			{
 				c, d := ioutil.ReadFile(m + "sites.php.tmpl")
 				if d != nil {
-					panic("could not read sites template, initialise and try again.")
+					fmt.Println("could not read sites template, using defaults.")
+				} else {
+					sites_php_template_data = string(c)
 				}
-				sites_php_template_data = string(c)
 			}
 			// Vhost template
 			{
 				c, d := ioutil.ReadFile(m + "vhost.tmpl")
 				if d != nil {
-					panic("could not read vhost template, initialise and try again.")
+					fmt.Println("could not read vhost template, using defaults.")
+				} else {
+					vhost_template_data = string(c)
 				}
-				vhost_template_data = string(c)
 			}
 		}
 
@@ -272,14 +275,25 @@ var initCmd = &cobra.Command{
 			WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
 		} else {
 			rn := strings.Join([]string{Home, "drubuild", ""}, string(os.PathSeparator))
-			log.Printf("Templating %vconfig.yml from defaults.", r)
-			WriteStringToFile(r+"config.yml", config_yml_template_data)
-			log.Printf("Replacing %vsites.php.tmpl with %v.", r, rn+"sites.php.tmpl")
-			WriteStringToFile(r+"sites.php.tmpl", sites_php_template_data)
-			log.Printf("Replacing %valias.tmpl with %v.", r, rn+"alias.tmpl")
-			WriteStringToFile(r+"alias.tmpl", drush_alias_template)
-			log.Printf("Replacing %vvhost.tmpl with %v.", r, rn+"vhost.tmpl")
-			WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+			if _, s := os.Stat(rn); s == nil {
+				log.Printf("Templating %vconfig.yml from defaults.", r)
+				WriteStringToFile(r+"config.yml", config_yml_template_data)
+				log.Printf("Replacing %vsites.php.tmpl with %v.", r, rn+"sites.php.tmpl")
+				WriteStringToFile(r+"sites.php.tmpl", sites_php_template_data)
+				log.Printf("Replacing %valias.tmpl with %v.", r, rn+"alias.tmpl")
+				WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+				log.Printf("Replacing %vvhost.tmpl with %v.", r, rn+"vhost.tmpl")
+				WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+			} else {
+				log.Printf("Templating %vconfig.yml from defaults.", r)
+				WriteStringToFile(r+"config.yml", config_yml_template_data)
+				log.Printf("Replacing %vsites.php.tmpl with defaults.", r)
+				WriteStringToFile(r+"sites.php.tmpl", sites_php_template_data)
+				log.Printf("Replacing %valias.tmpl with defaults.", r)
+				WriteStringToFile(r+"alias.tmpl", drush_alias_template)
+				log.Printf("Replacing %vvhost.tmpl with defaults.", r)
+				WriteStringToFile(r+"vhost.tmpl", vhost_template_data)
+			}
 		}
 	},
 }
