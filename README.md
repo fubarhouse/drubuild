@@ -22,6 +22,15 @@ It is *highly* recommended to install this using Go, and currently no other opti
 $ go get -u github.com/fubarhouse/drubuild
 ```
 
+## Configuration
+
+There are a couple of steps to configuring Drubuild.
+
+  1. Run `drubuild init --global` to establish a new set of templates and config files with default settings.
+  2. Modify `config.yml` and all templates as required.
+  3. If you are executing Drubuild from teh destination folder without the destination flag, you *can* run `drubuild init` to copy the global config and templates or to setup brand new config or templates (from default values)
+  4. When you first start the build process, please ensure the docroot flag is specified *correctly*.
+
 ## Usage
 
 Before you can begin, you will need to run `drubuild init` to establish a set of templates and configuration settings at `$HOME/drubuild/`.
