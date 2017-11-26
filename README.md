@@ -10,7 +10,7 @@ Drubuild is a command-line application which builds and manages sites via some c
 
 This application was born of the personal desire of the creator to be a useful tool for CI and automation to be used at work, however the stability and reliability was a catalyst for a lot of work here. 
 
-This application is fully-intended to work out of the box with [DrupalVM](https://www.drupalvm.com/), and a fork of DrupalVM with the configuration of the maintainer's Ansible role [fubarhouse.golang](https://github.com/fubarhouse/ansible-role-golang) will be available shortly.
+This application is fully-intended to work out of the box with [DrupalVM](https://www.drupalvm.com/), and a [fork of DrupalVM](https://github.com/fubarhouse/drupal-vm) with the configuration of the maintainer's Ansible role [fubarhouse.golang](https://github.com/fubarhouse/ansible-role-golang) is available for quick opportunities to use this in an isolated environment.
 
 The application has previously been used for CI tooling for the management of more than 40 websites simultaneously, supporting developers during their local build and development cycle with Jenkins. 
 
@@ -21,6 +21,8 @@ It is *highly* recommended to install this using Go, and currently no other opti
 ```console
 $ go get -u github.com/fubarhouse/drubuild
 ```
+
+After installing via `go get`, or with [the configured fork of DrupalVM](https://github.com/fubarhouse/drupal-vm), you should focus your attention on getting Drush Aliases and SSH working.
 
 ## Configuration
 
