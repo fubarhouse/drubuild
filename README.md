@@ -72,7 +72,7 @@ drubuild backup --source @mysite.dev --destination /mysite.dev.tar.gz
 
 ### Build
 
-The actual build process, which will accept a make file (for now), a composer.json file, and some other basic information and build you a site, including installation, multi-site setup, drush alias and virtualhost - all provided by the templates used by the system.
+The actual build process, which uses a composer.json file, and some other basic information and build you a site, including installation, multi-site setup, drush alias and virtualhost - all provided by the templates used by the system.
 
 There are many options here to control the process for site builds, folder hierarchy (specify a docroot in the folder) etc.
 ```

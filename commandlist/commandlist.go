@@ -17,22 +17,6 @@ func NewDrushCommandList() CommandList {
 	return CommandList{}
 }
 
-// RemoveIndex removes a single []Command object to a []Command slice based upon the index of the item.
-func (drush *CommandList) RemoveIndex(indexes ...int) {
-	for _, index := range indexes {
-		drush.item[index] = &command.Command{}
-	}
-}
-
-// RemoveCommand removes any []Command object which is effectively identical to the provided to a []Command slice.
-func (drush *CommandList) RemoveCommand(item *command.Command) {
-	for index := range drush.item {
-		if item.GetAlias() == drush.item[index].GetAlias() && item.GetCommand() == drush.item[index].GetCommand() && item.GetVerbose() == drush.item[index].GetVerbose() {
-			drush.item[index] = &command.Command{}
-		}
-	}
-}
-
 // Add adds any quantity of single []Command objects to a []Command slice.
 func (drush *CommandList) Add(items ...*command.Command) {
 	for index, item := range items {

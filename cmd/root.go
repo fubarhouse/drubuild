@@ -62,8 +62,6 @@ var (
 	// composer represents the path to the composer file to be used.
 	// it also represents a source file, in the event a composer.json file
 	// does not exist at the destination path.
-	// this flag will also supersede the necessity and the functionality
-	// associated with legacy make files.
 	//
 	// this value will default to composer.json in the value specified by
 	// the destination value. destination will default to the current
@@ -118,17 +116,6 @@ var (
 	// drubuild folder at the user profile path.
 	global bool
 
-	// makes is a comma-separated list of legacy make files to be used.
-	// it will be automatically superseded by the use of the composer flag
-	// however there is a lot of available deprecated functionality here.
-	//
-	// it is still appropriate to use this subset of functionality when
-	// working with older codebases still accommodated to using make files.
-	// these features may or may not be removed or isolated at a later time.
-	//
-	// Deprecated: use composer instead.
-	makes string
-
 	// name is the human-readable name for the target of this application.
 	name string
 
@@ -143,24 +130,6 @@ var (
 
 	// remove is a boolean which will indicate to remove a composer application.
 	remove bool
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the destination result of that change, what the
-	// string is to be replaced to be in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteDestination string
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the source of that change, what string is to be
-	// replaced in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteSource string
 
 	// sites_php_template is the path to a template to be used for sites.php
 	// for the default multi-site installation which must accompany builds.

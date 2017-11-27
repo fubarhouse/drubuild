@@ -48,7 +48,7 @@ var destroyCmd = &cobra.Command{
 		x := make.NewSite("none", name, destination, alias, "", domain, "", "")
 		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
-		x.ActionDestroy()
+		x.Destroy()
 	},
 }
 

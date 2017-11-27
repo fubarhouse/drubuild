@@ -89,7 +89,7 @@ func TestVhostInstall(t *testing.T) {
 		t.Error("Could not determine current user.")
 	}
 	obj := NewVirtualHost("testing", Home, "apache", "testing.local", Home)
-	obj.Install()
+	obj.Install(Home + "/testing.local.conf")
 	_, FilCreateErr := os.Stat(Home + "/testing.local.conf")
 	if FilCreateErr != nil {
 		t.Error("File could not be created.")
@@ -108,7 +108,7 @@ func TestVhostStatus(t *testing.T) {
 		t.Error("Could not determine current user.")
 	}
 	obj := NewVirtualHost("testing", Home, "apache", "testing.local", Home)
-	obj.Install()
+	obj.Install(Home + "/testing.local.conf")
 	_, FilCreateErr := os.Stat(Home + "/testing.local.conf")
 	if FilCreateErr != nil {
 		t.Error("File could not be created.")

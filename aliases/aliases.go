@@ -36,54 +36,11 @@ func (list *AliasList) Generate(key string) {
 	}
 }
 
-// Filter an AliasList by a given key.
-func (list *AliasList) Filter(key string) {
-	values := list.GetNames()
-	newList := NewAliasList()
-	for _, currAlias := range values {
-		if strings.Contains(currAlias, key) == true {
-			thisAlias := alias.NewAlias(currAlias, "", "")
-			newList.Add(thisAlias)
-		} else {
-			fmt.Sprintln("Filtered out", currAlias)
-		}
-	}
-	*list = *newList
-}
-
-// Count will return how many aliases are in the AliasList
-func (list *AliasList) Count() int {
-	count := 0
-	for _, thisAlias := range list.value {
-		fmt.Sprintln(thisAlias)
-		count++
-	}
-	return count
-}
-
 // GetNames gets a list of alias names from the AliasList items
 func (list *AliasList) GetNames() []string {
 	returnVals := []string{}
 	for _, val := range list.value {
 		returnVals = append(returnVals, val.GetName())
-	}
-	return returnVals
-}
-
-// GetAliasNames gets alias uri fields from AliasList items
-func (list *AliasList) GetAliasNames() []string {
-	returnVals := []string{}
-	for _, val := range list.value {
-		returnVals = append(returnVals, val.GetURI())
-	}
-	return returnVals
-}
-
-// GetAliases gets value field from AliasList items
-func (list *AliasList) GetAliases() *AliasList {
-	returnVals := NewAliasList()
-	for _, val := range list.value {
-		returnVals.value = append(returnVals.value, val)
 	}
 	return returnVals
 }
