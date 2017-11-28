@@ -130,6 +130,152 @@ This one has proven critical when managing literally hundreds of Drupal accounts
 drubuild user --name TestUser --email test@user.com --password MyPassword --aliases dev,test,preprod,prod --pattern mysite.%v --create
 ```
 
+## Example
+
+Using our [fork](https://github.com/fubarhouse/drupal-vm) of DrupalVM, here's a full example of how a site could be stood up from the default setup.
+
+<span style="color:red">Do not forget to apply the --docroot flag!</span>
+
+The docroot using the example composer.json file supplied with DrupalVM is "web".
+
+It should also be noted that there is a bug with using dashes in the name flag, please avoid it. 
+
+````
+vagrant@drupalvm2:~$ mkdir -p /vagrant/sites/repo-example
+vagrant@drupalvm2:~$ cp /vagrant/example.drupal.composer.json /vagrant/sites/repo-example/composer.json
+vagrant@drupalvm2:~$ cd /vagrant/sites/repo-example/
+vagrant@drupalvm2:/vagrant/sites/repo-example$ drubuild init
+Using config file: /home/vagrant/drubuild/config.yml
+2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/config.yml
+2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/sites.php.tmpl
+2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/alias.tmpl
+2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/vhost.tmpl
+vagrant@drupalvm2:/vagrant/sites/repo-example$ drubuild build --name repoexample --domain repoexample.test --docroot web
+Using config file: /home/vagrant/drubuild/config.yml
+INFO[0000] Timestamp not specified, using 20171124073807
+INFO[0000] composer.json not found, copying from /vagrant/sites/repo-example/composer.json
+INFO[0000] Copied /vagrant/sites/repo-example/composer.json to /vagrant/sites/repo-example/repoexample.20171124073807_7047/composer.json
+
+    1/1:	http://packagist.org/p/provider-latest$fcb4af966a6cd9f00e2e291ac2ee483fc049ed42678438820dfacf0ceca3cee9.json
+    Finished: success: 1, skipped: 0, failure: 0, total: 1
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Package operations: 44 installs, 0 updates, 0 removals
+  - Installing composer/installers (v1.4.0): Loading from cache
+  - Installing drupal-composer/drupal-scaffold (2.3.0): Loading from cache
+  - Installing zendframework/zend-stdlib (3.1.0): Loading from cache
+  - Installing zendframework/zend-escaper (2.5.2): Loading from cache
+  - Installing zendframework/zend-feed (2.8.0): Loading from cache
+  - Installing psr/http-message (1.0.1): Loading from cache
+  - Installing zendframework/zend-diactoros (1.6.1): Loading from cache
+  - Installing twig/twig (v1.35.0): Loading from cache
+  - Installing symfony/yaml (v3.2.14): Loading from cache
+  - Installing symfony/polyfill-mbstring (v1.6.0): Loading from cache
+  - Installing symfony/translation (v3.2.14): Loading from cache
+  - Installing symfony/validator (v3.2.14): Loading from cache
+  - Installing symfony/serializer (v3.2.14): Loading from cache
+  - Installing symfony/routing (v3.2.14): Loading from cache
+  - Installing paragonie/random_compat (v2.0.11): Loading from cache
+  - Installing symfony/http-foundation (v3.2.14): Loading from cache
+  - Installing symfony/psr-http-message-bridge (v1.0.0): Loading from cache
+  - Installing symfony/process (v3.2.14): Loading from cache
+  - Installing symfony/polyfill-iconv (v1.6.0): Loading from cache
+  - Installing symfony/event-dispatcher (v3.2.14): Loading from cache
+  - Installing psr/log (1.0.2): Loading from cache
+  - Installing symfony/debug (v3.3.13): Loading from cache
+  - Installing symfony/http-kernel (v3.2.14): Loading from cache
+  - Installing symfony/dependency-injection (v3.2.14): Loading from cache
+  - Installing symfony/console (v3.2.14): Loading from cache
+  - Installing symfony/class-loader (v3.2.14): Loading from cache
+  - Installing symfony-cmf/routing (1.4.1): Loading from cache
+  - Installing stack/builder (v1.0.5): Loading from cache
+  - Installing masterminds/html5 (2.3.0): Loading from cache
+  - Installing guzzlehttp/psr7 (1.4.2): Loading from cache
+  - Installing guzzlehttp/promises (v1.3.1): Loading from cache
+  - Installing guzzlehttp/guzzle (6.3.0): Loading from cache
+  - Installing doctrine/lexer (v1.0.1): Loading from cache
+  - Installing egulias/email-validator (1.2.14): Loading from cache
+  - Installing easyrdf/easyrdf (0.9.1): Loading from cache
+  - Installing doctrine/inflector (v1.2.0): Loading from cache
+  - Installing doctrine/collections (v1.5.0): Loading from cache
+  - Installing doctrine/cache (v1.7.1): Loading from cache
+  - Installing doctrine/annotations (v1.5.0): Loading from cache
+  - Installing doctrine/common (v2.8.1): Loading from cache
+  - Installing composer/semver (1.4.2): Loading from cache
+  - Installing asm89/stack-cors (1.1.0): Loading from cache
+  - Installing drupal/core (8.4.2): Loading from cache
+  - Installing drupal/devel (dev-1.x be072e7): Cloning be072e747c from cache
+zendframework/zend-feed suggests installing zendframework/zend-cache (Zend\Cache component, for optionally caching feeds between requests)
+zendframework/zend-feed suggests installing zendframework/zend-db (Zend\Db component, for use with PubSubHubbub)
+zendframework/zend-feed suggests installing zendframework/zend-http (Zend\Http for PubSubHubbub, and optionally for use with Zend\Feed\Reader)
+zendframework/zend-feed suggests installing zendframework/zend-servicemanager (Zend\ServiceManager component, for easily extending ExtensionManager implementations)
+zendframework/zend-feed suggests installing zendframework/zend-validator (Zend\Validator component, for validating email addresses used in Atom feeds and entries ehen using the Writer subcomponent)
+symfony/translation suggests installing symfony/config ()
+symfony/validator suggests installing psr/cache-implementation (For using the metadata cache.)
+symfony/validator suggests installing symfony/config ()
+symfony/validator suggests installing symfony/expression-language (For using the Expression validator)
+symfony/validator suggests installing symfony/intl ()
+symfony/serializer suggests installing psr/cache-implementation (For using the metadata cache.)
+symfony/serializer suggests installing symfony/config (For using the XML mapping loader.)
+symfony/serializer suggests installing symfony/property-access (For using the ObjectNormalizer.)
+symfony/serializer suggests installing symfony/property-info (To deserialize relations.)
+symfony/routing suggests installing symfony/config (For using the all-in-one router or any loader)
+symfony/routing suggests installing symfony/expression-language (For using expression matching)
+paragonie/random_compat suggests installing ext-libsodium (Provides a modern crypto API that can be used to generate random bytes.)
+symfony/http-kernel suggests installing symfony/browser-kit ()
+symfony/http-kernel suggests installing symfony/config ()
+symfony/http-kernel suggests installing symfony/finder ()
+symfony/http-kernel suggests installing symfony/var-dumper ()
+symfony/dependency-injection suggests installing symfony/config ()
+symfony/dependency-injection suggests installing symfony/expression-language (For using expressions in service container configuration)
+symfony/dependency-injection suggests installing symfony/proxy-manager-bridge (Generate service proxies to lazy load them)
+symfony/console suggests installing symfony/filesystem ()
+symfony/class-loader suggests installing symfony/polyfill-apcu (For using ApcClassLoader on HHVM)
+easyrdf/easyrdf suggests installing ml/json-ld (~1.0)
+doctrine/cache suggests installing alcaeus/mongo-php-adapter (Required to use legacy MongoDB driver)
+drupal/devel suggests installing symfony/var-dumper (Pretty print complex values better with var-dumper available)
+Writing lock file
+Generating autoload files
+INFO[0112] Found template /home/vagrant/drubuild/sites.php.tmpl for usage
+INFO[0112] Created directory /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites/repoexample
+INFO[0112] Permissions set to 0755 on /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites/repoexample
+INFO[0112] Successfully templated multisite config to file /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites//sites.php
+INFO[0112] Removed symlink.
+INFO[0112] Created symlink
+
+
+
+
+You are about to create a sites/repoexample/settings.php file and DROP all tables in your 'repoexample_20171124073807_7047' database. Do you want to continue? (y/n): y
+
+
+
+
+
+
+Starting Drupal installation. This takes a while. Consider using the [ok]
+--notify global option.
+
+
+
+Installation complete.  User name: admin  User password: GjayYkGYGe  [ok]
+Congratulations, you installed Drupal!                               [status]
+INFO[0148] Found template /home/vagrant/drubuild/vhost.tmpl for usage
+INFO[0148] Successfully templated /home/vagrant/drubuild/vhost.tmpl to file /etc/nginx/sites-enabled//repoexample.test.conf
+INFO[0148] Found template /home/vagrant/drubuild/alias.tmpl for usage
+INFO[0148] Successfully templated alias to file /home/vagrant/.drush/repoexample.test.alias.drushrc.php
+INFO[0148] Based upon the output above, you may need to restart the web service.
+vagrant@drupalvm2:/vagrant/sites/repo-example$ sudo service nginx restart
+vagrant@drupalvm2:~$ curl http://repoexample.test/ | grep Drupal
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0<meta name="Generator" content="Drupal 8 (https://www.drupal.org)" />
+100  8530    0  8530    0     0   336k      0 --:--:-- --:--:-- --:--:--  347k
+      <span>Powered by <a href="https://www.drupal.org">Drupal</a></span>
+````
+
+From here, you
+
 ## Author Information
 
 This product was originally created in 2016 by [Karl Hepworth](https://twitter.com/fubarhouse).
