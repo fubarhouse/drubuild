@@ -141,23 +141,27 @@ The docroot using the example composer.json file supplied with DrupalVM is "web"
 It should also be noted that there is a bug with using dashes in the name flag, please avoid it. 
 
 ````
-vagrant@drupalvm2:~$ mkdir -p /vagrant/sites/repo-example
-vagrant@drupalvm2:~$ cp /vagrant/example.drupal.composer.json /vagrant/sites/repo-example/composer.json
-vagrant@drupalvm2:~$ cd /vagrant/sites/repo-example/
-vagrant@drupalvm2:/vagrant/sites/repo-example$ drubuild init
+vagrant@drupalvm2:~$ mkdir -p /vagrant/sites/mysiteone
+vagrant@drupalvm2:~$ cp /vagrant/example.drupal.composer.json /vagrant/sites/mysiteone/composer.json
+vagrant@drupalvm2:~$ cd /vagrant/sites/mysiteone/
+vagrant@drupalvm2:/vagrant/sites/mysiteone$ drubuild init
 Using config file: /home/vagrant/drubuild/config.yml
-2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/config.yml
-2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/sites.php.tmpl
-2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/alias.tmpl
-2017/11/24 07:16:20 Creating/replacing /home/vagrant/drubuild/vhost.tmpl
-vagrant@drupalvm2:/vagrant/sites/repo-example$ drubuild build --name repoexample --domain repoexample.test --docroot web
-Using config file: /home/vagrant/drubuild/config.yml
-INFO[0000] Timestamp not specified, using 20171124073807
-INFO[0000] composer.json not found, copying from /vagrant/sites/repo-example/composer.json
-INFO[0000] Copied /vagrant/sites/repo-example/composer.json to /vagrant/sites/repo-example/repoexample.20171124073807_7047/composer.json
+2017/11/24 08:11:20 Templating /vagrant/sites/mysiteone/drubuild/config.yml from defaults.
+2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/sites.php.tmpl with /home/vagrant/drubuild/sites.php.tmpl.
+2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/alias.tmpl with /home/vagrant/drubuild/alias.tmpl.
+2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/vhost.tmpl with /home/vagrant/drubuild/vhost.tmpl.
+vagrant@drupalvm2:/vagrant/sites/mysiteone$ drubuild build --name mysiteone --domain mysiteone.test --docroot web
+Using config file: /vagrant/sites/mysiteone/drubuild/config.yml
+INFO[0000] Timestamp not specified, using 20171124081132
+INFO[0000] composer.json not found, copying from /vagrant/sites/mysiteone/composer.json
+INFO[0000] Copied /vagrant/sites/mysiteone/composer.json to /vagrant/sites/mysiteone/mysiteone.20171124081132_7047/composer.json
 
-    1/1:	http://packagist.org/p/provider-latest$fcb4af966a6cd9f00e2e291ac2ee483fc049ed42678438820dfacf0ceca3cee9.json
+    1/1:	https://packages.drupal.org/8/drupal/provider-2017-3$6850a9263c4bed0fd003e1e84e14c71f4aa9b8304a453f7754d6c1edbd25c638.json
     Finished: success: 1, skipped: 0, failure: 0, total: 1
+    1/3:	http://packagist.org/p/provider-latest$40d2eeb0a214664f06b7959191e50bfd93e2b6b3adb023ebc5f18e8f95fb7134.json
+    2/3:	http://packagist.org/p/provider-2017-10$3706041cdaaf6c9ce37bc29a6f8460c5b6e26806ed76eed4f4e182baece607a1.json
+    3/3:	http://packagist.org/p/provider-2017-07$ffb45f4bf7108849406afd662d60ef80cffec40a957318122b362f8b1b99c9d1.json
+    Finished: success: 3, skipped: 0, failure: 0, total: 3
 Loading composer repositories with package information
 Updating dependencies (including require-dev)
 Package operations: 44 installs, 0 updates, 0 removals
@@ -236,17 +240,16 @@ doctrine/cache suggests installing alcaeus/mongo-php-adapter (Required to use le
 drupal/devel suggests installing symfony/var-dumper (Pretty print complex values better with var-dumper available)
 Writing lock file
 Generating autoload files
-INFO[0112] Found template /home/vagrant/drubuild/sites.php.tmpl for usage
-INFO[0112] Created directory /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites/repoexample
-INFO[0112] Permissions set to 0755 on /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites/repoexample
-INFO[0112] Successfully templated multisite config to file /vagrant/sites/repo-example/repoexample.20171124073807_7047/web/sites//sites.php
-INFO[0112] Removed symlink.
-INFO[0112] Created symlink
+INFO[0089] Found template /vagrant/sites/mysiteone/drubuild/sites.php.tmpl for usage
+INFO[0089] Created directory /vagrant/sites/mysiteone/mysiteone.20171124081132_7047/web/sites/mysiteone
+INFO[0089] Permissions set to 0755 on /vagrant/sites/mysiteone/mysiteone.20171124081132_7047/web/sites/mysiteone
+INFO[0089] Successfully templated multisite config to file /vagrant/sites/mysiteone/mysiteone.20171124081132_7047/web/sites//sites.php
+INFO[0089] Created symlink
 
 
 
 
-You are about to create a sites/repoexample/settings.php file and DROP all tables in your 'repoexample_20171124073807_7047' database. Do you want to continue? (y/n): y
+You are about to create a sites/mysiteone/settings.php file and DROP all tables in your 'mysiteone_20171124081132_7047' database. Do you want to continue? (y/n): y
 
 
 
@@ -258,19 +261,25 @@ Starting Drupal installation. This takes a while. Consider using the [ok]
 
 
 
-Installation complete.  User name: admin  User password: GjayYkGYGe  [ok]
+Installation complete.  User name: admin  User password: o2pJvkvfoM  [ok]
 Congratulations, you installed Drupal!                               [status]
-INFO[0148] Found template /home/vagrant/drubuild/vhost.tmpl for usage
-INFO[0148] Successfully templated /home/vagrant/drubuild/vhost.tmpl to file /etc/nginx/sites-enabled//repoexample.test.conf
-INFO[0148] Found template /home/vagrant/drubuild/alias.tmpl for usage
-INFO[0148] Successfully templated alias to file /home/vagrant/.drush/repoexample.test.alias.drushrc.php
-INFO[0148] Based upon the output above, you may need to restart the web service.
-vagrant@drupalvm2:/vagrant/sites/repo-example$ sudo service nginx restart
-vagrant@drupalvm2:~$ curl http://repoexample.test/ | grep Drupal
+INFO[0119] Found template /vagrant/sites/mysiteone/drubuild/vhost.tmpl for usage
+INFO[0119] Successfully templated /vagrant/sites/mysiteone/drubuild/vhost.tmpl to file /etc/nginx/sites-enabled//mysiteone.test.conf
+INFO[0119] Found template /vagrant/sites/mysiteone/drubuild/alias.tmpl for usage
+INFO[0119] Successfully templated alias to file /home/vagrant/.drush/mysiteone.test.alias.drushrc.php
+INFO[0119] Based upon the output above, you may need to restart the web service.
+vagrant@drupalvm2:/vagrant/sites/mysiteone$ sudo service nginx restart
+vagrant@drupalvm2:/vagrant/sites/mysiteone$ curl http://mysiteone.test/ | grep drupal
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0<meta name="Generator" content="Drupal 8 (https://www.drupal.org)" />
-100  8530    0  8530    0     0   336k      0 --:--:-- --:--:-- --:--:--  347k
+        <a href="/user/login" data-drupal-link-system-path="user/login">Log in</a>
+100  8518    0  8518    0     0   225k      0 --:--:-- --:--:-- --:--:--  231k
+        <a href="/" data-drupal-link-system-path="&lt;front&gt;" class="is-active">Home</a>
+    <div class="search-block-form block block-search container-inline" data-drupal-selector="search-block-form" id="block-bartik-search" role="search">
+        <input title="Enter the terms you wish to search for." data-drupal-selector="edit-keys" type="search" id="edit-keys" name="keys" value="" size="15" maxlength="128" class="form-search" />
+<div data-drupal-selector="edit-actions" class="form-actions js-form-wrapper form-wrapper" id="edit-actions"><input class="search-form__submit button js-form-submit form-submit" data-drupal-selector="edit-submit" type="submit" id="edit-submit" value="Search" />
+        <a href="/contact" data-drupal-link-system-path="contact">Contact</a>
       <span>Powered by <a href="https://www.drupal.org">Drupal</a></span>
 ````
 
