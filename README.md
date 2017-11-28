@@ -274,7 +274,7 @@ vagrant@drupalvm2:~$ curl http://repoexample.test/ | grep Drupal
       <span>Powered by <a href="https://www.drupal.org">Drupal</a></span>
 ````
 
-From here, you
+From here, you simply need to add a hosts entry for the domain, and a drush alias if accessing the site via drush from the host machine.
 
 ## Author Information
 
