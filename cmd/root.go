@@ -128,6 +128,10 @@ var (
 	// when dealing with operational work - most commonly aliases.
 	pattern string
 
+	// preferSource will tell composer install commands using the build command
+	// you need to build with preference to source (ie --build-source).
+	preferSource bool
+
 	// remove is a boolean which will indicate to remove a composer application.
 	remove bool
 

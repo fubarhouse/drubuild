@@ -128,7 +128,7 @@ func copy(src, dest string) error {
 
 // InstallComposerCodebase will accept a []string of paths
 // and run a composer install over each of the files found.
-func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination string, workingCopy bool) {
+func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination string, workingCopy, preferSource bool) {
 	Destination += "/" + Name + Timestamp
 	// Identify if copying the file is required.
 	ComposerPath := strings.Replace(ComposerFile, "/composer.json", "", -1)
@@ -154,7 +154,7 @@ func InstallComposerCodebase(Name, Timestamp string, ComposerFile, Destination s
 		log.Infof("%v/composer.json was found, not copying", ComposerDestination)
 	}
 	var c string
-	if workingCopy {
+	if preferSource {
 		c = "composer install --prefer-source"
 	} else {
 		c = "composer install --prefer-dist"
