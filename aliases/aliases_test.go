@@ -24,10 +24,8 @@ func TestGenerateAliasList(t *testing.T) {
 
 func TestValueOfAliasList(t *testing.T) {
 	// Test the values of a Alias List object
-	const testVal = "@ssc.loc"
 	y := NewAliasList()
 	y.Generate("loc")
-	// TODO Rethink this test, what we're testing for.
 	//if y. .value[0] != testVal {
 	//	t.Error("Test failed")
 	//}

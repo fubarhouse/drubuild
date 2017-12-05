@@ -66,8 +66,15 @@ var syncCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(syncCmd)
+
+	// Get the current working directory.
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	syncCmd.Flags().StringVarP(&source, "source", "s", "", "Drush alias to use as source")
-	syncCmd.Flags().StringVarP(&destination, "destination", "d", "", "Drush alias to use as destination")
+	syncCmd.Flags().StringVarP(&destination, "destination", "d", dir, "Drush alias to use as destination")
 	syncCmd.Flags().BoolVarP(&syncDatabase, "database", "b", false, "Flag database for sync action.")
 	syncCmd.Flags().BoolVarP(&syncFiles, "files", "f", false, "Flag files for sync action.")
 

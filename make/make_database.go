@@ -57,8 +57,3 @@ func (db *makeDB) setPort(dbPort int) {
 func (db *makeDB) getPort() int {
 	return db.dbPort
 }
-
-// getInfo returns the database struct
-func (db *makeDB) getInfo() *makeDB {
-	return db
-}

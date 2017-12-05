@@ -23,6 +23,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
 var (
@@ -61,8 +62,10 @@ var (
 	// composer represents the path to the composer file to be used.
 	// it also represents a source file, in the event a composer.json file
 	// does not exist at the destination path.
-	// this flag will also supersede the necessity and the functionality
-	// associated with legacy make files.
+	//
+	// this value will default to composer.json in the value specified by
+	// the destination value. destination will default to the current
+	// directory when it's not specified.
 	composer string
 
 	// db_host is the string which represents the configured database host
@@ -89,6 +92,8 @@ var (
 
 	// destination is the destination alias or path for the desired action.
 	// it will be determined based upon the command in use.
+	//
+	// if not specified, the default value will be the current directory.
 	destination string
 
 	// docroot is a string which indicates the nested file system destination.
@@ -105,16 +110,11 @@ var (
 	// by setting this to false, it will not create a drush alias.
 	drupal = true
 
-	// makes is a comma-separated list of legacy make files to be used.
-	// it will be automatically superseded by the use of the composer flag
-	// however there is a lot of available deprecated functionality here.
-	//
-	// it is still appropriate to use this subset of functionality when
-	// working with older codebases still accommodated to using make files.
-	// these features may or may not be removed or isolated at a later time.
-	//
-	// Deprecated: use composer instead.
-	makes string
+	// global is a boolean which indicates an action or process will be run
+	// with the intent of global usage. it is used exclusively by the init
+	// command to determine what path to use: the current directory or the
+	// drubuild folder at the user profile path.
+	global bool
 
 	// name is the human-readable name for the target of this application.
 	name string
@@ -134,24 +134,6 @@ var (
 
 	// remove is a boolean which will indicate to remove a composer application.
 	remove bool
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the destination result of that change, what the
-	// string is to be replaced to be in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteDestination string
-
-	// when working with make files, you can tell the system to rewrite
-	// a given module branch to change via a unique string inside the make
-	// file(s). this represents the source of that change, what string is to be
-	// replaced in the generated make file.
-	//
-	// Deprecated: used exclusively by make file functionality.
-	// upgrade to use composer instead.
-	rewriteSource string
 
 	// sites_php_template is the path to a template to be used for sites.php
 	// for the default multi-site installation which must accompany builds.
@@ -226,6 +208,11 @@ var (
 	// in this case, the user verification action will be invoked.
 	user_verify bool
 
+	// version is a string which represents the version of a packages. it is only used
+	// by the project command, to decouple the package name and version. it is optional
+	// and can otherwise be placed explicitly in the name flag.
+	version string
+
 	// vhost is a bool which indicates that a virtual host should be created.
 	// it will default to true, so if you're rebuilding a codebase or an existing
 	// site, it would be logical to be able to skip that process.
@@ -242,6 +229,11 @@ var (
 	// to send a file system to production, or for local development.
 	// a working-copy is the local file-system including any development
 	// file system data associated with each project/module.
+	//
+	// although it will be treated as logic for --prefer-dist or
+	// --prefer-source, it will also always git file systems when
+	// it is false. the removal of .git folders will be done upon
+	// completion of the build and project commands.
 	workingCopy bool
 
 	// virtualhost_path is the path which the web server uses to store
@@ -277,7 +269,19 @@ func Execute() {
 			os.Exit(1)
 		}
 
-		r := strings.Join([]string{home, "drubuild"}, string(os.PathSeparator))
+		// Get the current working directory.
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var r string
+		n := strings.Join([]string{dir, "drubuild", "config.yml"}, string(os.PathSeparator))
+		if _, err := os.Stat(n); err == nil {
+			r = strings.Join([]string{dir, "drubuild"}, string(os.PathSeparator))
+		} else {
+			r = strings.Join([]string{home, "drubuild"}, string(os.PathSeparator))
+		}
 
 		// Search config in home directory with name "drubuild" (without extension).
 		viper.AddConfigPath(r)

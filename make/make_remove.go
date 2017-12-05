@@ -8,8 +8,8 @@ import (
 	"os/exec"
 )
 
-// ActionDestroyDatabases will destroy all databases associated to the site struct.
-func (Site *Site) ActionDestroyDatabases() {
+// remove_databases will destroy all databases associated to the site struct.
+func (Site *Site) removeDatabases() {
 	var dbDeleteCount int
 	for _, database := range Site.DatabasesGet() {
 		sqlQuery := fmt.Sprintf("DROP DATABASE %v;", database)
@@ -30,18 +30,18 @@ func (Site *Site) ActionDestroyDatabases() {
 	}
 }
 
-// ActionDestroyAlias is an API call for alias un-installation.
-func (Site *Site) ActionDestroyAlias() {
+// destroy_alias is an API call for alias un-installation.
+func (Site *Site) destroyAlias() {
 	Site.AliasUninstall()
 }
 
-// ActionDestroyVhost is an API call for virtual-host un-installation.
-func (Site *Site) ActionDestroyVhost() {
+// destroy_vhost is an API call for virtual-host un-installation.
+func (Site *Site) destroyVhost() {
 	Site.VhostUninstall()
 }
 
-// ActionDestroyPermissions is an API call for site file system un-installation.
-func (Site *Site) ActionDestroyPermissions() {
+// destroy_filesystem is an API call for site file system un-installation.
+func (Site *Site) destroyFilesystem() {
 	privateFilesPath := Site.Path
 	_, statErr := os.Stat(privateFilesPath)
 	if statErr == nil {
@@ -61,12 +61,12 @@ func (Site *Site) ActionDestroyPermissions() {
 }
 
 // ActionDestroySym is an API call for symlink un-installation.
-func (Site *Site) ActionDestroySym() {
+func (Site *Site) destroySym() {
 	Site.SymUninstall()
 }
 
 // ActionDestroyFiles is an API call for file system removal.
-func (Site *Site) ActionDestroyFiles() {
+func (Site *Site) destroySites() {
 	_, statErr := os.Stat(Site.Path)
 	if statErr == nil {
 		err := os.RemoveAll(Site.Path)
@@ -80,13 +80,12 @@ func (Site *Site) ActionDestroyFiles() {
 	}
 }
 
-// ActionDestroy is an API call for site removal.
-func (Site *Site) ActionDestroy() {
-	// Destroy will remove all traces of said site.
-	Site.ActionDestroyDatabases()
-	Site.ActionDestroyAlias()
-	Site.ActionDestroyVhost()
-	Site.ActionDestroyPermissions()
-	Site.ActionDestroyFiles()
-	Site.ActionDestroySym()
+// Destroy is an API call for site removal.
+func (Site *Site) Destroy() {
+	Site.removeDatabases()
+	Site.destroyAlias()
+	Site.destroyVhost()
+	Site.destroyFilesystem()
+	Site.destroySites()
+	Site.destroySym()
 }

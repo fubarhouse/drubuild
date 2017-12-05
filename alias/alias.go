@@ -128,13 +128,6 @@ func (Alias *Alias) Uninstall() {
 
 }
 
-// Reinstall re-installs an alias from an alias struct
-func (Alias *Alias) Reinstall() {
-	Alias.Uninstall()
-	Alias.Install()
-
-}
-
 // GetStatus returns the installation status of an alias struct
 func (Alias *Alias) GetStatus() bool {
 	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
@@ -148,16 +141,6 @@ func (Alias *Alias) GetStatus() bool {
 		}
 	}
 	return true
-}
-
-// PrintStatus prints the installation status of an alias struct
-func (Alias *Alias) PrintStatus() {
-	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
-	if err != nil {
-		fmt.Println("false")
-	} else {
-		fmt.Println("true")
-	}
 }
 
 // getHome returns the user home directory.
