@@ -22,8 +22,8 @@ import (
 
 	c "github.com/fubarhouse/drubuild/composer"
 
-	"github.com/spf13/cobra"
 	"errors"
+	"github.com/spf13/cobra"
 )
 
 // projectCmd represents the project command
@@ -46,10 +46,10 @@ var projectCmd = &cobra.Command{
 		}
 		if add {
 			var r string
-			if workingCopy {
+			if preferSource {
 				r = "require --prefer-source"
 			} else {
-				r = "require --prefer-dist"
+				r = "require"
 			}
 			if version != "" {
 				name += ":" + version
@@ -95,6 +95,7 @@ func init() {
 	projectCmd.Flags().BoolVarP(&add, "add", "a", false, "Flag to trigger add action.")
 	projectCmd.Flags().BoolVarP(&remove, "remove", "r", false, "Flag to trigger remove action.")
 	projectCmd.Flags().BoolVarP(&workingCopy, "working-copy", "w", false, "Mark as a working-copy.")
+	projectCmd.Flags().BoolVarP(&preferSource, "prefer-source", "s", false, "Build with preference to source packages.")
 
 	projectCmd.MarkFlagRequired("name")
 	projectCmd.MarkFlagRequired("path")
