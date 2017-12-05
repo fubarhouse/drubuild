@@ -95,16 +95,6 @@ var buildCmd = &cobra.Command{
 		if composer != "" {
 			x.Composer = true
 			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, workingCopy, preferSource)
-		} else if makes != "" {
-			x.Make = makes
-			MakefilesFormatted := strings.Replace(makes, " ", "", -1)
-			MakeFiles := strings.Split(MakefilesFormatted, ",")
-
-			if rewriteSource != "" && rewriteDestination != "" {
-				x.MakeFileRewriteSource = rewriteSource
-				x.MakeFileRewriteDestination = rewriteDestination
-			}
-			x.ActionRebuildCodebase(MakeFiles)
 		} else {
 			cmd.Usage()
 			fmt.Println()
@@ -166,7 +156,6 @@ func init() {
 	buildCmd.Flags().StringVarP(&destination, "destination", "p", "", "The path to where the site(s) exist.")
 	buildCmd.Flags().StringVarP(&domain, "domain", "d", "", "The domain this site is to use")
 	// Very important but not completely needed > 0 is needed though.
-	buildCmd.Flags().StringVarP(&makes, "makes", "m", "", "A comma-separated list of make files for use")
 	buildCmd.Flags().StringVarP(&composer, "composer", "c", "", "Path to the composer.json file.")
 	// Optional flags
 	buildCmd.Flags().StringVarP(&docroot, "docroot", "o", "docroot", "The folder to use for the built codebase.")
@@ -176,8 +165,6 @@ func init() {
 	buildCmd.Flags().BoolVarP(&vhost, "vhost", "v", true, "Include a virtual host as configured with this build.")
 	buildCmd.Flags().BoolVarP(&preferSource, "prefer-source", "s", false, "Build with preference to source packages.")
 	// Deprecated flags
-	buildCmd.Flags().StringVarP(&rewriteSource, "rewrite-source", "x", "", "The rewrite string source")
-	buildCmd.Flags().StringVarP(&rewriteDestination, "rewrite-destination", "y", "", "The rewrite string destination")
 	buildCmd.Flags().BoolVarP(&workingCopy, "working-copy", "w", false, "Mark as a working-copy during the build process.")
 	// Hide deprecated fields.
 	buildCmd.Flags().MarkHidden("rewrite-source")
