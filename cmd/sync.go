@@ -36,8 +36,8 @@ var syncCmd = &cobra.Command{
 		}
 		if syncFiles {
 			{
-				fsPu := fmt.Sprintf("@%v:%%public", source)
-				fdPu := fmt.Sprintf("@%v:%%public", destination)
+				fsPu := fmt.Sprintf("@%v:%%files", source)
+				fdPu := fmt.Sprintf("@%v:%%files", destination)
 				c := exec.Command(d, "--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
