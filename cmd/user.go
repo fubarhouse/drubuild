@@ -46,80 +46,6 @@ var userCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		if user_block {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					if User.State == 1 {
-						User.State = 0
-						User.StateChange()
-					} else {
-						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
-					}
-				} else {
-					log.Printf("User '%v' was not found on %v\n", User.Name, Alias)
-				}
-			}
-		}
-
-		if user_create {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				User.Alias = Alias
-				User.Name = user_name
-				User.Email = user_email
-				User.Create(user_password)
-				if user_role != "" {
-					if !User.HasRole(user_role) {
-						User.Roles = append(User.Roles, user_role)
-					}
-					User.RolesAdd()
-				}
-			}
-		}
-		if user_delete {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					User.Delete()
-				} else {
-					log.Printf("User '%v' was not found on %v", user_name, Alias)
-				}
-			}
-		}
-
-		if user_unblock {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					if User.State == 0 {
-						User.State = 1
-						User.StateChange()
-					} else {
-						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
-					}
-				} else {
-					log.Printf("User '%v' was not found on %v", user_name, Alias)
-				}
-			}
-		}
-
 		if user_verify {
 			for _, ThisAlias := range strings.Split(aliases, ",") {
 				ThisAlias = strings.Trim(ThisAlias, " ")
@@ -175,6 +101,89 @@ var userCmd = &cobra.Command{
 					log.Printf("Could not find alias %v\n", Alias.GetName())
 				}
 			}
+			return
+		}
+
+		if user_block {
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					if User.State == 1 {
+						User.State = 0
+						User.StateChange()
+					} else {
+						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
+					}
+				} else {
+					log.Printf("User '%v' was not found on %v\n", User.Name, Alias)
+				}
+			}
+			return
+		}
+
+		if user_create {
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				User.Alias = Alias
+				User.Name = user_name
+				User.Email = user_email
+				User.Create(user_password)
+				if user_role != "" {
+					if !User.HasRole(user_role) {
+						User.Roles = append(User.Roles, user_role)
+					}
+					User.RolesAdd()
+				}
+			}
+			return
+		}
+		if user_delete {
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					User.Delete()
+				} else {
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
+				}
+			}
+			return
+		}
+
+		if user_unblock {
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					if User.State == 0 {
+						User.State = 1
+						User.StateChange()
+					} else {
+						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
+					}
+				} else {
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
+				}
+			}
+			return
 		}
 
 		if !user_block && !user_create && !user_delete && !user_unblock && !user_verify {
