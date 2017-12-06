@@ -38,7 +38,7 @@ var syncCmd = &cobra.Command{
 			{
 				fsPu := fmt.Sprintf("@%v:%%public", source)
 				fdPu := fmt.Sprintf("@%v:%%public", destination)
-				c := exec.Command(d, "rsync", fsPu, fdPu, "--yes", "--exclude-other-sites", "--exclude-conf")
+				c := exec.Command(d, "--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
 				c.Run()
@@ -47,7 +47,7 @@ var syncCmd = &cobra.Command{
 			{
 				fsPr := fmt.Sprintf("@%v:%%private", source)
 				fdPr := fmt.Sprintf("@%v:%%private", destination)
-				c := exec.Command(d, "rsync", fsPr, fdPr, "--yes", "--exclude-other-sites", "--exclude-conf")
+				c := exec.Command(d, "--yes", "rsync", fsPr, fdPr, "--exclude-other-sites", "--exclude-conf")
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
 				c.Run()
