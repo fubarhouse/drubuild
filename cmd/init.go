@@ -36,8 +36,7 @@ var (
 	// sites_php_template_data is the data for sites.php file.
 	// it was taken from the templates folder and serves as a backup
 	// when that file isn't available (not a go get install).
-	sites_php_template_data = `
-<?php
+	sites_php_template_data = `<?php
 
 /**
  * @file
