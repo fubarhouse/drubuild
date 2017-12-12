@@ -71,11 +71,11 @@ var userCmd = &cobra.Command{
 					}
 
 					if user_block {
-						User.State = 1
-						User.StateChange()
-					} else if user_unblock {
 						User.State = 0
-						User.StateChange()
+						User.Block()
+					} else if user_unblock {
+						User.State = 1
+						User.Unblock()
 					} else {
 						log.Println("Block/Unblock action not set, skipping.")
 					}
@@ -89,10 +89,8 @@ var userCmd = &cobra.Command{
 					User.EmailChange()
 
 					if user_role != "" {
-						if !User.HasRole(user_role) {
-							User.Roles = append(User.Roles, user_role)
-							User.RolesAdd()
-						}
+						User.Roles = append(User.Roles, user_role)
+						User.RolesAdd()
 					} else {
 						log.Println("Role not set, skipping.")
 					}
@@ -113,9 +111,9 @@ var userCmd = &cobra.Command{
 				UserGroup.Populate(Alias)
 				User := UserGroup.GetUser(user_name)
 				if User.Name == user_name {
-					if User.State == 1 {
-						User.State = 0
-						User.StateChange()
+					if User.State == 0 {
+						User.State = 1
+						User.Block()
 					} else {
 						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
 					}
@@ -173,9 +171,9 @@ var userCmd = &cobra.Command{
 				UserGroup.Populate(Alias)
 				User := UserGroup.GetUser(user_name)
 				if User.Name == user_name {
-					if User.State == 0 {
-						User.State = 1
-						User.StateChange()
+					if User.State == 1 {
+						User.State = 0
+						User.Unblock()
 					} else {
 						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
 					}

@@ -6,6 +6,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/drubuild/command"
+	"os"
+	"os/exec"
 )
 
 // DrupalUser represents fields from Drupals user table, as well as roles.
@@ -44,77 +46,75 @@ func (DrupalUser *DrupalUser) SetRoles() {
 
 // Delete will delete a user from a Drupal site, but only if it exists.
 func (DrupalUser *DrupalUser) Delete() {
-	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	if UserGroup.FindUser(DrupalUser.Name) {
-		var Command = fmt.Sprintf("user-cancel --yes '%v'", DrupalUser.Name)
-		cmd := command.NewDrushCommand()
-		cmd.Set(DrupalUser.Alias, Command, false)
-		_, cmdErr := cmd.CombinedOutput()
-		if cmdErr != nil {
-			log.Warnf("Could not remove user %v on site %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
-		} else {
-			log.Infof("Removed user %v on site %v.", DrupalUser.Name, DrupalUser.Alias)
-		}
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		panic(e)
 	}
+	var Command = fmt.Sprintf("user-cancel --yes '%v'", DrupalUser.Name)
+	cmd := exec.Command(d, DrupalUser.Alias, Command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+	cmd.Wait()
 }
 
 // Create will create a user from a Drupal site, but only if does not exist.
 func (DrupalUser *DrupalUser) Create(Password string) {
-	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	if !UserGroup.FindUser(DrupalUser.Name) {
-		var Command = fmt.Sprintf("user-create '%v' --mail='%v' --password='%v'", DrupalUser.Name, DrupalUser.Email, Password)
-		cmd := command.NewDrushCommand()
-		cmd.Set(DrupalUser.Alias, Command, false)
-		cmdOut, cmdErr := cmd.CombinedOutput()
-		if cmdErr != nil {
-			log.Warnf("Could not create user '%v' on site '%v': %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error(), string(cmdOut))
-		} else {
-			log.Infof("Created user '%v' on site '%v'.", DrupalUser.Name, DrupalUser.Alias)
-		}
-	} else {
-		log.Warnln("Could not create user, user already exists.")
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		panic(e)
 	}
+	var Command = fmt.Sprintf("user-create '%v' --mail='%v' --password='%v'", DrupalUser.Name, DrupalUser.Email, Password)
+	cmd := exec.Command(d, DrupalUser.Alias, Command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+	cmd.Wait()
 }
 
-// StateChange will change the status of the user to the value specified in *DrupalUser.State
+// Unblock will change the status of the user to the value specified in *DrupalUser.State
 // There is a built-in verification process here, so a separate verification method is not required.
-func (DrupalUser *DrupalUser) StateChange() {
-	// Get the absolutely correct User object.
-	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	User := UserGroup.GetUser(DrupalUser.Name)
-
-	if User.State != DrupalUser.State {
-		State := "user-block"
-		if User.State == 0 {
-			State = "user-unblock"
-		}
-		cmd := command.NewDrushCommand()
-		var Command = fmt.Sprintf("%v '%v'", State, DrupalUser.Name)
-		cmd.Set(DrupalUser.Alias, Command, false)
-		_, cmdErr := cmd.CombinedOutput()
-		if cmdErr != nil {
-			log.Warnf("Could not perform action %v for user %v on site %v: %v", State, DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
-		} else {
-			log.Infof("Performed action %v for user %v on site %v", State, DrupalUser.Name, DrupalUser.Alias)
-		}
+func (DrupalUser *DrupalUser) Unblock() {
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		panic(e)
 	}
+	var Command = fmt.Sprintf("%v '%v'", "user-unblock", DrupalUser.Name)
+	cmd := exec.Command(d, DrupalUser.Alias, Command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+	cmd.Wait()
+}
+
+// Block will change the status of the user to the value specified in *DrupalUser.State
+// There is a built-in verification process here, so a separate verification method is not required.
+func (DrupalUser *DrupalUser) Block() {
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		panic(e)
+	}
+	var Command = fmt.Sprintf("%v '%v'", "user-block", DrupalUser.Name)
+	cmd := exec.Command(d, DrupalUser.Alias, Command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+	cmd.Wait()
 }
 
 // SetPassword will set the password of a user.
 // Action will be performed, as there is no password validation available.
 func (DrupalUser *DrupalUser) SetPassword(Password string) {
-	var Command = fmt.Sprintf("user-password \"%v\" --password=\"%v\"", DrupalUser.Name, Password)
-	cmd := command.NewDrushCommand()
-	cmd.Set(DrupalUser.Alias, Command, false)
-	_, cmdErr := cmd.CombinedOutput()
-	if cmdErr != nil {
-		log.Warnf("Could not complete password change for user %v on site %v: %v", DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
-	} else {
-		log.Infof("Password for user %v on site %v has been changed.", DrupalUser.Name, DrupalUser.Alias)
+	d, e := exec.LookPath("drush")
+	if e != nil {
+		panic(e)
 	}
+	var Command = fmt.Sprintf("user-password \"%v\" --password=\"%v\"", DrupalUser.Name, Password)
+	cmd := exec.Command(d, DrupalUser.Alias, Command)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+	cmd.Wait()
 }
 
 // EmailChange will change the email of the target if the email address
@@ -124,15 +124,27 @@ func (DrupalUser *DrupalUser) EmailChange() {
 	UserGroup.Populate(DrupalUser.Alias)
 	User := UserGroup.GetUser(DrupalUser.Name)
 	if User.Email != DrupalUser.Email && UserGroup.FindUser(DrupalUser.Name) {
-		var Command = "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + DrupalUser.Email + "' WHERE name='" + DrupalUser.Name + "';\""
-		cmd := command.NewDrushCommand()
-		cmd.Set(DrupalUser.Alias, Command, false)
-		_, cmdErr := cmd.CombinedOutput()
-		if cmdErr != nil {
-			log.Warnf("Could not change email for user %v on site %v from %v to %v: %v", DrupalUser.Name, DrupalUser.Alias, User.Email, DrupalUser.Email, cmdErr.Error())
-		} else {
-			log.Infof("Changed email for user %v on site %v from %v to %v, clear caches if results are unexpected.", DrupalUser.Name, DrupalUser.Alias, User.Email, DrupalUser.Email)
+		d, e := exec.LookPath("drush")
+		if e != nil {
+			panic(e)
 		}
+		var Command = "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + DrupalUser.Email + "' WHERE name='" + DrupalUser.Name + "';\""
+		cmd := exec.Command(d, DrupalUser.Alias, Command)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Run()
+		cmd.Wait()
+
+		_, cmdErr := cmd.CombinedOutput()
+		log.Println(cmdErr)
+		if cmdErr != nil {
+			log.Warnf("User email address was not changed")
+			log.Println(Command)
+		} else {
+			fmt.Println("User email address was changed")
+		}
+	} else if User.Email == DrupalUser.Email {
+		fmt.Println("Email address already matches, not changing.")
 	}
 }
 
@@ -148,24 +160,30 @@ func (DrupalUser *DrupalUser) HasRole(Role string) bool {
 
 // RolesAdd will add all associated roles to the target user,
 // when not present in the DrupalUser object.
+//
+// TODO: This code calls duplicates where user already has a role.
 func (DrupalUser *DrupalUser) RolesAdd() {
 	UserGroup := NewDrupalUserGroup()
 	UserGroup.Populate(DrupalUser.Alias)
 	User := UserGroup.GetUser(DrupalUser.Name)
 	User.SetRoles()
+
 	for _, Role := range DrupalUser.Roles {
-		if Role != "authenticated user" {
-			if !User.HasRole(Role) {
-				var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", DrupalUser.Name, Role)
-				cmd := command.NewDrushCommand()
-				cmd.Set(DrupalUser.Alias, Command, false)
-				_, cmdErr := cmd.CombinedOutput()
-				if cmdErr != nil {
-					log.Warnf("Could not add role %v to use %v on site %v: %v", Role, DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
-				} else {
-					log.Infof("Added user %v to role %v on site %v.", DrupalUser.Name, Role, DrupalUser.Alias)
-				}
+		if !User.HasRole(Role) {
+			fmt.Println(!User.HasRole(Role))
+
+			d, e := exec.LookPath("drush")
+			if e != nil {
+				panic(e)
 			}
+			var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", DrupalUser.Name, Role)
+			cmd := exec.Command(d, DrupalUser.Alias, Command)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Run()
+			cmd.Wait()
+		} else {
+			fmt.Printf("User already has role '%v'\n", Role)
 		}
 	}
 }
@@ -182,15 +200,16 @@ func (DrupalUser *DrupalUser) RolesRemove() {
 	for _, Role := range DrupalUser.Roles {
 		if Role != "authenticated user" {
 			if User.HasRole(Role) {
-				var Command = fmt.Sprintf("user-remove-role --name='%v' '%v'", DrupalUser.Name, Role)
-				cmd := command.NewDrushCommand()
-				cmd.Set(DrupalUser.Alias, Command, false)
-				_, cmdErr := cmd.CombinedOutput()
-				if cmdErr != nil {
-					log.Warnf("Could not remove role %v on user %v on site %v: %v", Role, DrupalUser.Name, DrupalUser.Alias, cmdErr.Error())
-				} else {
-					log.Infof("Removed user %v from role %v on site %v.", DrupalUser.Name, Role, DrupalUser.Alias)
+				d, e := exec.LookPath("drush")
+				if e != nil {
+					panic(e)
 				}
+				var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", DrupalUser.Name, Role)
+				cmd := exec.Command(d, DrupalUser.Alias, Command)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				cmd.Wait()
 			}
 		}
 	}
