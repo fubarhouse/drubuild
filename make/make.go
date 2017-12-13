@@ -163,12 +163,13 @@ func (Site *Site) ActionInstall() {
 	}
 	// Drush site-install
 	thisCmd := fmt.Sprintf("-y site-install standard --sites-subdir=%v --db-url=mysql://%v:%v@%v:%v/%v", Site.Name, Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)
-	_, installErr := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd).Output()
-	if installErr != nil {
-		log.Warnln("Unable to install Drupal:", installErr)
-	} else {
-		log.Infoln("Installed Drupal.")
-	}
+	d := exec.Command("sh", "-c", "cd "+Site.Path+"/"+Site.Name+Site.Timestamp+" && drush "+thisCmd)
+	log.Println("Executing drush", d)
+	d.Stdout = os.Stdout
+	d.Stderr = os.Stderr
+	d.Run()
+	d.Wait()
+
 }
 
 // ActionKill will delete a single site instance.
