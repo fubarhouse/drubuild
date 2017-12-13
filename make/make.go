@@ -6,7 +6,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/drubuild/command"
-	"github.com/fubarhouse/drubuild/composer"
+	//"github.com/fubarhouse/drubuild/composer"
 	"github.com/fubarhouse/drubuild/makeupdater"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
 	"io/ioutil"
@@ -634,17 +634,17 @@ func (Site *Site) ProcessMake(Make Make) bool {
 	}
 
 	// Composer tasks when working with Drupal 8
-	if major, _ := makeupdater.GetCoreFromMake(Make.Path); major == 8 {
-		log.Println("Drupal 8 dependencies are being processed...")
-		Projects := composer.GetProjects(Make.Path)
-		composer.InstallProjects(Projects, drushMake.GetWorkingDir())
-		log.Println("Looking for composer.json files...")
-		composerFiles := composer.FindComposerJSONFiles(Site.Path)
-		if len(composerFiles) != 0 {
-			log.Printf("Installing dependencies for %v custom project(s).\n", len(composerFiles))
-			composer.InstallComposerJSONFiles(composerFiles)
-		}
-	}
+	//if major, _ := makeupdater.GetCoreFromMake(Make.Path); major == 8 {
+	//	log.Println("Drupal 8 dependencies are being processed...")
+	//	Projects := composer.GetProjects(Make.Path)
+	//	composer.InstallProjects(Projects, drushMake.GetWorkingDir())
+	//	log.Println("Looking for composer.json files...")
+	//	composerFiles := composer.FindComposerJSONFiles(Site.Path)
+	//	if len(composerFiles) != 0 {
+	//		log.Printf("Installing dependencies for %v custom project(s).\n", len(composerFiles))
+	//		composer.InstallComposerJSONFiles(composerFiles)
+	//	}
+	//}
 
 	return true
 }
