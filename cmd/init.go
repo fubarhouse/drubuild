@@ -52,8 +52,7 @@ var (
 	// drush_alias_template is the data for drush alias file.
 	// it was taken from the templates folder and serves as a backup
 	// when that file isn't available (not a go get install).
-	drush_alias_template = `
-<?php
+	drush_alias_template = `<?php
 	$aliases['{{ .Alias }}'] = array(
 		'root' => '{{ .Root }}',
 		'uri' => '{{ .Domain }}',
@@ -69,8 +68,7 @@ var (
 	// templates will need to be added/changed as required.
 	// it was taken from the templates folder and serves as a backup
 	// when that file isn't available (not a go get install).
-	vhost_template_data = `
-server {
+	vhost_template_data = `server {
     listen 80;
 
     server_name {{ .Domain }}
@@ -164,8 +162,7 @@ server {
 	// config_yml_template_data is the data for sites.php file.
 	// it was taken from the templates folder and serves as a backup
 	// when that file isn't available (not a go get install).
-	config_yml_template_data = `
----
+	config_yml_template_data = `---
 
 db_user: root
 db_pass: root
