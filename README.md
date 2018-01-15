@@ -76,7 +76,7 @@ The actual build process, which uses a composer.json file, and some other basic 
 
 There are many options here to control the process for site builds, folder hierarchy (specify a docroot in the folder) etc.
 ```
-drubuild build --name mysite --domain mysite.dev --destination /sites/mysite.dev --composer /composer.json
+drubuild build --name mysite --domain mysite.dev --destination /sites/mysite.dev --composer /composer.json --vhost --install
 ```
 
 ### Destroy
@@ -118,7 +118,7 @@ drubuild runner --aliases dev,test,preprod,prod --pattern mysite.%v --commands "
 
 The syncer will attempt to sync the databases and files between two Drush aliases. Note that this can be very dangerous if used incorrectly, and Drush doesn't support remote to remote syncs. The exact settings for this can be found in the Drush alias template.
 ```
-drubuild sync --source mysite.prod --destination mysite.local  --database --files
+drubuild sync --source mysite.prod --destination mysite.local  --database --files --yes
 ```
 
 ### User
@@ -150,7 +150,7 @@ Using config file: /home/vagrant/drubuild/config.yml
 2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/sites.php.tmpl with /home/vagrant/drubuild/sites.php.tmpl.
 2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/alias.tmpl with /home/vagrant/drubuild/alias.tmpl.
 2017/11/24 08:11:20 Replacing /vagrant/sites/mysiteone/drubuild/vhost.tmpl with /home/vagrant/drubuild/vhost.tmpl.
-vagrant@drupalvm2:/vagrant/sites/mysiteone$ drubuild build --name mysiteone --domain mysiteone.test --docroot web
+vagrant@drupalvm2:/vagrant/sites/mysiteone$ drubuild build --name mysiteone --domain mysiteone.test --docroot web --vhost --install
 Using config file: /vagrant/sites/mysiteone/drubuild/config.yml
 INFO[0000] Timestamp not specified, using 20171124081132
 INFO[0000] composer.json not found, copying from /vagrant/sites/mysiteone/composer.json
