@@ -107,7 +107,7 @@ var buildCmd = &cobra.Command{
 			x.SymReinstall()
 		}
 
-		if !noInstall {
+		if installDrupal {
 			x.ActionInstall()
 		}
 
@@ -160,7 +160,7 @@ func init() {
 	// Optional flags
 	buildCmd.Flags().StringVarP(&docroot, "docroot", "o", "docroot", "The folder to use for the built codebase.")
 	buildCmd.Flags().BoolVarP(&drupal, "drupal", "r", true, "Mark the build process as a Drupal build.")
-	buildCmd.Flags().BoolVarP(&noInstall, "no-install", "i", false, "Mark this build so that installation doesn't happen.")
+	buildCmd.Flags().BoolVarP(&installDrupal, "install", "i", false, "Mark this build so that installation doesn't happen.")
 	buildCmd.Flags().Int64VarP(&timestamp, "timestamp", "t", 0, "Optional timestamp in the format YYYYMMDDHHMMSS")
 	buildCmd.Flags().BoolVarP(&vhost, "vhost", "v", true, "Include a virtual host as configured with this build.")
 	buildCmd.Flags().BoolVarP(&preferSource, "prefer-source", "s", false, "Build with preference to source packages.")

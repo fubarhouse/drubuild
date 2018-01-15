@@ -119,10 +119,10 @@ var (
 	// name is the human-readable name for the target of this application.
 	name string
 
-	// noInstall marks the site build so that an installation will not trigger.
-	// this is useful when rebuilding a codebase with no intention of using the
+	// installDrupal marks the site build so that an installation will trigger.
+	// this is useful when rebuilding a codebase with intention of using the
 	// site, other than committing to source control.
-	noInstall bool
+	installDrupal bool
 
 	// pattern is a string which replaces the substring '%v' with another string
 	// when dealing with operational work - most commonly aliases.
