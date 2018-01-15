@@ -216,7 +216,7 @@ var (
 	// vhost is a bool which indicates that a virtual host should be created.
 	// it will default to true, so if you're rebuilding a codebase or an existing
 	// site, it would be logical to be able to skip that process.
-	vhost = true
+	vhost bool
 
 	// webserver is the name of the software package which handles HTTP
 	// and HTTPS requests. this variable simply represents the name of
