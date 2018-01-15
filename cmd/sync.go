@@ -34,11 +34,16 @@ var syncCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("Drush was not found in your $PATH")
 		}
+		var yesVal string
+		if yes {
+			yesVal = "--yes";
+		}
 		if syncFiles {
 			{
 				fsPu := fmt.Sprintf("@%v:%%files", source)
 				fdPu := fmt.Sprintf("@%v:%%files", destination)
-				c := exec.Command(d, "--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
+				c := exec.Command(d, yesVal, "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
+				c.Stdin = os.Stdin
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
 				c.Run()
@@ -47,7 +52,8 @@ var syncCmd = &cobra.Command{
 			{
 				fsPr := fmt.Sprintf("@%v:%%private", source)
 				fdPr := fmt.Sprintf("@%v:%%private", destination)
-				c := exec.Command(d, "--yes", "rsync", fsPr, fdPr, "--exclude-other-sites", "--exclude-conf")
+				c := exec.Command(d, yesVal, "rsync", fsPr, fdPr, "--exclude-other-sites", "--exclude-conf")
+				c.Stdin = os.Stdin
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
 				c.Run()
@@ -56,6 +62,7 @@ var syncCmd = &cobra.Command{
 		}
 		if syncDatabase {
 			c := exec.Command(d, "sql-sync", source, destination, "--yes")
+			c.Stdin = os.Stdin
 			c.Stdout = os.Stdout
 			c.Stderr = os.Stderr
 			c.Run()
@@ -77,6 +84,7 @@ func init() {
 	syncCmd.Flags().StringVarP(&destination, "destination", "d", dir, "Drush alias to use as destination")
 	syncCmd.Flags().BoolVarP(&syncDatabase, "database", "b", false, "Flag database for sync action.")
 	syncCmd.Flags().BoolVarP(&syncFiles, "files", "f", false, "Flag files for sync action.")
+	syncCmd.Flags().BoolVarP(&yes, "yes", "y", false, "Use command with --yes")
 
 	syncCmd.MarkFlagRequired("source")
 	syncCmd.MarkFlagRequired("destination")

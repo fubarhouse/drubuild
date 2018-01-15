@@ -246,6 +246,12 @@ var (
 	// the websrver variable. This assists to provide the webserver
 	// a pre-configured set of defaults for a working site.
 	virtualhost_template string
+
+	// yes is basically the --yes argument which gets passed to prevent
+	// prompt of action. defaults to false (nil value), and currently
+	// is only used by the sync command, due to its destructive nature
+	// syncing should not be forced unless specified by the user.
+	yes bool
 )
 
 // RootCmd represents the base command when called without any subcommands
