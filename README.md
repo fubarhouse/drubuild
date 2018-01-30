@@ -3,6 +3,7 @@
 # Drubuild
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
+![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
 
 ## Purpose
 
