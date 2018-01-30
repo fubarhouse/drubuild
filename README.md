@@ -3,6 +3,7 @@
 # Golang Drush
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
+![stability-deprecated](https://img.shields.io/badge/stability-deprecated-red.svg)
 
 ## Purpose
 
