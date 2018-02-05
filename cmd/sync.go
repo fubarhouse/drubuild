@@ -41,8 +41,8 @@ var syncCmd = &cobra.Command{
 				}
 				fsPu := fmt.Sprintf("%v:%%%v", source, name)
 				fdPu := fmt.Sprintf("%v:%%%v", destination, name)
-				if (yes) {
-					c := exec.Command(d, "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf", "--yes")
+				if yes {
+					c := exec.Command(d, "--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
 					c.Stdin = os.Stdin
 					c.Stdout = os.Stdout
 					c.Stderr = os.Stderr
@@ -60,7 +60,7 @@ var syncCmd = &cobra.Command{
 		}
 		if syncDatabase {
 			if yes {
-				c := exec.Command(d, "sql-sync", source, destination, "--yes")
+				c := exec.Command(d, "--yes", "sql-sync", source, destination)
 				c.Stdin = os.Stdin
 				c.Stdout = os.Stdout
 				c.Stderr = os.Stderr
