@@ -4,6 +4,16 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
 
+## Compatibility notice
+
+Until the tooling for Drush 9 becomes stable, this tool will work exclusively with Drush 7 and 8, but not 9.
+
+Drush 9 changes the alias requirements (template) and the commands available including syntax.
+
+After Drush 9 is stable and mature, an effort will be made towards compatibility exclusively to Drush 9.
+
+We will also audit and review a few things at the same time, and inventorize the use of each program (drush, drupal-console, drush-launcher, composer).
+
 ## Purpose
 
 Drubuild is a command-line application which builds and manages sites via some common composer and drush commands.
