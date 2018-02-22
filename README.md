@@ -2,7 +2,9 @@
 
 # Drubuild
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
+[![stability-stable](https://img.shields.io/badge/stability-stable-green.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild?style=for-the-badge)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)](https://raw.githubusercontent.com/fubarhouse/brand/master/LICENSE.txt)
 
 ## Compatibility notice
 
