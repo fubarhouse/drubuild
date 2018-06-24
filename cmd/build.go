@@ -24,7 +24,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-		"github.com/fubarhouse/drubuild/util/make"
+	"github.com/fubarhouse/drubuild/util/make"
+	c "github.com/fubarhouse/drubuild/util/composer"
 	"github.com/spf13/viper"
 	"path/filepath"
 )
@@ -62,12 +63,8 @@ var buildCmd = &cobra.Command{
 		db_host = viper.GetString("db_host")
 		db_port = viper.GetInt("db_port")
 
-		webserver = viper.GetString("webserver")
-
 		alias_template = viper.GetString("alias_template")
 		sites_php_template = viper.GetString("sites_php_template")
-		virtualhost_path = viper.GetString("virtualhost_path")
-		virtualhost_template = viper.GetString("virtualhost_template")
 
 		if docroot == "" {
 			log.Printf("docroot value is emptied, sub-folders will not be used.")
@@ -77,7 +74,7 @@ var buildCmd = &cobra.Command{
 			log.Printf("Timestamp not specified, using %v", timestamp)
 		}
 
-		x := make.NewSite("", name, destination, alias, webserver, domain, virtualhost_path, virtualhost_template)
+		x := make.NewSite(name, destination, alias, domain)
 		x.AliasTemplate = alias_template
 		x.Docroot = docroot
 		if alias == "" {
@@ -93,12 +90,8 @@ var buildCmd = &cobra.Command{
 
 		if composer != "" {
 			x.Composer = true
-			//composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, workingCopy, preferSource)
-		} else {
-			cmd.Usage()
-			fmt.Println()
-			log.Fatalln("makes and/or composer values were not specified")
-			os.Exit(1)
+			c.Copy(composer, x.Path)
+			c.Run([]string{"install", "-d="+ x.Path, "--working-copy", "--prefer-source"})
 		}
 
 		x.InstallSiteRef(sites_php_template)
@@ -108,15 +101,6 @@ var buildCmd = &cobra.Command{
 
 		if installDrupal {
 			x.ActionInstall()
-		}
-
-		if virtualhost_template != "" {
-			if _, err := os.Stat(virtualhost_template); err == nil {
-				log.Infof("Found template %v for usage", virtualhost_template)
-				x.Template = virtualhost_template
-			} else {
-				log.Warnln("Could not find configured virtual host template.")
-			}
 		}
 
 		if alias_template != "" {
@@ -180,9 +164,4 @@ func init() {
 
 	// Alias template
 	alias_template = viper.GetString("alias_template")
-
-	// Virtual host
-	webserver = viper.GetString("webserver")
-	virtualhost_path = viper.GetString("virtualhost_path")
-	virtualhost_template = viper.GetString("virtualhost_template")
 }

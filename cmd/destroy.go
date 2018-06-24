@@ -35,17 +35,13 @@ var destroyCmd = &cobra.Command{
 		db_host = viper.GetString("db_host")
 		db_port = viper.GetInt("db_port")
 
-		webserver = viper.GetString("webserver")
-
 		alias_template = viper.GetString("alias_template")
 		sites_php_template = viper.GetString("sites_php_template")
-		virtualhost_path = viper.GetString("virtualhost_path")
-		virtualhost_template = viper.GetString("virtualhost_template")
 
 		if alias == "" {
 			alias = domain
 		}
-		x := make.NewSite("none", name, destination, alias, "", domain, "", "")
+		x := make.NewSite(name, destination, alias, domain)
 		y := make.NewmakeDB(db_host, db_user, db_pass, db_port)
 		x.DatabaseSet(y)
 		x.Destroy()

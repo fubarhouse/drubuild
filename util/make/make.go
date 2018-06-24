@@ -26,8 +26,6 @@ type Site struct {
 	Domain        string
 	Docroot       string
 	database      *makeDB
-	Webserver     string
-	Vhostpath     string
 	Template      string
 	AliasTemplate string
 	FilePathPrivate            string
@@ -38,20 +36,16 @@ type Site struct {
 }
 
 // NewSite instantiates an instance of the struct Site
-func NewSite(make, name, path, alias, webserver, domain, vhostpath, template string) *Site {
+func NewSite(name, path, alias, domain string) *Site {
 	Site := &Site{}
 	Site.TimeStampReset()
 	Site.Name = name
 	Site.Path = path
-	Site.Webserver = webserver
 	Site.Alias = alias
 	Site.Domain = domain
-	Site.Vhostpath = vhostpath
-	Site.Template = template
 	Site.FilePathPrivate = "files/private"
 	Site.FilePathPublic = "" // For later implementation
 	Site.FilePathTemp = "files/private/temp"
-	Site.WorkingCopy = false
 	return Site
 }
 
@@ -82,7 +76,6 @@ func (Site *Site) ActionInstall() {
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.
 func (Site *Site) CleanCodebase() {
 	_ = filepath.Walk(Site.Path, func(path string, Info os.FileInfo, _ error) error {
-
 		realpath := strings.Split(Site.Path, "\n")
 		err := new(error)
 		for _, name := range realpath {
@@ -210,25 +203,5 @@ func (Site *Site) InstallSiteRef(Template string) {
 		log.Infof("Successfully templated multisite config to file %v", filename)
 	} else {
 		log.Warnf("Error templating multisite config to file %v", filename)
-	}
-}
-
-// ReplaceTextInFile reinstalls and verifies the ctools cache folder for the site struct.
-func (Site *Site) ReplaceTextInFile() {
-	// We need to remove and re-add the ctools cache directory as 0777.
-	cToolsDir := fmt.Sprintf("%v/%v%v/sites/%v/files/ctools", Site.Path, Site.Name, Site.Timestamp, Site.Name)
-	// Remove the directory!
-	cToolsErr := os.RemoveAll(cToolsDir)
-	if cToolsErr != nil {
-		log.Errorln("Couldn't remove", cToolsDir)
-	} else {
-		log.Infoln("Created", cToolsDir)
-	}
-	// Add the directory!
-	cToolsErr = os.Mkdir(cToolsDir, 0777)
-	if cToolsErr != nil {
-		log.Errorln("Couldn't remove", cToolsDir)
-	} else {
-		log.Infoln("Created", cToolsDir)
 	}
 }

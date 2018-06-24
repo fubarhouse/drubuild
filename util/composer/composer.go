@@ -16,7 +16,7 @@ type DrupalProject struct {
 }
 
 // copy will copy a file to a destination.
-func copy(src, dest string) error {
+func Copy(src, dest string) error {
 	data, err := ioutil.ReadFile(src)
 	if err != nil {
 		return errors.New("could not read " + src + ": " + err.Error())
