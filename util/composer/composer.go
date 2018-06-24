@@ -7,15 +7,7 @@ import (
 	"github.com/fubarhouse/drubuild/util/command"
 )
 
-// DrupalProject is a type to provide both name and verison of a given Drupal project.
-type DrupalProject struct {
-	Project string
-	Version string
-	Patch   string
-	Subdir  string
-}
-
-// copy will copy a file to a destination.
+// Copy will copy a file to a destination.
 func Copy(src, dest string) error {
 	data, err := ioutil.ReadFile(src)
 	if err != nil {

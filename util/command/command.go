@@ -13,9 +13,15 @@ import (
 // Run a composer command with the input arguments.
 func Run(name string, args []string) (string, error) {
 
+	bin, err := exec.LookPath(name)
+	if err != nil {
+		log.Errorln(err)
+		return "", err
+	}
+
 	// Generate the command, based on input.
 	cmd := exec.Cmd{}
-	cmd.Path = name
+	cmd.Path = bin
 	cmd.Args = []string{cmd.Path}
 
 	// Add our arguments to the command.
