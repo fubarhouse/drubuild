@@ -16,12 +16,12 @@ package cmd
 
 import (
 	"fmt"
-	"os/exec"
-	"log"
+		"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // importCmd represents the import command
@@ -30,11 +30,6 @@ var importCmd = &cobra.Command{
 	Short: "Restore an archive-dump snapshot of a site to a local destination",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		d, err := exec.LookPath("drush")
-		if err != nil {
-			log.Fatal("Drush was not found in your $PATH")
-		}
-
 		db_user = viper.GetString("db_user")
 		db_pass = viper.GetString("db_pass")
 		db_host = viper.GetString("db_host")
@@ -44,31 +39,15 @@ var importCmd = &cobra.Command{
 
 		if docroot != "" {
 			if yes {
-				c := exec.Command(d, destination, "archive-restore", source, "--destination="+docroot, "--overwrite", db)
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{destination, "archive-restore", source, "--destination="+docroot, "--overwrite", db})
 			} else {
-				c := exec.Command(d, destination, "archive-restore", source, "--destination="+docroot, db)
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{destination, "archive-restore", source, "--destination="+docroot, db})
 			}
 		} else {
 			if yes {
-				c := exec.Command(d, destination, "archive-restore", source, "--overwrite", db)
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{destination, "archive-restore", source, "--overwrite", db})
 			} else {
-				c := exec.Command(d, destination, "archive-restore", source, db)
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{destination, "archive-restore", source, db})
 			}
 		}
 	},

@@ -2,9 +2,9 @@ package aliases
 
 import (
 	"fmt"
-	"github.com/fubarhouse/drubuild/alias"
-	"github.com/fubarhouse/drubuild/command"
-	"strings"
+	"github.com/fubarhouse/drubuild/util/alias"
+		"strings"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // AliasList struct to contain a slice of Alias structs
@@ -24,10 +24,8 @@ func (list *AliasList) Add(item *alias.Alias) {
 
 // Generate an AliasList from a given key from all available aliases
 func (list *AliasList) Generate(key string) {
-	sites := command.NewDrushCommand()
-	sites.Set("", "sa", false)
-	values, _ := sites.Output()
-	values = strings.Split(fmt.Sprintf("%v", values), "\n")
+	aliases, _ := drush.Run([]string{"sa"})
+	values := strings.Split(fmt.Sprintf("%v", aliases), "\n")
 	for _, currAlias := range values {
 		if strings.Contains(currAlias, key) == true {
 			thisAlias := alias.NewAlias(currAlias, "", "")

@@ -14,6 +14,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // Site struct which represents a build website being used.
@@ -75,17 +76,7 @@ func (Site *Site) ActionInstall() {
 	// Drush site-install
 	var sitePath string
 	sitePath = Site.Path + string(os.PathSeparator) + Site.Name + Site.Timestamp + string(os.PathSeparator) + Site.Docroot
-	d, e := exec.LookPath("drush")
-	if e != nil {
-		log.Fatalln(e)
-	}
-	a := []string{"site-install", "--root="+sitePath, "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)}
-	i := exec.Command(d, a...)
-	i.Dir = sitePath
-	i.Stderr = os.Stderr
-	i.Stdout = os.Stdout
-	i.Run()
-	i.Wait()
+	drush.Run([]string{"site-install", "--root="+sitePath, "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)})
 }
 
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.

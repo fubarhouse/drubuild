@@ -19,8 +19,8 @@ import (
 
 	"log"
 
-	"github.com/fubarhouse/drubuild/command"
-	"github.com/spf13/cobra"
+		"github.com/spf13/cobra"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // runnerCmd represents the runner command
@@ -35,12 +35,7 @@ var runnerCmd = &cobra.Command{
 			Alias = strings.Trim(Alias, " ")
 			for _, Command := range strings.Split(commands, ",") {
 				Command = strings.Trim(Command, " ")
-				DrushCommand := command.NewDrushCommand()
-				DrushCommand.SetAlias(Alias)
-				DrushCommand.SetCommand(Command)
-				if Command != "" {
-					DrushCommand.RawOutput()
-				}
+				drush.Run([]string{Alias, Command})
 			}
 		}
 	},

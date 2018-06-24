@@ -35,11 +35,6 @@ func (Site *Site) destroyAlias() {
 	Site.AliasUninstall()
 }
 
-// destroy_vhost is an API call for virtual-host un-installation.
-func (Site *Site) destroyVhost() {
-	Site.VhostUninstall()
-}
-
 // destroy_filesystem is an API call for site file system un-installation.
 func (Site *Site) destroyFilesystem() {
 	privateFilesPath := Site.Path
@@ -84,7 +79,6 @@ func (Site *Site) destroySites() {
 func (Site *Site) Destroy() {
 	Site.removeDatabases()
 	Site.destroyAlias()
-	Site.destroyVhost()
 	Site.destroyFilesystem()
 	Site.destroySites()
 	Site.destroySym()

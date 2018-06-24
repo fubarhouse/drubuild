@@ -3,8 +3,7 @@ package alias
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"os/user"
+		"os/user"
 	"strings"
 
 	"text/template"
@@ -12,6 +11,7 @@ import (
 	"io/ioutil"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // Alias is a struct for managing a single Drush Alias
@@ -34,10 +34,9 @@ func (a *Alias) SetTemplate(template string) {
 // NewAlias instantiates an Alias struct
 func NewAlias(name, path, alias string) *Alias {
 	alias = strings.Replace(alias, "@", "", -1)
-	Command := exec.Command("drush", "sa", "@"+alias)
-	CommandOut, _ := Command.CombinedOutput()
-	if strings.Contains(string(CommandOut), "Could not find the alias") {
-		log.Warnln(string(CommandOut))
+	c, _ := drush.Run([]string{"drush", "sa", "@"+alias})
+	if strings.Contains(c, "Could not find the alias") {
+		log.Warnln(c)
 		return &Alias{}
 	} else {
 		return &Alias{"", name, path, alias, ""}
@@ -132,8 +131,7 @@ func (Alias *Alias) Uninstall() {
 func (Alias *Alias) GetStatus() bool {
 	_, err := os.Stat(getHome() + "/.drush/" + Alias.GetURI() + ".alias.drushrc.php")
 	if err != nil {
-		Command := exec.Command("drush", "sa")
-		CommandOut, _ := Command.CombinedOutput()
+		CommandOut, _ := drush.Run([]string{"sa"})
 		if strings.Contains(string(CommandOut), Alias.GetName()) {
 			return true
 		} else {

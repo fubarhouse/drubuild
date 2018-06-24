@@ -23,8 +23,8 @@ import (
 
 	"fmt"
 
-	alias2 "github.com/fubarhouse/drubuild/alias"
-	"github.com/fubarhouse/drubuild/user"
+	alias2 "github.com/fubarhouse/drubuild/util/alias"
+	"github.com/fubarhouse/drubuild/util/user"
 	"github.com/spf13/cobra"
 )
 

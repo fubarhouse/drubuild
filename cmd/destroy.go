@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/drubuild/make"
+	"github.com/fubarhouse/drubuild/util/make"
 	"github.com/spf13/viper"
 	"log"
 	"os"

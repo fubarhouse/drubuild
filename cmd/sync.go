@@ -17,11 +17,10 @@ package cmd
 import (
 	"log"
 	"os"
-	"os/exec"
-
-	"fmt"
+		"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // syncCmd represents the backup command
@@ -30,10 +29,6 @@ var syncCmd = &cobra.Command{
 	Short: "Execute drush sql-sync or rsync between two drush aliases",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		d, err := exec.LookPath("drush")
-		if err != nil {
-			log.Fatal("Drush was not found in your $PATH")
-		}
 		if syncFiles {
 			{
 				if name == "" {
@@ -42,37 +37,17 @@ var syncCmd = &cobra.Command{
 				fsPu := fmt.Sprintf("%v:%%%v", source, name)
 				fdPu := fmt.Sprintf("%v:%%%v", destination, name)
 				if yes {
-					c := exec.Command(d, "--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
-					c.Stdin = os.Stdin
-					c.Stdout = os.Stdout
-					c.Stderr = os.Stderr
-					c.Run()
-					c.Wait()
+					drush.Run([]string{"--yes", "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf"})
 				} else {
-					c := exec.Command(d, "rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf")
-					c.Stdin = os.Stdin
-					c.Stdout = os.Stdout
-					c.Stderr = os.Stderr
-					c.Run()
-					c.Wait()
+					drush.Run([]string{"rsync", fsPu, fdPu, "--exclude-other-sites", "--exclude-conf"})
 				}
 			}
 		}
 		if syncDatabase {
 			if yes {
-				c := exec.Command(d, "--yes", "sql-sync", source, destination)
-				c.Stdin = os.Stdin
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{"--yes", "sql-sync", source, destination})
 			} else {
-				c := exec.Command(d, "sql-sync", source, destination)
-				c.Stdin = os.Stdin
-				c.Stdout = os.Stdout
-				c.Stderr = os.Stderr
-				c.Run()
-				c.Wait()
+				drush.Run([]string{"sql-sync", source, destination})
 			}
 		}
 	},

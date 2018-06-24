@@ -24,8 +24,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	composer2 "github.com/fubarhouse/drubuild/composer"
-	"github.com/fubarhouse/drubuild/make"
+		"github.com/fubarhouse/drubuild/util/make"
 	"github.com/spf13/viper"
 	"path/filepath"
 )
@@ -94,7 +93,7 @@ var buildCmd = &cobra.Command{
 
 		if composer != "" {
 			x.Composer = true
-			composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, workingCopy, preferSource)
+			//composer2.InstallComposerCodebase(x.Name, x.TimeStampGet(), composer, x.Path, workingCopy, preferSource)
 		} else {
 			cmd.Usage()
 			fmt.Println()
@@ -118,10 +117,6 @@ var buildCmd = &cobra.Command{
 			} else {
 				log.Warnln("Could not find configured virtual host template.")
 			}
-		}
-
-		if vhost {
-			x.VhostInstall()
 		}
 
 		if alias_template != "" {

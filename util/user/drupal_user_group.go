@@ -2,10 +2,9 @@ package user
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/fubarhouse/drubuild/command"
 	"strconv"
 	"strings"
+	"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // DrupalUserList is a custom type for a slice for Drupal Users in the form of a DrupalUser struct
@@ -53,29 +52,24 @@ func (DrupalUserList *DrupalUserList) GetUser(query string) DrupalUser {
 func (DrupalUserList *DrupalUserList) Populate(Alias string) {
 	DrupalUsers := []DrupalUser{}
 	var Command = fmt.Sprint("sqlq \"SELECT uid,name,mail,status FROM users;\"")
-	cmd := command.NewDrushCommand()
-	cmd.Set(Alias, Command, false)
-	cmdOut, cmdErr := cmd.CombinedOutput()
-	if cmdErr != nil {
-		log.Warnln("Could not execute Drush sql-query:", cmdErr.Error())
-	} else {
-		for _, UserID := range strings.Split(string(cmdOut), "\n") {
-			UserInfo := strings.Split(UserID, "\t")
-			if UserInfo[0] != "" && UserInfo[1] != "" {
-				UserState := 0
-				if UserInfo[3] == "1" {
-					UserState = 1
-				}
-				UserID, _ := strconv.Atoi(UserInfo[0])
-				DrupalUser := DrupalUser{
-					Alias, UserID, UserInfo[1], UserInfo[2], UserState, []string{},
-				}
-				DrupalUsers = append(DrupalUsers, DrupalUser)
+	cmdOut, _ := drush.Run([]string{Alias, Command})
+
+	for _, UserID := range strings.Split(cmdOut, "\n") {
+		UserInfo := strings.Split(UserID, "\t")
+		if UserInfo[0] != "" && UserInfo[1] != "" {
+			UserState := 0
+			if UserInfo[3] == "1" {
+				UserState = 1
 			}
+			UserID, _ := strconv.Atoi(UserInfo[0])
+			DrupalUser := DrupalUser{
+				Alias, UserID, UserInfo[1], UserInfo[2], UserState, []string{},
+			}
+			DrupalUsers = append(DrupalUsers, DrupalUser)
 		}
-		// Ensure previously inputted values do not get overridden.
-		for _, DrupalUser := range DrupalUsers {
-			*DrupalUserList = append(*DrupalUserList, DrupalUser)
-		}
+	}
+	// Ensure previously inputted values do not get overridden.
+	for _, DrupalUser := range DrupalUsers {
+		*DrupalUserList = append(*DrupalUserList, DrupalUser)
 	}
 }

@@ -15,11 +15,11 @@
 package cmd
 
 import (
-	"os/exec"
-	"log"
+		"log"
 	"os"
 
 	"github.com/spf13/cobra"
+		"github.com/fubarhouse/drubuild/util/drush"
 )
 
 // backupCmd represents the backup command
@@ -28,15 +28,7 @@ var backupCmd = &cobra.Command{
 	Short: "Take a archive-dump snapshot of a local site",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		d, err := exec.LookPath("drush")
-		if err != nil {
-			log.Fatal("Drush was not found in your $PATH")
-		}
-		c := exec.Command(d, source, "archive-dump", "--destination=" + destination)
-		c.Stdout = os.Stdout
-		c.Stderr = os.Stderr
-		c.Run()
-		c.Wait()
+		drush.Run([]string{source, "archive-dump", "--destination=" + destination})
 	},
 }
 

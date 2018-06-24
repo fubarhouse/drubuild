@@ -18,12 +18,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
-	c "github.com/fubarhouse/drubuild/composer"
+	c "github.com/fubarhouse/drubuild/util/composer"
 
-	"errors"
-	"github.com/spf13/cobra"
+		"github.com/spf13/cobra"
 )
 
 // projectCmd represents the project command
@@ -32,17 +30,8 @@ var projectCmd = &cobra.Command{
 	Short: "Install or remove a project.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ComposerCmd, err := exec.LookPath("composer")
-		if err != nil {
-			log.Fatal("Composer was not found in your $PATH")
-		}
 		if remove {
-			d := exec.Command(ComposerCmd, "remove", name)
-			d.Dir = destination
-			d.Stdout = os.Stdout
-			d.Stderr = os.Stderr
-			d.Run()
-			d.Wait()
+			c.Run([]string{"remove", name})
 		}
 		if add {
 			var r string
@@ -54,24 +43,19 @@ var projectCmd = &cobra.Command{
 			if version != "" {
 				name += ":" + version
 			}
-			d := exec.Command(ComposerCmd, r, name)
-			d.Dir = destination
-			d.Stdout = os.Stdout
-			d.Stderr = os.Stderr
-			d.Run()
-			d.Wait()
+			c.Run([]string{r, name})
 		}
 
-		if !workingCopy {
-			x, e := c.GetPath(destination, name)
-			if e != nil {
-				err := errors.New("could not find path associated to " + name)
-				err.Error()
-			}
-			if x != "" {
-				removeGitFromPath(x)
-			}
-		}
+		//if !workingCopy {
+		//	x, e := c.GetPath(destination, name)
+		//	if e != nil {
+		//		err := errors.New("could not find path associated to " + name)
+		//		err.Error()
+		//	}
+		//	if x != "" {
+		//		removeGitFromPath(x)
+		//	}
+		//}
 
 		if !add && !remove {
 			fmt.Println("No action selected, add --add or --remove for effect.")

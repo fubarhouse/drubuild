@@ -3,8 +3,8 @@ package make
 import (
 	"strings"
 
-	"github.com/fubarhouse/drubuild/alias"
-	"github.com/fubarhouse/drubuild/aliases"
+	"github.com/fubarhouse/drubuild/util/alias"
+	"github.com/fubarhouse/drubuild/util/aliases"
 )
 
 // AliasExists returns a boolean for the status of a given alias in a given list.

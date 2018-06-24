@@ -1,20 +1,14 @@
 <img style="float:left" alight="left" height="128px" width="100px" src="https://github.com/fubarhouse/ansible-role-golang/raw/master/gopher.png">
 
-# Drubuild
+# Drubuild 0.3.x
 
-[![stability-stable](https://img.shields.io/badge/stability-stable-green.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
+[![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
 [![Go Report Card](https://goreportcard.com/badge/github.com/fubarhouse/drubuild?style=for-the-badge)](https://goreportcard.com/report/github.com/fubarhouse/drubuild)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg?style=for-the-badge)](https://raw.githubusercontent.com/fubarhouse/brand/master/LICENSE.txt)
 
-## Compatibility notice
-
-Until the tooling for Drush 9 becomes stable, this tool will work exclusively with Drush 7 and 8, but not 9.
-
-Drush 9 changes the alias requirements (template) and the commands available including syntax.
-
-After Drush 9 is stable and mature, an effort will be made towards compatibility exclusively to Drush 9.
-
-We will also audit and review a few things at the same time, and inventorize the use of each program (drush, drupal-console, drush-launcher, composer).
+```
+version 0.3.x is experimental, please avoid use of this version.
+```
 
 ## Purpose
 
