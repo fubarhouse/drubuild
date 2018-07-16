@@ -109,6 +109,7 @@ var aliasCmd = &cobra.Command{
 			break
 
 		default:
+			log.Errorln("No valid argument was found, please run with 'install' or 'uninstall'")
 			break;
 		}
 	},
