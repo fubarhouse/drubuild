@@ -15,8 +15,8 @@
 package cmd
 
 import (
-		"github.com/spf13/cobra"
-		log "github.com/Sirupsen/logrus"
+	"github.com/spf13/cobra"
+	log "github.com/Sirupsen/logrus"
 	"os"
 	"fmt"
 	"os/user"
