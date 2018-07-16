@@ -52,7 +52,7 @@ func getDrushPath() string {
 // aliasCmd represents the alias command
 var aliasCmd = &cobra.Command{
 	Use:   "alias",
-	Short: "An isolated command for alias operations",
+	Short: "Drush alias install and uninstall operations",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
