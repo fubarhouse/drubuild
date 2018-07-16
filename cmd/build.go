@@ -63,7 +63,6 @@ var buildCmd = &cobra.Command{
 		db_host = viper.GetString("db_host")
 		db_port = viper.GetInt("db_port")
 
-		alias_template = viper.GetString("alias_template")
 		sites_php_template = viper.GetString("sites_php_template")
 
 		if docroot == "" {
@@ -101,26 +100,6 @@ var buildCmd = &cobra.Command{
 
 		if installDrupal {
 			x.ActionInstall()
-		}
-
-		if alias_template != "" {
-			if _, err := os.Stat(alias_template); err == nil {
-				x.AliasTemplate = alias_template
-			} else {
-				log.Warnln("alias file could not be found.")
-			}
-		}
-
-		if alias == "" {
-			x.Alias = domain
-		}
-
-		if drupal {
-			x.AliasInstall(docroot)
-		}
-
-		if !workingCopy {
-			removeGitFromPath(strings.Join([]string{x.Path, x.Domain + ".latest"}, string(os.PathSeparator)))
 		}
 
 		log.Infoln("Based upon the output above, you may need to restart the web service.")
@@ -162,6 +141,4 @@ func init() {
 	// Sites.php template
 	sites_php_template = viper.GetString("sites_php_template")
 
-	// Alias template
-	alias_template = viper.GetString("alias_template")
 }

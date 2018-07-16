@@ -1,14 +1,9 @@
 package alias
 
 import (
-	"fmt"
 	"os"
-		"os/user"
+	"os/user"
 	"strings"
-
-	"text/template"
-
-	"io/ioutil"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/drubuild/util/drush"
@@ -71,60 +66,6 @@ func (Alias *Alias) SetPath(value string) {
 // GetPath gets the path field for an alias struct
 func (Alias *Alias) GetPath() string {
 	return Alias.path
-}
-
-// Install an alias from an alias struct
-func (Alias *Alias) Install() {
-	Root := fmt.Sprintf("%v/%v.latest/%v/", Alias.GetPath(), Alias.GetURI(), Alias.Docroot)
-	data := map[string]string{
-		"Name":   Alias.GetName(),
-		"Root":   Root,
-		"Alias":  Alias.GetURI(),
-		"Domain": Alias.GetURI(),
-	}
-	usr, _ := user.Current()
-	filedir := usr.HomeDir + "/.drush"
-	filename := Alias.GetURI() + ".alias.drushrc.php"
-	fullpath := filedir + "/" + filename
-
-	t := template.New("alias")
-	if _, err := os.Stat(Alias.template); err == nil {
-		log.Infof("Found template %v for usage", Alias.template)
-		defaultData, _ := ioutil.ReadFile(Alias.template)
-		t.Parse(string(defaultData))
-	} else {
-		log.Warnln("alias template file could not be found.")
-	}
-
-	os.Remove(fullpath)
-	file, _ := os.Create(fullpath)
-	tplErr := t.Execute(file, data)
-
-	if tplErr == nil {
-		log.Infof("Successfully templated alias to file %v", fullpath)
-	} else {
-		log.Warnf("Error templating alias to file %v", fullpath)
-	}
-}
-
-// Uninstall un-installs an alias from an alias struct
-func (Alias *Alias) Uninstall() {
-	usr, _ := user.Current()
-	filedir := usr.HomeDir + "/.drush"
-	filename := Alias.GetURI() + ".alias.drushrc.php"
-	fullpath := filedir + "/" + filename
-	_, statErr := os.Stat(fullpath)
-	if statErr == nil {
-		err := os.Remove(fullpath)
-		if err != nil {
-			log.Warnln("Could not remove alias file", fullpath)
-		} else {
-			log.Infoln("Removed alias file", fullpath)
-		}
-	} else {
-		log.Warnln("Alias file was not found.", fullpath)
-	}
-
 }
 
 // GetStatus returns the installation status of an alias struct

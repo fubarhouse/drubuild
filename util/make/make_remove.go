@@ -30,11 +30,6 @@ func (Site *Site) removeDatabases() {
 	}
 }
 
-// destroy_alias is an API call for alias un-installation.
-func (Site *Site) destroyAlias() {
-	Site.AliasUninstall()
-}
-
 // destroy_filesystem is an API call for site file system un-installation.
 func (Site *Site) destroyFilesystem() {
 	privateFilesPath := Site.Path
@@ -78,7 +73,6 @@ func (Site *Site) destroySites() {
 // Destroy is an API call for site removal.
 func (Site *Site) Destroy() {
 	Site.removeDatabases()
-	Site.destroyAlias()
 	Site.destroyFilesystem()
 	Site.destroySites()
 	Site.destroySym()

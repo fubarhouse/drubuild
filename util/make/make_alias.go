@@ -2,8 +2,6 @@ package make
 
 import (
 	"strings"
-
-	"github.com/fubarhouse/drubuild/util/alias"
 	"github.com/fubarhouse/drubuild/util/aliases"
 )
 
@@ -17,24 +15,4 @@ func (Site *Site) AliasExists(filter string) bool {
 		}
 	}
 	return false
-}
-
-// AliasInstall installs an alias for a given site struct
-func (Site *Site) AliasInstall(docroot string) {
-	var siteAlias alias.Alias
-	siteAlias.Docroot = docroot
-	siteAlias.SetName(Site.Name)
-	siteAlias.SetPath(Site.Path)
-	siteAlias.SetURI(Site.Alias)
-	siteAlias.SetTemplate(Site.AliasTemplate)
-	siteAlias.Install()
-}
-
-// AliasUninstall un-installs an alias for a given site struct
-func (Site *Site) AliasUninstall() {
-	var siteAlias alias.Alias
-	siteAlias.SetName(Site.Name)
-	siteAlias.SetPath(Site.Path)
-	siteAlias.SetURI(Site.Alias)
-	siteAlias.Uninstall()
 }
