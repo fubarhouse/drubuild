@@ -27,14 +27,18 @@ import (
 // AliasTemplate is a basic Drush alias template
 var AliasTemplate = `
 <?php
-	$aliases['{{ .Alias }}'] = array(
-		'root' => '{{ .Root }}',
-		'uri' => '{{ .Domain }}',
-		'path-aliases' => array(
-			'%files' => 'sites/{{ .Name }}/files',
-			'%private' => 'sites/{{ .Name }}/private',
-		),
-	);
+  /**
+   * Drush alias file for {{ .Name }}.
+   * Generated via Drubuild 0.3.x.
+   */
+  $aliases['{{ .Alias }}'] = array(
+	'root' => '{{ .Root }}',
+  	  'uri' => '{{ .Domain }}',
+	  'path-aliases' => array(
+		'%%files' => 'sites/{{ .Name }}/files',
+		'%%private' => 'sites/{{ .Name }}/private',
+	  ),
+  );
 ?>
 `
 
