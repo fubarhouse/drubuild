@@ -15,15 +15,6 @@ type Alias struct {
 	name     string
 	path     string
 	uri      string
-	template string
-}
-
-func (a *Alias) Template() string {
-	return a.template
-}
-
-func (a *Alias) SetTemplate(template string) {
-	a.template = template
 }
 
 // NewAlias instantiates an Alias struct
@@ -34,7 +25,7 @@ func NewAlias(name, path, alias string) *Alias {
 		log.Warnln(c)
 		return &Alias{}
 	} else {
-		return &Alias{"", name, path, alias, ""}
+		return &Alias{"", name, path, alias}
 	}
 }
 
