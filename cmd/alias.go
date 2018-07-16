@@ -56,6 +56,15 @@ var aliasCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// Alias should default to the domain.
+		if alias == "" {
+			alias = domain
+		}
+		// Name should default to the domain.
+		if name == "" {
+			name = domain
+		}
+
 		switch args[0] {
 		case "install":
 
@@ -69,10 +78,6 @@ var aliasCmd = &cobra.Command{
 				log.Errorln("Could not create file", fullpath, err)
 				os.Exit(1)
 			} else {
-				if (name == "" || alias == "" || destination == "") {
-					log.Errorln("Flags name, alias and destination are required for installation, run with --help for more information")
-					os.Exit(1)
-				}
 				defer file.Close()
 				w := bufio.NewWriter(file)
 				AliasTemplate = strings.Replace(AliasTemplate, "{{ .Alias }}", alias, -1);
@@ -112,11 +117,18 @@ var aliasCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(aliasCmd)
 
+	// Get $PWD
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	// Declare flags.
-	aliasCmd.Flags().StringVarP(&name, "directory", "d", "", "The directory name under /sites which contains settings.php")
-	aliasCmd.Flags().StringVarP(&alias, "alias", "a", "", "The drush alias for this site")
-	aliasCmd.Flags().StringVarP(&destination, "root", "r", "", "The path to the root of the site")
+	aliasCmd.Flags().StringVarP(&destination, "root", "r", pwd, "The path to the root of the site")
 	aliasCmd.Flags().StringVarP(&domain, "url", "u", "", "The domain of the site not including protocol or trailing slashes")
+	aliasCmd.Flags().StringVarP(&alias, "alias", "a", domain, "The drush alias for this site")
+	aliasCmd.Flags().StringVarP(&name, "directory", "d", domain, "The directory name under /sites which contains settings.php")
 
 	// Declare required flags.
 	aliasCmd.MarkFlagRequired("url")
