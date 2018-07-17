@@ -132,12 +132,6 @@ func init() {
 	buildCmd.MarkFlagRequired("destination")
 	buildCmd.MarkFlagRequired("domain")
 
-	// Database
-	db_user = viper.GetString("db_user")
-	db_pass = viper.GetString("db_pass")
-	db_host = viper.GetString("db_host")
-	db_port = viper.GetInt("db_port")
-
 	// Sites.php template
 	sites_php_template = viper.GetString("sites_php_template")
 

@@ -67,10 +67,6 @@ func (Site *Site) ActionInstall() {
 	if dbErr != nil {
 		panic(dbErr)
 	}
-	// Drush site-install
-	var sitePath string
-	sitePath = Site.Path + string(os.PathSeparator) + Site.Name + Site.Timestamp + string(os.PathSeparator) + Site.Docroot
-	drush.Run([]string{"site-install", "--root="+sitePath, "--yes", "--sites-subdir="+Site.Name, fmt.Sprintf("--db-url=mysql://%v:%v@%v:%v/%v", Site.database.getUser(), Site.database.getPass(), Site.database.getHost(), Site.database.getPort(), dbName)})
 }
 
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.
@@ -161,47 +157,4 @@ func (Site *Site) TimeStampReset() {
 	now := time.Now()
 	r := rand.Intn(100) * rand.Intn(100)
 	Site.Timestamp = fmt.Sprintf(".%v_%v", now.Format("20060102150405"), r)
-}
-
-// InstallSiteRef installs the Drupal multisite sites.php file for the site struct.
-func (Site *Site) InstallSiteRef(Template string) {
-
-	if Template == "" {
-		log.Warnln("no template specified for sites.php")
-		return
-	}
-
-	data := map[string]string{
-		"Name":  Site.Name,
-		"Alias": Site.Alias,
-	}
-	var dirPath string
-	dirPath = Site.Path + "/" + Site.Name + Site.Timestamp + "/" + Site.Docroot + "/sites/"
-	dirErr := os.MkdirAll(dirPath+Site.Name, 0755)
-	if dirErr != nil {
-		log.Errorln("Unable to create directory", dirPath+Site.Name, dirErr)
-	} else {
-		log.Infoln("Created directory", dirPath+Site.Name)
-	}
-
-	dirErr = os.Chmod(dirPath+Site.Name, 0775)
-	if dirErr != nil {
-		log.Errorln("Could not set permissions 0755 on", dirPath+Site.Name, dirErr)
-	} else {
-		log.Infoln("Permissions set to 0755 on", dirPath+Site.Name)
-	}
-
-	filename := dirPath + "/sites.php"
-
-	t := template.New("sites.php")
-	defaultData, _ := ioutil.ReadFile(Template)
-	t.Parse(string(defaultData))
-	file, _ := os.Create(filename)
-	tplErr := t.Execute(file, data)
-
-	if tplErr == nil {
-		log.Infof("Successfully templated multisite config to file %v", filename)
-	} else {
-		log.Warnf("Error templating multisite config to file %v", filename)
-	}
 }
