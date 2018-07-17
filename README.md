@@ -29,10 +29,6 @@ $ go get -u github.com/fubarhouse/drubuild
 
 ## Usage
 
-Before you can begin, you will need to run `drubuild init` to establish a set of templates and configuration settings at `$HOME/drubuild/`.
-
-After having made the templates and config available, you can run `drubuild` like any other console application.
-
 > Usage documentation for v0.3.x is not available, but will become available closer to the release.
 
 ## Responsibilities
