@@ -22,12 +22,15 @@ func Run(name string, args []string) (string, error) {
 	// Generate the command, based on input.
 	cmd := exec.Cmd{}
 	cmd.Path = bin
-	cmd.Args = []string{cmd.Path}
+	cmd.Args = []string{bin}
+
+	// Specify location for stdin, stdout & stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
 
 	// Add our arguments to the command.
-	for _, arg := range args {
-		cmd.Args = append(cmd.Args, arg)
-	}
+	cmd.Args = append(cmd.Args, args...)
 
 	// Create a buffer for the output.
 	var out bytes.Buffer
