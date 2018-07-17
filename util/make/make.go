@@ -3,19 +3,16 @@ package make
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"text/template"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	_ "github.com/go-sql-driver/mysql" // mysql is assumed under this system (for now).
-	"github.com/fubarhouse/drubuild/util/drush"
-)
+	)
 
 // Site struct which represents a build website being used.
 type Site struct {
