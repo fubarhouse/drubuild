@@ -34,7 +34,7 @@ func Run(name string, args []string) (string, error) {
 	multi := io.MultiWriter(&out, os.Stdout)
 
 	// Assign the output to the writer.
-	cmd.Stdout = multi
+	//cmd.Stdout = multi
 
 	// Check the errors, return as needed.
 	if err := cmd.Run(); err != nil {
