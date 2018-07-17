@@ -73,7 +73,7 @@ var buildCmd = &cobra.Command{
 			cargs = append(cargs, "--prefer-source")
 		}
 		if workingCopy {
-			cargs = append(cargs, "--working-copy")
+			cargs = append(cargs, "--prefer-dist")
 		}
 
 		log.Infoln("Running composer...")
