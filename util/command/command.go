@@ -1,13 +1,11 @@
 package command
 
 import (
-	"os"
-	"os/exec"
+		"os/exec"
 
 	log "github.com/Sirupsen/logrus"
 	"bytes"
-	"io"
-)
+	)
 
 
 // Run a composer command with the input arguments.
@@ -31,7 +29,7 @@ func Run(name string, args []string) (string, error) {
 
 	// Create a buffer for the output.
 	var out bytes.Buffer
-	multi := io.MultiWriter(&out, os.Stdout)
+	//multi := io.MultiWriter(&out, os.Stdout)
 
 	// Assign the output to the writer.
 	//cmd.Stdout = multi
