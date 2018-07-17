@@ -77,7 +77,8 @@ var buildCmd = &cobra.Command{
 		}
 
 		log.Infoln("Running composer...")
-		c.Run(cargs)
+		out, _ := c.Run(cargs)
+		fmt.Println(string(out))
 	},
 }
 
