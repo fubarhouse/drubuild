@@ -68,7 +68,7 @@ var buildCmd = &cobra.Command{
 		timestamp, _ = strconv.ParseInt(time.Now().Format("20060102150405"), 0, 0)
 		c.Copy(composer, destination)
 
-		cargs := []string{"install", "-d='"+destination+"'"}
+		cargs := []string{"install", "--working-dir", destination}
 		if preferSource {
 			cargs = append(cargs, "--prefer-source")
 		}
