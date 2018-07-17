@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"path/filepath"
 	c "github.com/fubarhouse/drubuild/util/composer"
@@ -54,6 +55,16 @@ var buildCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		if _, err := os.Stat(destination); err != nil {
+			log.Infoln("Creating directory", destination)
+			dirErr := os.MkdirAll(destination, 0755)
+			if dirErr != nil {
+				log.Errorln("Unable to create directory", destination, dirErr)
+			} else {
+				log.Infoln("Created directory", destination)
+			}
+		}
+
 		timestamp, _ = strconv.ParseInt(time.Now().Format("20060102150405"), 0, 0)
 		c.Copy(composer, destination)
 
@@ -65,6 +76,7 @@ var buildCmd = &cobra.Command{
 			cargs = append(cargs, "--working-copy")
 		}
 
+		log.Infoln("Running composer...")
 		c.Run(cargs)
 	},
 }
