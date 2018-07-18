@@ -65,32 +65,32 @@ var userCmd = &cobra.Command{
 					User.Email = Email.Address
 
 					if user_create {
-						User.Create(user_password)
+						user.Create(alias, user_name, user_email, user_password)
 					} else {
 						log.Println("User creation not set, skipping.")
 					}
 
 					if user_block {
 						User.State = 0
-						User.Block()
+						user.Block(alias, User.Name)
 					} else if user_unblock {
 						User.State = 1
-						User.Unblock()
+						user.Unblock(alias, User.Name)
 					} else {
 						log.Println("Block/Unblock action not set, skipping.")
 					}
 
 					if user_password != "" {
-						User.SetPassword(user_password)
+						user.SetPassword(alias, User.Name, user_password)
 					} else {
 						log.Println("Password not set, skipping.")
 					}
 
-					User.EmailChange()
+					user.EmailChange(alias, user_name, user_email)
 
 					if user_role != "" {
 						User.Roles = append(User.Roles, user_role)
-						User.RolesAdd()
+						user.RolesAdd(alias, user_name, User.Roles)
 					} else {
 						log.Println("Role not set, skipping.")
 					}
@@ -113,7 +113,7 @@ var userCmd = &cobra.Command{
 				if User.Name == user_name {
 					if User.State == 0 {
 						User.State = 1
-						User.Block()
+						user.Block(alias, User.Name)
 					} else {
 						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
 					}
@@ -135,12 +135,12 @@ var userCmd = &cobra.Command{
 				User.Alias = Alias
 				User.Name = user_name
 				User.Email = user_email
-				User.Create(user_password)
+				user.Create(alias, user_name, user_email, user_password)
 				if user_role != "" {
-					if !User.HasRole(user_role) {
+					if !user.HasRole(User.Alias, User.Name, user_role) {
 						User.Roles = append(User.Roles, user_role)
 					}
-					User.RolesAdd()
+					user.RolesAdd(alias, user_name, User.Roles)
 				}
 			}
 			return
@@ -154,7 +154,7 @@ var userCmd = &cobra.Command{
 				UserGroup.Populate(Alias)
 				User := UserGroup.GetUser(user_name)
 				if User.Name == user_name {
-					User.Delete()
+					user.Delete(alias, name)
 				} else {
 					log.Printf("User '%v' was not found on %v", user_name, Alias)
 				}
@@ -173,7 +173,7 @@ var userCmd = &cobra.Command{
 				if User.Name == user_name {
 					if User.State == 1 {
 						User.State = 0
-						User.Unblock()
+						user.Unblock(alias, User.Name)
 					} else {
 						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
 					}

@@ -17,16 +17,10 @@ type DrupalUser struct {
 	Roles []string
 }
 
-// NewDrupalUser generates a new DrupalUser object.
-func NewDrupalUser() DrupalUser {
-	return DrupalUser{}
-}
-
 // SetRoles will allocate a valid and accurate value to the Roles field in a given DrupalUser object.
-func (DrupalUser *DrupalUser) SetRoles() {
-	var RolesCommand = fmt.Sprintf("user-information '%v' --fields=roles | cut -d: -f2", DrupalUser.Name)
-	cmdRolesOut, _ := drush.Run([]string{DrupalUser.Alias, RolesCommand})
-
+func SetRole(alias, name string) {
+	var RolesCommand = fmt.Sprintf("user-information '%v' --fields=roles | cut -d: -f2", name)
+	cmdRolesOut, _ := drush.Run([]string{alias, RolesCommand})
 	Roles := []string{}
 	for _, Role := range strings.Split(cmdRolesOut, "\n") {
 		Role = strings.TrimSpace(Role)
@@ -34,64 +28,59 @@ func (DrupalUser *DrupalUser) SetRoles() {
 			Roles = append(Roles, Role)
 		}
 	}
-	DrupalUser.Roles = Roles
 }
 
 // Delete will delete a user from a Drupal site, but only if it exists.
-func (DrupalUser *DrupalUser) Delete() {
-	var Command = fmt.Sprintf("user-cancel --yes '%v'", DrupalUser.Name)
-	drush.Run([]string{DrupalUser.Alias, Command})
+func Delete(alias, name string) {
+	var Command = fmt.Sprintf("user-cancel --yes '%v'", name)
+	drush.Run([]string{alias, Command})
 }
 
 // Create will create a user from a Drupal site, but only if does not exist.
-func (DrupalUser *DrupalUser) Create(Password string) {
-	var Command = fmt.Sprintf("user-create '%v' --mail='%v' --password='%v'", DrupalUser.Name, DrupalUser.Email, Password)
-	drush.Run([]string{DrupalUser.Alias, Command})
+func Create(alias, name, email, password string) {
+	var Command = fmt.Sprintf("user-create '%v' --mail='%v' --password='%v'", name, email, password)
+	drush.Run([]string{alias, Command})
 }
 
 // Unblock will change the status of the user to the value specified in *DrupalUser.State
 // There is a built-in verification process here, so a separate verification method is not required.
-func (DrupalUser *DrupalUser) Unblock() {
-	var Command = fmt.Sprintf("%v '%v'", "user-unblock", DrupalUser.Name)
-	drush.Run([]string{DrupalUser.Alias, Command})
+func Unblock(alias, name string) {
+	var Command = fmt.Sprintf("%v '%v'", "user-unblock", name)
+	drush.Run([]string{alias, Command})
 }
 
 // Block will change the status of the user to the value specified in *DrupalUser.State
 // There is a built-in verification process here, so a separate verification method is not required.
-func (DrupalUser *DrupalUser) Block() {
-	var Command = fmt.Sprintf("%v '%v'", "user-block", DrupalUser.Name)
-	drush.Run([]string{DrupalUser.Alias, Command})
+func Block(alias, name string) {
+	var Command = fmt.Sprintf("%v '%v'", "user-block", name)
+	drush.Run([]string{alias, Command})
 }
 
 // SetPassword will set the password of a user.
 // Action will be performed, as there is no password validation available.
-func (DrupalUser *DrupalUser) SetPassword(Password string) {
-	var Command = fmt.Sprintf("user-password \"%v\" --password=\"%v\"", DrupalUser.Name, Password)
-	drush.Run([]string{DrupalUser.Alias, Command})
+func SetPassword(alias, name, password string) {
+	var Command = fmt.Sprintf("user-password \"%v\" --password=\"%v\"", name, password)
+	drush.Run([]string{alias, Command})
 }
 
 // EmailChange will change the email of the target if the email address
 // does not match the email address in the DrupalUser object.
-func (DrupalUser *DrupalUser) EmailChange() {
+func EmailChange(alias, name, email string) {
 	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	User := UserGroup.GetUser(DrupalUser.Name)
-	if User.Email != DrupalUser.Email && UserGroup.FindUser(DrupalUser.Name) {
-		var Command = "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + DrupalUser.Email + "' WHERE name='" + DrupalUser.Name + "';\""
-		drush.Run([]string{DrupalUser.Alias, Command})
+	UserGroup.Populate(alias)
+	User := UserGroup.GetUser(name)
+	if User.Email != email && UserGroup.FindUser(name) {
+		var Command = "sqlq \"UPDATE users SET init='" + User.Email + "', mail='" + email + "' WHERE name='" + name + "';\""
+		drush.Run([]string{alias, Command})
 
-	} else if User.Email == DrupalUser.Email {
+	} else if User.Email == email {
 		fmt.Println("Email address already matches, not changing.")
 	}
 }
 
 // HasRole will determine if the user has a given String in the list of roles, which will return as a Boolean.
-func (DrupalUser *DrupalUser) HasRole(Role string) bool {
-	for _, value := range DrupalUser.Roles {
-		if value == Role {
-			return true
-		}
-	}
+func HasRole(alias, name, role string) bool {
+	// TODO: Rewrite.
 	return false
 }
 
@@ -99,18 +88,17 @@ func (DrupalUser *DrupalUser) HasRole(Role string) bool {
 // when not present in the DrupalUser object.
 //
 // TODO: This code calls duplicates where user already has a role.
-func (DrupalUser *DrupalUser) RolesAdd() {
+func RolesAdd(alias, name string, roles []string) {
 	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	User := UserGroup.GetUser(DrupalUser.Name)
-	User.SetRoles()
+	UserGroup.Populate(alias)
+	SetRole(alias, name)
 
-	for _, Role := range DrupalUser.Roles {
-		if !User.HasRole(Role) {
-			fmt.Println(!User.HasRole(Role))
+	for _, Role := range roles {
+		if !HasRole(alias, name, Role) {
+			fmt.Println(!HasRole(alias, name, Role))
 
-			var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", DrupalUser.Name, Role)
-			drush.Run([]string{DrupalUser.Alias, Command})
+			var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", name, Role)
+			drush.Run([]string{alias, Command})
 		} else {
 			fmt.Printf("User already has role '%v'\n", Role)
 		}
@@ -119,18 +107,17 @@ func (DrupalUser *DrupalUser) RolesAdd() {
 
 // RolesRemove will remove all associated roles to the target user,
 // when present in the DrupalUser object.
-func (DrupalUser *DrupalUser) RolesRemove() {
+func RolesRemove(alias, name string, roles []string) {
 	// if not "authenticated user" {
 	// if user has role, and the role needs to be removed, remove the role. {
 	UserGroup := NewDrupalUserGroup()
-	UserGroup.Populate(DrupalUser.Alias)
-	User := UserGroup.GetUser(DrupalUser.Name)
-	User.SetRoles()
-	for _, Role := range DrupalUser.Roles {
+	UserGroup.Populate(alias)
+	SetRole(alias, name)
+	for _, Role := range roles {
 		if Role != "authenticated user" {
-			if User.HasRole(Role) {
-				var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", DrupalUser.Name, Role)
-				drush.Run([]string{DrupalUser.Alias, Command})
+			if HasRole(alias, name, Role) {
+				var Command = fmt.Sprintf("user-add-role --name='%v' '%v'", name, Role)
+				drush.Run([]string{alias, Command})
 			}
 		}
 	}

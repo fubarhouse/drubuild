@@ -18,20 +18,7 @@ func NewDrupalUserGroup() DrupalUserList {
 // FindUser will return a boolean if the query sting is found inside
 // the DrupalUser objects of a DrupalUserList of a DrupalUserList object.
 func (DrupalUserList *DrupalUserList) FindUser(query string) bool {
-	for _, DrupalUser := range *DrupalUserList {
-		// Search by User Name
-		if DrupalUser.Name == query {
-			return true
-		}
-		// Search by Email
-		if DrupalUser.Email == query {
-			return true
-		}
-		// Search by UID
-		if fmt.Sprint(DrupalUser.UID) == query {
-			return true
-		}
-	}
+	// TODO: Rewrite this!
 	return false
 }
 
@@ -40,7 +27,7 @@ func (DrupalUserList *DrupalUserList) GetUser(query string) DrupalUser {
 	for _, User := range *DrupalUserList {
 		// Search by User Name
 		if User.Name == query {
-			User.SetRoles()
+			SetRole(User.Alias, User.Name)
 			return User
 		}
 	}
