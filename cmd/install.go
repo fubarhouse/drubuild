@@ -100,7 +100,7 @@ func init() {
 	installCmd.Flags().StringVarP(&name, "name", "n", "default", "The database name")
 	installCmd.Flags().StringVarP(&source, "sites-subdir", "f", "default", "The sites directory")
 	installCmd.Flags().StringVarP(&domain, "domain", "d", "default", "The sites directory")
-	installCmd.Flags().StringVarP(&db_host, "host", "t", "", "The database host")
+	installCmd.Flags().StringVarP(&db_host, "host", "t", "127.0.0.1", "The database host")
 	installCmd.Flags().StringVarP(&db_pass, "password", "s", "", "The database password")
 	installCmd.Flags().StringVarP(&db_user, "user", "u", "", "The database user name")
 	installCmd.Flags().StringVarP(&destination, "path", "p", pwd, "The directory of the Drupal codebase")
