@@ -108,11 +108,7 @@ func init() {
 
 	// All inputs are mandatory because we use a multisite setup.
 	installCmd.MarkFlagRequired("name")
-	installCmd.MarkFlagRequired("sites-subdir")
 	installCmd.MarkFlagRequired("domain")
-	installCmd.MarkFlagRequired("host")
 	installCmd.MarkFlagRequired("password")
 	installCmd.MarkFlagRequired("user")
-	installCmd.MarkFlagRequired("path")
-	installCmd.MarkFlagRequired("port")
 }
