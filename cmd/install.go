@@ -97,7 +97,7 @@ func init() {
 	}
 
 	// Parameters/Flags
-	installCmd.Flags().StringVarP(&name, "name", "n", "default", "The database name")
+	installCmd.Flags().StringVarP(&name, "name", "n", "", "The database name")
 	installCmd.Flags().StringVarP(&source, "sites-subdir", "f", "default", "The sites directory")
 	installCmd.Flags().StringVarP(&domain, "domain", "d", "default", "The sites directory")
 	installCmd.Flags().StringVarP(&db_host, "host", "t", "127.0.0.1", "The database host")
