@@ -46,7 +46,87 @@ var userCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		if user_verify {
+		switch args[0] {
+		case "block":
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					if User.State == 0 {
+						User.State = 1
+						user.Block(alias, User.Name)
+					} else {
+						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
+					}
+				} else {
+					log.Printf("User '%v' was not found on %v\n", User.Name, Alias)
+				}
+			}
+			break;
+
+		case "create":
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				User.Alias = Alias
+				User.Name = user_name
+				User.Email = user_email
+				user.Create(alias, user_name, user_email, user_password)
+				if user_role != "" {
+					if !user.HasRole(User.Alias, User.Name, user_role) {
+						User.Roles = append(User.Roles, user_role)
+					}
+					user.RolesAdd(alias, user_name, User.Roles)
+				}
+			}
+			break;
+
+		case "delete":
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					user.Delete(alias, name)
+				} else {
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
+				}
+			}
+			break;
+
+		case "unblock":
+			for _, Alias := range strings.Split(aliases, ",") {
+				Alias = strings.Trim(Alias, " ")
+				Alias = strings.Replace(pattern, "%v", Alias, 1)
+				log.Printf("Beginning to work with alias %v.", Alias)
+				UserGroup := user.NewDrupalUserGroup()
+				UserGroup.Populate(Alias)
+				User := UserGroup.GetUser(user_name)
+				if User.Name == user_name {
+					if User.State == 1 {
+						User.State = 0
+						user.Unblock(alias, User.Name)
+					} else {
+						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
+					}
+				} else {
+					log.Printf("User '%v' was not found on %v", user_name, Alias)
+				}
+			}
+			break;
+
+		case "verify":
 			for _, ThisAlias := range strings.Split(aliases, ",") {
 				ThisAlias = strings.Trim(ThisAlias, " ")
 				ThisAlias = strings.Replace(pattern, "%v", ThisAlias, 1)
@@ -99,92 +179,9 @@ var userCmd = &cobra.Command{
 					log.Printf("Could not find alias %v\n", Alias.GetName())
 				}
 			}
-			return
-		}
+			break;
 
-		if user_block {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				log.Printf("Beginning to work with alias %v.", Alias)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					if User.State == 0 {
-						User.State = 1
-						user.Block(alias, User.Name)
-					} else {
-						log.Printf("User '%v' is already blocked on %v\n", User.Name, Alias)
-					}
-				} else {
-					log.Printf("User '%v' was not found on %v\n", User.Name, Alias)
-				}
-			}
-			return
-		}
-
-		if user_create {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				log.Printf("Beginning to work with alias %v.", Alias)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				User.Alias = Alias
-				User.Name = user_name
-				User.Email = user_email
-				user.Create(alias, user_name, user_email, user_password)
-				if user_role != "" {
-					if !user.HasRole(User.Alias, User.Name, user_role) {
-						User.Roles = append(User.Roles, user_role)
-					}
-					user.RolesAdd(alias, user_name, User.Roles)
-				}
-			}
-			return
-		}
-		if user_delete {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				log.Printf("Beginning to work with alias %v.", Alias)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					user.Delete(alias, name)
-				} else {
-					log.Printf("User '%v' was not found on %v", user_name, Alias)
-				}
-			}
-			return
-		}
-
-		if user_unblock {
-			for _, Alias := range strings.Split(aliases, ",") {
-				Alias = strings.Trim(Alias, " ")
-				Alias = strings.Replace(pattern, "%v", Alias, 1)
-				log.Printf("Beginning to work with alias %v.", Alias)
-				UserGroup := user.NewDrupalUserGroup()
-				UserGroup.Populate(Alias)
-				User := UserGroup.GetUser(user_name)
-				if User.Name == user_name {
-					if User.State == 1 {
-						User.State = 0
-						user.Unblock(alias, User.Name)
-					} else {
-						log.Printf("User '%v' is already unblocked on %v", User.Name, Alias)
-					}
-				} else {
-					log.Printf("User '%v' was not found on %v", user_name, Alias)
-				}
-			}
-			return
-		}
-
-		if !user_block && !user_create && !user_delete && !user_unblock && !user_verify {
+		default:
 			cmd.Usage()
 			fmt.Println()
 			log.Fatalln("no action specified.")
@@ -206,14 +203,7 @@ func init() {
 	userCmd.Flags().StringVarP(&aliases, "aliases", "a", "", "Comma-separated list of drush aliases")
 	userCmd.Flags().StringVarP(&pattern, "pattern", "p", "%v", "Pattern to match against drush aliases, where token is '%v'")
 
-	userCmd.Flags().BoolVarP(&user_block, "block", "b", false, "Execute user block action.")
-	userCmd.Flags().BoolVarP(&user_create, "create", "c", false, "Execute user create action.")
-	userCmd.Flags().BoolVarP(&user_delete, "delete", "d", false, "Execute user delete action.")
-	userCmd.Flags().BoolVarP(&user_unblock, "unblock", "u", false, "Execute user unblock action.")
-	userCmd.Flags().BoolVarP(&user_verify, "verify", "v", false, "Execute user verification action.")
-
 	userCmd.MarkFlagRequired("name")
-	userCmd.MarkFlagRequired("email")
 	userCmd.MarkFlagRequired("aliases")
 
 }
