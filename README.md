@@ -36,7 +36,9 @@ $ go get -u github.com/fubarhouse/drubuild
 Drubuild 0.3.x changes responsibilities from version 0.2.x, the changes include, but are not limited to the following:
 
 * Drubuild no longer handles virtual hosts or webservers to _any_ degree - there is _zero_ support.
+* Drubuild no longer interacts directly with databases - databases must be created and dropped by the developer.
 * Drubuild no longer is responsible for the features previously provided in the destroy command, the developer is responsible for the database and file system removal. Aliases can be uninstalled with Drubuild, or they can be deleted independently.
+* Drubuild no longer creates, changes or removes symlinks.
 * Site installation processes have been isolated to their own command, which should improve CI pipelines.
 * Drush alias processes have been isolated to their own command, which should improve CI pipelines.
 * There's no longer an initialise command, and templates are no longer allowed to stray from default, please submit a PR if you feel this content should deviate.
