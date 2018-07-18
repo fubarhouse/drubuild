@@ -74,7 +74,7 @@ var installCmd = &cobra.Command{
 				if _, err = fmt.Fprintf(w, sites_php_template_data); err != nil {
 					log.Errorln("Could not template file.", err)
 				}
-				log.Infoln("Drush alias successfully installed")
+				log.Infoln("sites.php successfully installed")
 				w.Flush()
 			}
 		}
