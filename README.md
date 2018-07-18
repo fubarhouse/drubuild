@@ -33,6 +33,8 @@ $ go get -u github.com/fubarhouse/drubuild
 
 ## Responsibilities
 
+A __lot__ has changed since 0.3.x, and due to extended usage of 0.2.x we've been able to drive the project forward in the way of simplicity, conciseness and ultimately value.
+
 Drubuild 0.3.x changes responsibilities from version 0.2.x, the changes include, but are not limited to the following:
 
 * Drubuild no longer handles virtual hosts or webservers to _any_ degree - there is _zero_ support.
