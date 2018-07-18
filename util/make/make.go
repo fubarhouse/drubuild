@@ -1,11 +1,9 @@
 package make
 
 import (
-	"database/sql"
 	"fmt"
 	"math/rand"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -22,7 +20,6 @@ type Site struct {
 	Alias         string
 	Domain        string
 	Docroot       string
-	database      *makeDB
 	Template      string
 	AliasTemplate string
 	FilePathPrivate            string
@@ -44,26 +41,6 @@ func NewSite(name, path, alias, domain string) *Site {
 	Site.FilePathPublic = "" // For later implementation
 	Site.FilePathTemp = "files/private/temp"
 	return Site
-}
-
-// ActionInstall runs drush site-install on a Site struct
-func (Site *Site) ActionInstall() {
-	// Obtain a string value from the Port value in db config.
-	stringPort := fmt.Sprintf("%v", Site.database.getPort())
-	// Open a mysql connection
-	db, dbErr := sql.Open("mysql", Site.database.getUser()+":"+Site.database.getPass()+"@tcp("+Site.database.dbHost+":"+stringPort+")/")
-	// Defer the connection
-	defer db.Close()
-	// Report any connection errors
-	if dbErr != nil {
-		log.Warnf("WARN:", dbErr)
-	}
-	// Create database
-	dbName := strings.Replace(Site.Name+Site.Timestamp, ".", "_", -1)
-	_, dbErr = db.Exec("CREATE DATABASE IF NOT EXISTS " + dbName)
-	if dbErr != nil {
-		panic(dbErr)
-	}
 }
 
 // CleanCodebase will remove all data from the site path other than the /sites folder and contents.
@@ -92,24 +69,6 @@ func (Site *Site) CleanCodebase() {
 		}
 		return *err
 	})
-}
-
-// DatabaseSet sets the database field to an inputted *makeDB struct.
-func (Site *Site) DatabaseSet(database *makeDB) {
-	Site.database = database
-}
-
-// DatabasesGet returns a list of databases associated to local builds from the site struct
-func (Site *Site) DatabasesGet() []string {
-	values, _ := exec.Command("mysql", "--user="+Site.database.dbUser, "--password="+Site.database.dbPass, "-e", "show databases").Output()
-	databases := strings.Split(string(values), "\n")
-	siteDbs := []string{}
-	for _, database := range databases {
-		if strings.HasPrefix(database, Site.Name+"_2") {
-			siteDbs = append(siteDbs, database)
-		}
-	}
-	return siteDbs
 }
 
 // SymInstall installs a symlink to the site directory of the site struct
